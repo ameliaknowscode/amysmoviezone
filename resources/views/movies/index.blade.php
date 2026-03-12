@@ -1,0 +1,77 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Movies') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+
+                    @if(session('success'))
+                        <p class="mb-4 text-green-600">{{ session('success') }}</p>
+                    @endif
+
+                    <div class="mb-4">
+                        <a href="{{ route('movies.create') }}" class="text-blue-600 hover:underline">+ Add Movie</a>
+                    </div>
+
+                    @if($movies->isEmpty())
+                        <p>No movies found.</p>
+                    @else
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 text-left">
+                                    <th class="border border-gray-300 px-4 py-2">ID</th>
+                                    <th class="border border-gray-300 px-4 py-2">Title</th>
+                                    <th class="border border-gray-300 px-4 py-2">Director</th>
+                                    <th class="border border-gray-300 px-4 py-2">
+                                        <a href="{{ route('movies.index', ['sort' => $direction === 'asc' ? 'desc' : 'asc']) }}"
+                                            class="flex items-center gap-1 hover:underline">
+                                            Release Year
+                                            @if($direction === 'asc')
+                                                <span>↑</span>
+                                            @else
+                                                <span>↓</span>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th class="border border-gray-300 px-4 py-2"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($movies as $movie)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="border border-gray-300 px-4 py-2">{{ $movie->id }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $movie->title }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $movie->director }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $movie->release_year }}</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">
+                                            <form method="POST" action="{{ route('movies.destroy', $movie) }}"
+                                                onsubmit="return confirm('Are you sure you want to delete this movie?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-500 hover:text-red-700" title="Delete movie">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <polyline points="3 6 5 6 21 6"/>
+                                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                                        <path d="M10 11v6"/>
+                                                        <path d="M14 11v6"/>
+                                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
