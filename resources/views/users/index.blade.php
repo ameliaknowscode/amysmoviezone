@@ -15,7 +15,7 @@
                     @endif
 
                     <div class="mb-4">
-                        <a href="{{ route('users.create') }}" class="text-blue-600 hover:underline">+ Create User</a>
+                        <a href="{{ route('admin.users.create') }}" class="text-blue-600 hover:underline">+ Create User</a>
                     </div>
 
                     @if($users->isEmpty())
@@ -39,7 +39,7 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $user->email }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $user->created_at->format('Y-m-d H:i') }}</td>
                                         <td class="border border-gray-300 px-4 py-2 text-center">
-                                            <form method="POST" action="{{ route('users.destroy', $user) }}"
+                                            <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
                                                 onsubmit="return confirm('Are you sure you want to delete this user?')">
                                                 @csrf
                                                 @method('DELETE')

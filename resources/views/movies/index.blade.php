@@ -15,7 +15,7 @@
                     @endif
 
                     <div class="mb-4">
-                        <a href="{{ route('movies.create') }}" class="text-blue-600 hover:underline">+ Add Movie</a>
+                        <a href="{{ route('admin.movies.create') }}" class="text-blue-600 hover:underline">+ Add Movie</a>
                     </div>
 
                     @if($movies->isEmpty())
@@ -28,7 +28,7 @@
                                     <th class="border border-gray-300 px-4 py-2">Title</th>
                                     <th class="border border-gray-300 px-4 py-2">Director</th>
                                     <th class="border border-gray-300 px-4 py-2">
-                                        <a href="{{ route('movies.index', ['sort' => $direction === 'asc' ? 'desc' : 'asc']) }}"
+                                        <a href="{{ route('admin.movies.index', ['sort' => $direction === 'asc' ? 'desc' : 'asc']) }}"
                                             class="flex items-center gap-1 hover:underline">
                                             Release Year
                                             @if($direction === 'asc')
@@ -49,7 +49,7 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $movie->director }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $movie->release_year }}</td>
                                         <td class="border border-gray-300 px-4 py-2 text-center">
-                                            <form method="POST" action="{{ route('movies.destroy', $movie) }}"
+                                            <form method="POST" action="{{ route('admin.movies.destroy', $movie) }}"
                                                 onsubmit="return confirm('Are you sure you want to delete this movie?')">
                                                 @csrf
                                                 @method('DELETE')

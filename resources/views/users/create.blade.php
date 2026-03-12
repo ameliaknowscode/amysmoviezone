@@ -18,7 +18,7 @@
                         </ul>
                     @endif
 
-                    <form method="POST" action="{{ route('users.store') }}">
+                    <form method="POST" action="{{ route('admin.users.store') }}">
                         @csrf
 
                         <div class="mb-4">
@@ -50,7 +50,7 @@
                                 class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700">
                                 Create User
                             </button>
-                            <a href="{{ route('users.index') }}" class="text-gray-600 hover:underline">Cancel</a>
+                            <a href="{{ route('admin.users.index') }}" class="text-gray-600 hover:underline">Cancel</a>
                         </div>
                     </form>
 

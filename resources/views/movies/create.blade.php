@@ -18,7 +18,7 @@
                         </ul>
                     @endif
 
-                    <form method="POST" action="{{ route('movies.store') }}">
+                    <form method="POST" action="{{ route('admin.movies.store') }}">
                         @csrf
 
                         <div class="mb-4">
@@ -45,7 +45,7 @@
                                 class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700">
                                 Add Movie
                             </button>
-                            <a href="{{ route('movies.index') }}" class="text-gray-600 hover:underline">Cancel</a>
+                            <a href="{{ route('admin.movies.index') }}" class="text-gray-600 hover:underline">Cancel</a>
                         </div>
                     </form>
 
