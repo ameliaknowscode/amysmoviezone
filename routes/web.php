@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActorController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -7,7 +8,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
+
+Route::get('/movies/search', [MovieController::class, 'search'])->name('movies.search');
+Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -32,6 +36,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
         Route::post('/movies', [MovieController::class, 'store'])->name('movies.store');
         Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
+
+        Route::get('/actors', [ActorController::class, 'index'])->name('actors.index');
+        Route::get('/actors/create', [ActorController::class, 'create'])->name('actors.create');
+        Route::post('/actors', [ActorController::class, 'store'])->name('actors.store');
+        Route::delete('/actors/{actor}', [ActorController::class, 'destroy'])->name('actors.destroy');
     });
 });
 
