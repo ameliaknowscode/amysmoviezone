@@ -29,13 +29,13 @@ class MovieController extends Controller
 
         Movie::create($validated);
 
-        return redirect()->route('movies.index')->with('success', 'Movie added successfully.');
+        return redirect()->route('admin.movies.index')->with('success', 'Movie added successfully.');
     }
 
     public function destroy(Movie $movie)
     {
         $movie->delete();
 
-        return redirect()->route('movies.index')->with('success', 'Movie deleted successfully.');
+        return redirect()->route('admin.movies.index')->with('success', 'Movie deleted successfully.');
     }
 }
