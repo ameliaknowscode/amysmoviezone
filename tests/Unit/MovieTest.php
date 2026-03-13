@@ -1,0 +1,49 @@
+<?php
+
+namespace Tests\Unit;
+
+use App\Models\Movie;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class MovieTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_movie_can_be_created_with_factory(): void
+    {
+        $movie = Movie::factory()->create();
+
+        $this->assertInstanceOf(Movie::class, $movie);
+        $this->assertNotNull($movie->id);
+    }
+
+    public function test_movie_has_correct_fillable_fields(): void
+    {
+        $movie = new Movie();
+
+        $this->assertEquals(['title', 'director', 'release_year'], $movie->getFillable());
+    }
+
+    public function test_movie_stores_all_fields_correctly(): void
+    {
+        Movie::factory()->create([
+            'title'        => 'Inception',
+            'director'     => 'Christopher Nolan',
+            'release_year' => 2010,
+        ]);
+
+        $this->assertDatabaseHas('movies', [
+            'title'        => 'Inception',
+            'director'     => 'Christopher Nolan',
+            'release_year' => 2010,
+        ]);
+    }
+
+    public function test_movie_release_year_is_an_integer(): void
+    {
+        $movie = Movie::factory()->create(['release_year' => 2005]);
+
+        $this->assertIsInt($movie->release_year);
+    }
+}

@@ -174,6 +174,86 @@ class MovieControllerTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
+    // Show (public — no auth required)
+    // -------------------------------------------------------------------------
+
+    public function test_show_returns_200_for_unauthenticated_user(): void
+    {
+        $movie = Movie::factory()->create();
+
+        $this->get(route('movies.show', $movie))
+            ->assertOk();
+    }
+
+    public function test_show_displays_movie_details(): void
+    {
+        $movie = Movie::factory()->create([
+            'title'        => 'The Matrix',
+            'director'     => 'Wachowski Sisters',
+            'release_year' => 1999,
+        ]);
+
+        $this->get(route('movies.show', $movie))
+            ->assertSee('The Matrix')
+            ->assertSee('Wachowski Sisters')
+            ->assertSee('1999');
+    }
+
+    public function test_show_returns_404_for_nonexistent_movie(): void
+    {
+        $this->get(route('movies.show', 999999))
+            ->assertNotFound();
+    }
+
+    // -------------------------------------------------------------------------
+    // Search (public — no auth required)
+    // -------------------------------------------------------------------------
+
+    public function test_search_returns_200_for_unauthenticated_user(): void
+    {
+        $this->get(route('movies.search'))
+            ->assertOk();
+    }
+
+    public function test_search_with_no_query_returns_empty_results(): void
+    {
+        Movie::factory()->count(3)->create();
+
+        $this->get(route('movies.search'))
+            ->assertViewHas('movies', function ($movies) {
+                return $movies->isEmpty();
+            });
+    }
+
+    public function test_search_finds_movies_by_partial_title(): void
+    {
+        Movie::factory()->create(['title' => 'The Matrix']);
+        Movie::factory()->create(['title' => 'Inception']);
+
+        $this->get(route('movies.search', ['q' => 'Matrix']))
+            ->assertSee('The Matrix')
+            ->assertDontSee('Inception');
+    }
+
+    public function test_search_is_case_insensitive(): void
+    {
+        Movie::factory()->create(['title' => 'The Matrix']);
+
+        $this->get(route('movies.search', ['q' => 'matrix']))
+            ->assertSee('The Matrix');
+    }
+
+    public function test_search_returns_empty_for_unmatched_query(): void
+    {
+        Movie::factory()->create(['title' => 'The Matrix']);
+
+        $this->get(route('movies.search', ['q' => 'zzznomatch']))
+            ->assertViewHas('movies', function ($movies) {
+                return $movies->isEmpty();
+            });
+    }
+
+    // -------------------------------------------------------------------------
     // Destroy
     // -------------------------------------------------------------------------
 
