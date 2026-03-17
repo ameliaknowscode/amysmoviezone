@@ -28,6 +28,12 @@
                         </div>
 
                         <div class="mb-4">
+                            <label for="username" class="block font-medium text-sm text-gray-700 mb-1">Username</label>
+                            <input type="text" id="username" name="username" value="{{ old('username') }}"
+                                class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                        </div>
+
+                        <div class="mb-4">
                             <label for="email" class="block font-medium text-sm text-gray-700 mb-1">Email</label>
                             <input type="email" id="email" name="email" value="{{ old('email') }}"
                                 class="w-full max-w-md border-gray-300 rounded-md shadow-sm">

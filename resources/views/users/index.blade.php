@@ -26,6 +26,7 @@
                                 <tr class="bg-gray-100 text-left">
                                     <th class="border border-gray-300 px-4 py-2">ID</th>
                                     <th class="border border-gray-300 px-4 py-2">Name</th>
+                                    <th class="border border-gray-300 px-4 py-2">Username</th>
                                     <th class="border border-gray-300 px-4 py-2">Email</th>
                                     <th class="border border-gray-300 px-4 py-2">Created At</th>
                                     <th class="border border-gray-300 px-4 py-2"></th>
@@ -36,6 +37,7 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">{{ $user->id }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $user->name }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $user->username ?? '—' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $user->email }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $user->created_at->format('Y-m-d H:i') }}</td>
                                         <td class="border border-gray-300 px-4 py-2 text-center">

@@ -74,6 +74,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
                 'name'                  => 'New User',
+                'username'              => 'new_user',
                 'email'                 => 'new@example.com',
                 'password'              => 'secret123',
                 'password_confirmation' => 'secret123',
@@ -82,8 +83,9 @@ class UserControllerTest extends TestCase
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('users', [
-            'name'  => 'New User',
-            'email' => 'new@example.com',
+            'name'     => 'New User',
+            'username' => 'new_user',
+            'email'    => 'new@example.com',
         ]);
     }
 
@@ -94,6 +96,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
                 'name'                  => 'Hash Test',
+                'username'              => 'hash_test',
                 'email'                 => 'hash@example.com',
                 'password'              => 'plainpassword',
                 'password_confirmation' => 'plainpassword',
@@ -110,11 +113,42 @@ class UserControllerTest extends TestCase
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
+                'username'              => 'test_user',
                 'email'                 => 'test@example.com',
                 'password'              => 'secret123',
                 'password_confirmation' => 'secret123',
             ])
             ->assertSessionHasErrors('name');
+    }
+
+    public function test_store_validates_required_username(): void
+    {
+        $actor = User::factory()->create();
+
+        $this->actingAs($actor)
+            ->post(route('admin.users.store'), [
+                'name'                  => 'Test User',
+                'email'                 => 'test@example.com',
+                'password'              => 'secret123',
+                'password_confirmation' => 'secret123',
+            ])
+            ->assertSessionHasErrors('username');
+    }
+
+    public function test_store_validates_unique_username(): void
+    {
+        User::factory()->create(['username' => 'taken_user']);
+        $actor = User::factory()->create();
+
+        $this->actingAs($actor)
+            ->post(route('admin.users.store'), [
+                'name'                  => 'Another User',
+                'username'              => 'taken_user',
+                'email'                 => 'another@example.com',
+                'password'              => 'secret123',
+                'password_confirmation' => 'secret123',
+            ])
+            ->assertSessionHasErrors('username');
     }
 
     public function test_store_validates_required_email(): void
@@ -124,6 +158,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
                 'name'                  => 'Test User',
+                'username'              => 'test_user',
                 'password'              => 'secret123',
                 'password_confirmation' => 'secret123',
             ])
@@ -138,6 +173,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
                 'name'                  => 'Another User',
+                'username'              => 'another_user',
                 'email'                 => 'taken@example.com',
                 'password'              => 'secret123',
                 'password_confirmation' => 'secret123',
@@ -152,6 +188,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
                 'name'                  => 'Test User',
+                'username'              => 'test_user',
                 'email'                 => 'test@example.com',
                 'password'              => 'secret123',
                 'password_confirmation' => 'different',
@@ -166,6 +203,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
                 'name'                  => 'Test User',
+                'username'              => 'test_user',
                 'email'                 => 'test@example.com',
                 'password'              => 'short',
                 'password_confirmation' => 'short',
