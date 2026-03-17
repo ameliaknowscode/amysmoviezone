@@ -431,23 +431,23 @@ class MovieControllerTest extends TestCase
             });
     }
 
-    public function test_search_finds_actors_by_name(): void
+    public function test_search_finds_people_by_name(): void
     {
-        Actor::factory()->create(['name' => 'Meryl Streep']);
-        Actor::factory()->create(['name' => 'Tom Hanks']);
+        Person::factory()->create(['name' => 'Meryl Streep']);
+        Person::factory()->create(['name' => 'Tom Hanks']);
 
         $this->get(route('search', ['q' => 'Meryl']))
             ->assertSee('Meryl Streep')
             ->assertDontSee('Tom Hanks');
     }
 
-    public function test_search_with_no_query_returns_empty_actors(): void
+    public function test_search_with_no_query_returns_empty_people(): void
     {
-        Actor::factory()->count(2)->create();
+        Person::factory()->count(2)->create();
 
         $this->get(route('search'))
-            ->assertViewHas('actors', function ($actors) {
-                return $actors->isEmpty();
+            ->assertViewHas('people', function ($people) {
+                return $people->isEmpty();
             });
     }
 
