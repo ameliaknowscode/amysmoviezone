@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Actor;
+use App\Models\Movie;
 use Illuminate\Http\Request;
 
 class ActorController extends Controller
@@ -15,7 +16,8 @@ class ActorController extends Controller
 
     public function create()
     {
-        return view('actors.create');
+        $movies = Movie::orderBy('title')->get();
+        return view('actors.create', compact('movies'));
     }
 
     public function store(Request $request)
@@ -24,16 +26,26 @@ class ActorController extends Controller
             'name'          => 'required|string|max:255',
             'date_of_birth' => 'nullable|date|before:today',
             'nationality'   => 'nullable|string|max:255',
+            'movie_ids'     => 'nullable|array',
+            'movie_ids.*'   => 'integer|exists:movies,id',
         ]);
 
-        Actor::create($validated);
+        $actor = Actor::create([
+            'name'          => $validated['name'],
+            'date_of_birth' => $validated['date_of_birth'] ?? null,
+            'nationality'   => $validated['nationality'] ?? null,
+        ]);
+
+        $actor->movies()->sync($validated['movie_ids'] ?? []);
 
         return redirect()->route('admin.actors.index')->with('success', 'Actor added successfully.');
     }
 
     public function edit(Actor $actor)
     {
-        return view('actors.edit', compact('actor'));
+        $movies = Movie::orderBy('title')->get();
+        $actor->load('movies');
+        return view('actors.edit', compact('actor', 'movies'));
     }
 
     public function update(Request $request, Actor $actor)
@@ -42,9 +54,17 @@ class ActorController extends Controller
             'name'          => 'required|string|max:255',
             'date_of_birth' => 'nullable|date|before:today',
             'nationality'   => 'nullable|string|max:255',
+            'movie_ids'     => 'nullable|array',
+            'movie_ids.*'   => 'integer|exists:movies,id',
         ]);
 
-        $actor->update($validated);
+        $actor->update([
+            'name'          => $validated['name'],
+            'date_of_birth' => $validated['date_of_birth'] ?? null,
+            'nationality'   => $validated['nationality'] ?? null,
+        ]);
+
+        $actor->movies()->sync($validated['movie_ids'] ?? []);
 
         return redirect()->route('admin.actors.index')->with('success', 'Actor updated successfully.');
     }
