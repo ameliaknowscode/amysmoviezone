@@ -211,7 +211,7 @@ class MovieControllerTest extends TestCase
 
     public function test_search_returns_200_for_unauthenticated_user(): void
     {
-        $this->get(route('movies.search'))
+        $this->get(route('search'))
             ->assertOk();
     }
 
@@ -219,7 +219,7 @@ class MovieControllerTest extends TestCase
     {
         Movie::factory()->count(3)->create();
 
-        $this->get(route('movies.search'))
+        $this->get(route('search'))
             ->assertViewHas('movies', function ($movies) {
                 return $movies->isEmpty();
             });
@@ -230,7 +230,7 @@ class MovieControllerTest extends TestCase
         Movie::factory()->create(['title' => 'The Matrix']);
         Movie::factory()->create(['title' => 'Inception']);
 
-        $this->get(route('movies.search', ['q' => 'Matrix']))
+        $this->get(route('search', ['q' => 'Matrix']))
             ->assertSee('The Matrix')
             ->assertDontSee('Inception');
     }
@@ -239,7 +239,7 @@ class MovieControllerTest extends TestCase
     {
         Movie::factory()->create(['title' => 'The Matrix']);
 
-        $this->get(route('movies.search', ['q' => 'matrix']))
+        $this->get(route('search', ['q' => 'matrix']))
             ->assertSee('The Matrix');
     }
 
@@ -247,7 +247,7 @@ class MovieControllerTest extends TestCase
     {
         Movie::factory()->create(['title' => 'The Matrix']);
 
-        $this->get(route('movies.search', ['q' => 'zzznomatch']))
+        $this->get(route('search', ['q' => 'zzznomatch']))
             ->assertViewHas('movies', function ($movies) {
                 return $movies->isEmpty();
             });

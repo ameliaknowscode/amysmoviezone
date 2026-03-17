@@ -37,11 +37,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/movies', [MovieController::class, 'index'])->name('movies.index');
         Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
         Route::post('/movies', [MovieController::class, 'store'])->name('movies.store');
+        Route::get('/movies/{movie}/edit', [MovieController::class, 'edit'])->name('movies.edit');
+        Route::patch('/movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
         Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
 
         Route::get('/actors', [ActorController::class, 'index'])->name('actors.index');
         Route::get('/actors/create', [ActorController::class, 'create'])->name('actors.create');
         Route::post('/actors', [ActorController::class, 'store'])->name('actors.store');
+        Route::get('/actors/{actor}/edit', [ActorController::class, 'edit'])->name('actors.edit');
+        Route::patch('/actors/{actor}', [ActorController::class, 'update'])->name('actors.update');
         Route::delete('/actors/{actor}', [ActorController::class, 'destroy'])->name('actors.destroy');
     });
 });

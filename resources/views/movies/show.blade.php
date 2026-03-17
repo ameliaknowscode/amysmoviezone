@@ -23,6 +23,20 @@
                             <dt class="text-sm font-medium text-gray-500">Release Year</dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ $movie->release_year }}</dd>
                         </div>
+                        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
+                            <dt class="text-sm font-medium text-gray-500">Cast</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                                @if($movie->actors->isEmpty())
+                                    <span class="text-gray-400">No cast listed.</span>
+                                @else
+                                    <ul class="space-y-1">
+                                        @foreach($movie->actors->sortBy('name') as $actor)
+                                            <li><a href="{{ route('actors.show', $actor) }}" class="text-indigo-600 hover:underline">{{ $actor->name }}</a></li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </dd>
+                        </div>
                     </dl>
 
                     <div class="mt-6">

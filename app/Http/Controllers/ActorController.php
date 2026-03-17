@@ -31,8 +31,27 @@ class ActorController extends Controller
         return redirect()->route('admin.actors.index')->with('success', 'Actor added successfully.');
     }
 
+    public function edit(Actor $actor)
+    {
+        return view('actors.edit', compact('actor'));
+    }
+
+    public function update(Request $request, Actor $actor)
+    {
+        $validated = $request->validate([
+            'name'          => 'required|string|max:255',
+            'date_of_birth' => 'nullable|date|before:today',
+            'nationality'   => 'nullable|string|max:255',
+        ]);
+
+        $actor->update($validated);
+
+        return redirect()->route('admin.actors.index')->with('success', 'Actor updated successfully.');
+    }
+
     public function show(Actor $actor)
     {
+        $actor->load('movies');
         return view('actors.show', compact('actor'));
     }
 
