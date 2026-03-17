@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Actor;
+use App\Models\Credit;
 use App\Models\Movie;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -57,5 +58,15 @@ class MovieTest extends TestCase
 
         $this->assertCount(2, $movie->actors);
         $this->assertInstanceOf(Actor::class, $movie->actors->first());
+    }
+
+    public function test_movie_has_many_credits(): void
+    {
+        $movie = Movie::factory()->create();
+        Credit::factory()->count(3)->create(['movie_id' => $movie->id]);
+
+        $movie->refresh();
+        $this->assertCount(3, $movie->credits);
+        $this->assertInstanceOf(Credit::class, $movie->credits->first());
     }
 }

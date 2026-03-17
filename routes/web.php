@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActorController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\PersonController;
+use App\Http\Controllers\PersonTypeCreditsController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
@@ -68,3 +69,6 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Wildcard — must be last so it cannot shadow any specific route above.
+Route::get('/{typeSlug}/{personSlug}', PersonTypeCreditsController::class)->name('credits.by-type');

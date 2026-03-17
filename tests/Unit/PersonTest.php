@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Models\Credit;
 use App\Models\Person;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -56,5 +57,15 @@ class PersonTest extends TestCase
         $person = Person::factory()->create(['name' => 'Tom Jones']);
 
         $this->assertIsString($person->name);
+    }
+
+    public function test_person_has_many_credits(): void
+    {
+        $person = Person::factory()->create();
+        Credit::factory()->count(2)->create(['person_id' => $person->id]);
+
+        $person->refresh();
+        $this->assertCount(2, $person->credits);
+        $this->assertInstanceOf(Credit::class, $person->credits->first());
     }
 }

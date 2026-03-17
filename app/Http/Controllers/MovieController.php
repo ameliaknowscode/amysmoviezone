@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Actor;
 use App\Models\Movie;
+use App\Models\Person;
+use App\Models\Type;
 use Illuminate\Http\Request;
 
 class MovieController extends Controller
@@ -17,20 +18,22 @@ class MovieController extends Controller
 
     public function create()
     {
-        $actors      = Actor::orderBy('name')->get();
-        $initialCast = [['actor_id' => '', 'role' => '']];
-        return view('movies.create', compact('actors', 'initialCast'));
+        $people         = Person::orderBy('name')->get();
+        $types          = Type::orderBy('name')->get();
+        $initialCredits = [['person_id' => '', 'type_id' => '', 'character' => '']];
+        return view('movies.create', compact('people', 'types', 'initialCredits'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'              => 'required|string|max:255',
-            'director'           => 'required|string|max:255',
-            'release_year'       => 'required|integer|min:1888|max:' . (date('Y') + 5),
-            'cast'               => 'nullable|array',
-            'cast.*.actor_id'    => 'nullable|integer|exists:actors,id',
-            'cast.*.role'        => 'nullable|string|max:255',
+            'title'               => 'required|string|max:255',
+            'director'            => 'required|string|max:255',
+            'release_year'        => 'required|integer|min:1888|max:' . (date('Y') + 5),
+            'credits'             => 'nullable|array',
+            'credits.*.person_id' => 'nullable|integer|exists:people,id',
+            'credits.*.type_id'   => 'nullable|integer|exists:types,id',
+            'credits.*.character' => 'nullable|string|max:255',
         ]);
 
         $movie = Movie::create([
@@ -39,43 +42,42 @@ class MovieController extends Controller
             'release_year' => $validated['release_year'],
         ]);
 
-        $syncData = [];
-        foreach ($request->input('cast', []) as $row) {
-            if (!empty($row['actor_id'])) {
-                $syncData[(int)$row['actor_id']] = ['role' => $row['role'] ?? null];
-            }
-        }
-        $movie->actors()->sync($syncData);
+        $this->syncCredits($movie, $request->input('credits', []));
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie added successfully.');
     }
 
     public function show(Movie $movie)
     {
-        $movie->load(['actors' => fn($q) => $q->orderBy('name')]);
-        return view('movies.show', compact('movie'));
+        $movie->load(['credits' => fn($q) => $q->with(['person', 'type'])->orderBy('id')]);
+        $cast = $movie->credits->filter(fn($c) => !$c->type->is_crew)->values();
+        $crew = $movie->credits->filter(fn($c) =>  $c->type->is_crew)->groupBy(fn($c) => $c->type->name);
+        return view('movies.show', compact('movie', 'cast', 'crew'));
     }
 
     public function edit(Movie $movie)
     {
-        $actors      = Actor::orderBy('name')->get();
-        $movie->load('actors');
-        $initialCast = $movie->actors->map(fn($a) => [
-            'actor_id' => (string) $a->id,
-            'role'     => $a->pivot->role ?? '',
+        $people         = Person::orderBy('name')->get();
+        $types          = Type::orderBy('name')->get();
+        $movie->load('credits');
+        $initialCredits = $movie->credits->map(fn($c) => [
+            'person_id' => (string) $c->person_id,
+            'type_id'   => (string) $c->type_id,
+            'character' => $c->character ?? '',
         ])->values()->toArray();
-        return view('movies.edit', compact('movie', 'actors', 'initialCast'));
+        return view('movies.edit', compact('movie', 'people', 'types', 'initialCredits'));
     }
 
     public function update(Request $request, Movie $movie)
     {
         $validated = $request->validate([
-            'title'              => 'required|string|max:255',
-            'director'           => 'required|string|max:255',
-            'release_year'       => 'required|integer|min:1888|max:' . (date('Y') + 5),
-            'cast'               => 'nullable|array',
-            'cast.*.actor_id'    => 'nullable|integer|exists:actors,id',
-            'cast.*.role'        => 'nullable|string|max:255',
+            'title'               => 'required|string|max:255',
+            'director'            => 'required|string|max:255',
+            'release_year'        => 'required|integer|min:1888|max:' . (date('Y') + 5),
+            'credits'             => 'nullable|array',
+            'credits.*.person_id' => 'nullable|integer|exists:people,id',
+            'credits.*.type_id'   => 'nullable|integer|exists:types,id',
+            'credits.*.character' => 'nullable|string|max:255',
         ]);
 
         $movie->update([
@@ -84,13 +86,7 @@ class MovieController extends Controller
             'release_year' => $validated['release_year'],
         ]);
 
-        $syncData = [];
-        foreach ($request->input('cast', []) as $row) {
-            if (!empty($row['actor_id'])) {
-                $syncData[(int)$row['actor_id']] = ['role' => $row['role'] ?? null];
-            }
-        }
-        $movie->actors()->sync($syncData);
+        $this->syncCredits($movie, $request->input('credits', []));
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie updated successfully.');
     }
@@ -100,5 +96,19 @@ class MovieController extends Controller
         $movie->delete();
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie deleted successfully.');
+    }
+
+    private function syncCredits(Movie $movie, array $rows): void
+    {
+        $movie->credits()->delete();
+        foreach ($rows as $row) {
+            if (!empty($row['person_id']) && !empty($row['type_id'])) {
+                $movie->credits()->create([
+                    'person_id' => (int) $row['person_id'],
+                    'type_id'   => (int) $row['type_id'],
+                    'character' => $row['character'] ?? null,
+                ]);
+            }
+        }
     }
 }

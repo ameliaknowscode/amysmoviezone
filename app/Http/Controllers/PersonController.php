@@ -33,6 +33,10 @@ class PersonController extends Controller
 
     public function show(Person $person)
     {
+        $person->load(['credits' => fn($q) => $q->with(['movie', 'type'])
+            ->join('movies', 'credits.movie_id', '=', 'movies.id')
+            ->orderBy('movies.release_year', 'desc')
+            ->select('credits.*')]);
         return view('people.show', compact('person'));
     }
 

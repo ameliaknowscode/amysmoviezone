@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Actor;
+use App\Models\Credit;
 use App\Models\Movie;
+use App\Models\Person;
+use App\Models\Type;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -196,29 +199,39 @@ class MovieControllerTest extends TestCase
             ->assertSessionHasErrors('release_year');
     }
 
-    public function test_store_syncs_actors(): void
+    public function test_store_syncs_credits(): void
     {
-        $user   = User::factory()->create();
-        $actor1 = Actor::factory()->create();
-        $actor2 = Actor::factory()->create();
+        $user          = User::factory()->create();
+        $person1       = Person::factory()->create();
+        $person2       = Person::factory()->create();
+        $actorType     = Type::firstOrCreate(['name' => 'Actor'],    ['is_crew' => false]);
+        $directorType  = Type::firstOrCreate(['name' => 'Director'], ['is_crew' => true]);
 
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
-                'title'        => 'Cast Movie',
+                'title'        => 'Credits Movie',
                 'director'     => 'Some Director',
                 'release_year' => 2000,
-                'cast'         => [
-                    ['actor_id' => $actor1->id, 'role' => 'Hero'],
-                    ['actor_id' => $actor2->id, 'role' => 'Villain'],
+                'credits'      => [
+                    ['person_id' => $person1->id, 'type_id' => $actorType->id,    'character' => 'Hero'],
+                    ['person_id' => $person2->id, 'type_id' => $directorType->id, 'character' => ''],
                 ],
             ]);
 
-        $movie = Movie::where('title', 'Cast Movie')->firstOrFail();
-        $this->assertCount(2, $movie->actors);
-        $this->assertTrue($movie->actors->contains($actor1));
-        $this->assertTrue($movie->actors->contains($actor2));
-        $this->assertEquals('Hero', $movie->actors->find($actor1->id)->pivot->role);
-        $this->assertEquals('Villain', $movie->actors->find($actor2->id)->pivot->role);
+        $movie = Movie::where('title', 'Credits Movie')->firstOrFail();
+        $this->assertCount(2, $movie->credits);
+
+        $this->assertDatabaseHas('credits', [
+            'movie_id'  => $movie->id,
+            'person_id' => $person1->id,
+            'type_id'   => $actorType->id,
+            'character' => 'Hero',
+        ]);
+        $this->assertDatabaseHas('credits', [
+            'movie_id'  => $movie->id,
+            'person_id' => $person2->id,
+            'type_id'   => $directorType->id,
+        ]);
     }
 
     // -------------------------------------------------------------------------
@@ -268,29 +281,43 @@ class MovieControllerTest extends TestCase
         $this->assertDatabaseHas('movies', ['id' => $movie->id, 'title' => 'Original']);
     }
 
-    public function test_update_syncs_actors(): void
+    public function test_update_syncs_credits(): void
     {
-        $user   = User::factory()->create();
-        $movie  = Movie::factory()->create();
-        $actor1 = Actor::factory()->create();
-        $actor2 = Actor::factory()->create();
-        $movie->actors()->sync([$actor1->id]);
+        $user      = User::factory()->create();
+        $movie     = Movie::factory()->create();
+        $person1   = Person::factory()->create();
+        $person2   = Person::factory()->create();
+        $actorType = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
+
+        // Pre-existing credit for person1
+        Credit::factory()->create([
+            'movie_id'  => $movie->id,
+            'person_id' => $person1->id,
+            'type_id'   => $actorType->id,
+        ]);
 
         $this->actingAs($user)
             ->patch(route('admin.movies.update', $movie), [
                 'title'        => $movie->title,
                 'director'     => $movie->director,
                 'release_year' => $movie->release_year,
-                'cast'         => [
-                    ['actor_id' => $actor2->id, 'role' => 'Protagonist'],
+                'credits'      => [
+                    ['person_id' => $person2->id, 'type_id' => $actorType->id, 'character' => 'Protagonist'],
                 ],
             ]);
 
         $movie->refresh();
-        $this->assertCount(1, $movie->actors);
-        $this->assertTrue($movie->actors->contains($actor2));
-        $this->assertFalse($movie->actors->contains($actor1));
-        $this->assertEquals('Protagonist', $movie->actors->find($actor2->id)->pivot->role);
+        $this->assertCount(1, $movie->credits);
+        $this->assertDatabaseHas('credits', [
+            'movie_id'  => $movie->id,
+            'person_id' => $person2->id,
+            'type_id'   => $actorType->id,
+            'character' => 'Protagonist',
+        ]);
+        $this->assertDatabaseMissing('credits', [
+            'movie_id'  => $movie->id,
+            'person_id' => $person1->id,
+        ]);
     }
 
     // -------------------------------------------------------------------------
@@ -309,13 +336,11 @@ class MovieControllerTest extends TestCase
     {
         $movie = Movie::factory()->create([
             'title'        => 'The Matrix',
-            'director'     => 'Wachowski Sisters',
             'release_year' => 1999,
         ]);
 
         $this->get(route('movies.show', $movie))
             ->assertSee('The Matrix')
-            ->assertSee('Wachowski Sisters')
             ->assertSee('1999');
     }
 
@@ -325,25 +350,37 @@ class MovieControllerTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_show_displays_cast(): void
+    public function test_show_displays_cast_section(): void
     {
-        $movie = Movie::factory()->create();
-        $actor = Actor::factory()->create(['name' => 'Keanu Reeves']);
-        $movie->actors()->attach($actor);
-
-        $this->get(route('movies.show', $movie))
-            ->assertSee('Keanu Reeves');
-    }
-
-    public function test_show_displays_role_in_cast(): void
-    {
-        $movie = Movie::factory()->create();
-        $actor = Actor::factory()->create(['name' => 'Keanu Reeves']);
-        $movie->actors()->attach($actor, ['role' => 'Neo']);
+        $movie  = Movie::factory()->create();
+        $person = Person::factory()->create(['name' => 'Keanu Reeves']);
+        $type   = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
+        Credit::factory()->create([
+            'movie_id'  => $movie->id,
+            'person_id' => $person->id,
+            'type_id'   => $type->id,
+            'character' => 'Neo',
+        ]);
 
         $this->get(route('movies.show', $movie))
             ->assertSee('Keanu Reeves')
             ->assertSee('Neo');
+    }
+
+    public function test_show_displays_crew_section(): void
+    {
+        $movie  = Movie::factory()->create();
+        $person = Person::factory()->create(['name' => 'Christopher Nolan']);
+        $type   = Type::factory()->create(['name' => 'Director', 'is_crew' => true]);
+        Credit::factory()->create([
+            'movie_id'  => $movie->id,
+            'person_id' => $person->id,
+            'type_id'   => $type->id,
+        ]);
+
+        $this->get(route('movies.show', $movie))
+            ->assertSee('Christopher Nolan')
+            ->assertSee('Director');
     }
 
     // -------------------------------------------------------------------------

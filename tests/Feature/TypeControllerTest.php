@@ -84,13 +84,13 @@ class TypeControllerTest extends TestCase
 
         $this->actingAs($user)
             ->post(route('admin.types.store'), [
-                'name'    => 'Actor',
+                'name'    => 'Stunt Double',
                 'is_crew' => '0',
             ])
             ->assertRedirect(route('admin.types.index'))
             ->assertSessionHas('success');
 
-        $this->assertDatabaseHas('types', ['name' => 'Actor', 'is_crew' => false]);
+        $this->assertDatabaseHas('types', ['name' => 'Stunt Double', 'is_crew' => false]);
     }
 
     public function test_store_creates_crew_type_and_redirects(): void
@@ -206,7 +206,7 @@ class TypeControllerTest extends TestCase
     {
         $user  = User::factory()->create();
         Type::factory()->create(['name' => 'Director']);
-        $type = Type::factory()->create(['name' => 'Actor']);
+        $type = Type::factory()->create(['name' => 'Cinematographer']);
 
         $this->actingAs($user)
             ->patch(route('admin.types.update', $type), ['name' => 'Director'])

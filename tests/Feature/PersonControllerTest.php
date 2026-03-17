@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Credit;
+use App\Models\Movie;
 use App\Models\Person;
+use App\Models\Type;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -89,6 +92,25 @@ class PersonControllerTest extends TestCase
     {
         $this->get(route('people.show', 999999))
             ->assertNotFound();
+    }
+
+    public function test_show_displays_filmography_via_credits(): void
+    {
+        $person = Person::factory()->create(['name' => 'Tom Hanks']);
+        $movie  = Movie::factory()->create(['title' => 'Forrest Gump', 'release_year' => 1994]);
+        $type   = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
+        Credit::factory()->create([
+            'person_id' => $person->id,
+            'movie_id'  => $movie->id,
+            'type_id'   => $type->id,
+            'character' => 'Forrest',
+        ]);
+
+        $this->get(route('people.show', $person))
+            ->assertSee('Forrest Gump')
+            ->assertSee('1994')
+            ->assertSee('Actor')
+            ->assertSee('Forrest');
     }
 
     // -------------------------------------------------------------------------
