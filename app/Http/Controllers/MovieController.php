@@ -28,7 +28,6 @@ class MovieController extends Controller
     {
         $validated = $request->validate([
             'title'               => 'required|string|max:255',
-            'director'            => 'required|string|max:255',
             'release_year'        => 'required|integer|min:1888|max:' . (date('Y') + 5),
             'credits'             => 'nullable|array',
             'credits.*.person_id' => 'nullable|integer|exists:people,id',
@@ -38,7 +37,6 @@ class MovieController extends Controller
 
         $movie = Movie::create([
             'title'        => $validated['title'],
-            'director'     => $validated['director'],
             'release_year' => $validated['release_year'],
         ]);
 
@@ -72,7 +70,6 @@ class MovieController extends Controller
     {
         $validated = $request->validate([
             'title'               => 'required|string|max:255',
-            'director'            => 'required|string|max:255',
             'release_year'        => 'required|integer|min:1888|max:' . (date('Y') + 5),
             'credits'             => 'nullable|array',
             'credits.*.person_id' => 'nullable|integer|exists:people,id',
@@ -82,7 +79,6 @@ class MovieController extends Controller
 
         $movie->update([
             'title'        => $validated['title'],
-            'director'     => $validated['director'],
             'release_year' => $validated['release_year'],
         ]);
 

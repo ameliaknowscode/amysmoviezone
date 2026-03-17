@@ -29,12 +29,6 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="director" class="block font-medium text-sm text-gray-700 mb-1">Director</label>
-                            <input type="text" id="director" name="director" value="{{ old('director', $movie->director) }}"
-                                class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
-                        </div>
-
-                        <div class="mb-4">
                             <label for="release_year" class="block font-medium text-sm text-gray-700 mb-1">Release Year</label>
                             <input type="number" id="release_year" name="release_year" value="{{ old('release_year', $movie->release_year) }}"
                                 min="1888" max="{{ date('Y') + 5 }}"

@@ -124,7 +124,6 @@ class MovieControllerTest extends TestCase
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
                 'title'        => 'The Matrix',
-                'director'     => 'Wachowski Sisters',
                 'release_year' => 1999,
             ])
             ->assertRedirect(route('admin.movies.index'))
@@ -132,7 +131,6 @@ class MovieControllerTest extends TestCase
 
         $this->assertDatabaseHas('movies', [
             'title'        => 'The Matrix',
-            'director'     => 'Wachowski Sisters',
             'release_year' => 1999,
         ]);
     }
@@ -143,22 +141,9 @@ class MovieControllerTest extends TestCase
 
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
-                'director'     => 'Some Director',
                 'release_year' => 2000,
             ])
             ->assertSessionHasErrors('title');
-    }
-
-    public function test_store_validates_required_director(): void
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
-            ->post(route('admin.movies.store'), [
-                'title'        => 'Some Movie',
-                'release_year' => 2000,
-            ])
-            ->assertSessionHasErrors('director');
     }
 
     public function test_store_validates_required_release_year(): void
@@ -167,8 +152,7 @@ class MovieControllerTest extends TestCase
 
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
-                'title'    => 'Some Movie',
-                'director' => 'Some Director',
+                'title' => 'Some Movie',
             ])
             ->assertSessionHasErrors('release_year');
     }
@@ -180,7 +164,6 @@ class MovieControllerTest extends TestCase
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
                 'title'        => 'Ancient Film',
-                'director'     => 'Someone',
                 'release_year' => 1887,
             ])
             ->assertSessionHasErrors('release_year');
@@ -193,7 +176,6 @@ class MovieControllerTest extends TestCase
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
                 'title'        => 'Some Movie',
-                'director'     => 'Someone',
                 'release_year' => 'not-a-year',
             ])
             ->assertSessionHasErrors('release_year');
@@ -210,7 +192,6 @@ class MovieControllerTest extends TestCase
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
                 'title'        => 'Credits Movie',
-                'director'     => 'Some Director',
                 'release_year' => 2000,
                 'credits'      => [
                     ['person_id' => $person1->id, 'type_id' => $actorType->id,    'character' => 'Hero'],
@@ -246,7 +227,6 @@ class MovieControllerTest extends TestCase
         $this->actingAs($user)
             ->patch(route('admin.movies.update', $movie), [
                 'title'        => 'New Title',
-                'director'     => 'New Director',
                 'release_year' => 2005,
             ])
             ->assertRedirect(route('admin.movies.index'))
@@ -262,7 +242,6 @@ class MovieControllerTest extends TestCase
 
         $this->actingAs($user)
             ->patch(route('admin.movies.update', $movie), [
-                'director'     => 'Some Director',
                 'release_year' => 2000,
             ])
             ->assertSessionHasErrors('title');
@@ -274,7 +253,6 @@ class MovieControllerTest extends TestCase
 
         $this->patch(route('admin.movies.update', $movie), [
             'title'        => 'Changed',
-            'director'     => 'Someone',
             'release_year' => 2000,
         ])->assertRedirect(route('login'));
 
@@ -299,7 +277,6 @@ class MovieControllerTest extends TestCase
         $this->actingAs($user)
             ->patch(route('admin.movies.update', $movie), [
                 'title'        => $movie->title,
-                'director'     => $movie->director,
                 'release_year' => $movie->release_year,
                 'credits'      => [
                     ['person_id' => $person2->id, 'type_id' => $actorType->id, 'character' => 'Protagonist'],

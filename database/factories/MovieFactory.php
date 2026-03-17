@@ -14,7 +14,6 @@ class MovieFactory extends Factory
     {
         return [
             'title'        => fake()->sentence(3, false),
-            'director'     => fake()->name(),
             'release_year' => fake()->numberBetween(1950, 2024),
         ];
     }
