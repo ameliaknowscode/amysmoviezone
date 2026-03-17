@@ -25,7 +25,7 @@ class TypeController extends Controller
             'is_crew' => 'boolean',
         ]);
 
-        $validated['is_crew'] = $request->boolean('is_crew');
+        $validated['is_crew'] = $request->has('is_crew') ? $request->boolean('is_crew') : true;
 
         Type::create($validated);
 
@@ -44,7 +44,7 @@ class TypeController extends Controller
             'is_crew' => 'boolean',
         ]);
 
-        $validated['is_crew'] = $request->boolean('is_crew');
+        $validated['is_crew'] = $request->has('is_crew') ? $request->boolean('is_crew') : true;
 
         $type->update($validated);
 

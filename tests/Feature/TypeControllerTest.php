@@ -108,7 +108,7 @@ class TypeControllerTest extends TestCase
         $this->assertDatabaseHas('types', ['name' => 'Director', 'is_crew' => true]);
     }
 
-    public function test_store_defaults_is_crew_to_false_when_omitted(): void
+    public function test_store_defaults_is_crew_to_true_when_omitted(): void
     {
         $user = User::factory()->create();
 
@@ -118,7 +118,7 @@ class TypeControllerTest extends TestCase
             ])
             ->assertRedirect(route('admin.types.index'));
 
-        $this->assertDatabaseHas('types', ['name' => 'Extra', 'is_crew' => false]);
+        $this->assertDatabaseHas('types', ['name' => 'Extra', 'is_crew' => true]);
     }
 
     public function test_store_validates_required_name(): void

@@ -12,7 +12,7 @@ class Type extends Model
     protected $fillable = ['name', 'is_crew'];
 
     protected $attributes = [
-        'is_crew' => false,
+        'is_crew' => true,
     ];
 
     protected $casts = [

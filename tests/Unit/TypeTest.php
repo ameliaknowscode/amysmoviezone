@@ -48,10 +48,10 @@ class TypeTest extends TestCase
         $this->assertFalse($nonCrew->is_crew);
     }
 
-    public function test_is_crew_defaults_to_false(): void
+    public function test_is_crew_defaults_to_true(): void
     {
         $type = Type::create(['name' => 'Extra']);
 
-        $this->assertFalse($type->is_crew);
+        $this->assertTrue($type->is_crew);
     }
 }
