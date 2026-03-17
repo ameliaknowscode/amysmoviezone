@@ -68,6 +68,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="mt-4">{{ $actors->links() }}</div>
                     @endif
 
                 </div>
