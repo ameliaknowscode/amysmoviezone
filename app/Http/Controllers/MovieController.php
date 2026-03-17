@@ -12,7 +12,13 @@ class MovieController extends Controller
     public function index(Request $request)
     {
         $direction = $request->query('sort') === 'asc' ? 'asc' : 'desc';
-        $movies = Movie::orderBy('release_year', $direction)->paginate(20)->appends(['sort' => $direction]);
+        $movies = Movie::orderBy('release_year', $direction)
+            ->with(['credits' => fn($q) => $q
+                ->with('person')
+                ->whereHas('type', fn($t) => $t->where('name', 'Director'))
+            ])
+            ->paginate(20)
+            ->appends(['sort' => $direction]);
         return view('movies.index', compact('movies', 'direction'));
     }
 

@@ -46,7 +46,9 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">{{ $movie->id }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $movie->title }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $movie->director }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">
+                                            {{ $movie->credits->map(fn($c) => $c->person->name)->join(', ') ?: '—' }}
+                                        </td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $movie->release_year }}</td>
                                         <td class="border border-gray-300 px-4 py-2 text-center">
                                             <div class="flex items-center justify-center gap-3">
