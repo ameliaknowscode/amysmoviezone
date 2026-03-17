@@ -30,7 +30,9 @@
                                         <td class="border border-gray-300 px-4 py-2">
                                             <a href="{{ route('movies.show', $movie) }}" class="text-indigo-600 hover:underline">{{ $movie->title }}</a>
                                         </td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $movie->director }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">
+                                            {{ $movie->credits->map(fn($c) => $c->person->name)->join(', ') ?: '—' }}
+                                        </td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $movie->release_year }}</td>
                                     </tr>
                                 @endforeach
@@ -40,13 +42,13 @@
                 </div>
             </div>
 
-            {{-- Actors --}}
+            {{-- People --}}
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold mb-4">Actors</h3>
+                    <h3 class="text-lg font-semibold mb-4">People</h3>
 
-                    @if($actors->isEmpty())
-                        <p class="text-gray-500">No actors found matching &ldquo;{{ $query }}&rdquo;.</p>
+                    @if($people->isEmpty())
+                        <p class="text-gray-500">No people found matching &ldquo;{{ $query }}&rdquo;.</p>
                     @else
                         <table class="w-full border-collapse">
                             <thead>
@@ -57,14 +59,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($actors as $actor)
+                                @foreach($people as $person)
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">
-                                            <a href="{{ route('actors.show', $actor) }}" class="text-indigo-600 hover:underline">{{ $actor->name }}</a>
+                                            <a href="{{ $person->dominantTypeUrl() ?? route('people.show', $person) }}" class="text-indigo-600 hover:underline">{{ $person->name }}</a>
                                         </td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $actor->nationality ?? '—' }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $person->nationality ?? '—' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
-                                            {{ $actor->date_of_birth ? \Carbon\Carbon::parse($actor->date_of_birth)->format('d M Y') : '—' }}
+                                            {{ $person->date_of_birth ? \Carbon\Carbon::parse($person->date_of_birth)->format('d M Y') : '—' }}
                                         </td>
                                     </tr>
                                 @endforeach
