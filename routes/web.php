@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActorController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\PersonController;
+use App\Http\Controllers\TypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
@@ -56,6 +57,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/people/{person}/edit', [PersonController::class, 'edit'])->name('people.edit');
         Route::patch('/people/{person}', [PersonController::class, 'update'])->name('people.update');
         Route::delete('/people/{person}', [PersonController::class, 'destroy'])->name('people.destroy');
+
+        Route::get('/types', [TypeController::class, 'index'])->name('types.index');
+        Route::get('/types/create', [TypeController::class, 'create'])->name('types.create');
+        Route::post('/types', [TypeController::class, 'store'])->name('types.store');
+        Route::get('/types/{type}/edit', [TypeController::class, 'edit'])->name('types.edit');
+        Route::patch('/types/{type}', [TypeController::class, 'update'])->name('types.update');
+        Route::delete('/types/{type}', [TypeController::class, 'destroy'])->name('types.destroy');
     });
 });
 
