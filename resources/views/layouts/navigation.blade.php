@@ -122,14 +122,14 @@
             x-transition.scale
             class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4"
         >
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Search for a film</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Search movies &amp; actors</h3>
 
-            <form method="GET" action="{{ route('movies.search') }}">
+            <form method="GET" action="{{ route('search') }}">
                 <div class="flex items-center gap-2">
                     <input
                         type="text"
                         name="q"
-                        placeholder="Enter film title…"
+                        placeholder="Enter title or actor name…"
                         x-init="$watch('searchOpen', val => { if (val) $nextTick(() => $el.focus()) })"
                         class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />

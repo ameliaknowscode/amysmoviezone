@@ -31,6 +31,11 @@ class ActorController extends Controller
         return redirect()->route('admin.actors.index')->with('success', 'Actor added successfully.');
     }
 
+    public function show(Actor $actor)
+    {
+        return view('actors.show', compact('actor'));
+    }
+
     public function destroy(Actor $actor)
     {
         $actor->delete();

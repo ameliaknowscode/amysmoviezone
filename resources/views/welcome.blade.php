@@ -1,15 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
-    <style>
-        body { font-family: sans-serif; padding: 2rem; }
-    </style>
-</head>
-<body>
-    <h1>Welcome</h1>
-    <a href="{{ route('users.index') }}">View Users</a>
-</body>
-</html>
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Amy's Movie Zone
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <p>Welcome to Amy's Movie Zone!</p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

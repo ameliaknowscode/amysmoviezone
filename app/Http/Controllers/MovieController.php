@@ -32,6 +32,11 @@ class MovieController extends Controller
         return redirect()->route('admin.movies.index')->with('success', 'Movie added successfully.');
     }
 
+    public function show(Movie $movie)
+    {
+        return view('movies.show', compact('movie'));
+    }
+
     public function destroy(Movie $movie)
     {
         $movie->delete();

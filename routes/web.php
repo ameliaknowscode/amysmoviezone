@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActorController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,8 +11,9 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('/movies/search', [MovieController::class, 'search'])->name('movies.search');
+Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
+Route::get('/actors/{actor}', [ActorController::class, 'show'])->name('actors.show');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
