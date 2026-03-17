@@ -42,17 +42,27 @@
                                 class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
                         </div>
 
-                        @php $selectedMovieIds = old('movie_ids', $actor->movies->pluck('id')->toArray()); @endphp
-                        <div class="mb-4">
-                            <label for="movie_ids" class="block font-medium text-sm text-gray-700 mb-1">Filmography</label>
-                            <select id="movie_ids" name="movie_ids[]" multiple class="tom-select w-full max-w-md">
-                                @foreach($movies as $movie)
-                                    <option value="{{ $movie->id }}"
-                                        {{ in_array($movie->id, $selectedMovieIds) ? 'selected' : '' }}>
-                                        {{ $movie->title }} ({{ $movie->release_year }})
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div x-data="{ filmography: {{ Js::from(old('filmography', $initialFilmography)) }} }" class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Filmography</label>
+                            <template x-for="(row, i) in filmography" :key="i">
+                                <div class="flex gap-2 mb-2 max-w-2xl items-center">
+                                    <select :name="`filmography[${i}][movie_id]`" x-model="row.movie_id"
+                                        class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
+                                        <option value="">Select movie…</option>
+                                        @foreach($movies as $movie)
+                                            <option value="{{ $movie->id }}">{{ $movie->title }} ({{ $movie->release_year }})</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="text" :name="`filmography[${i}][role]`" x-model="row.role"
+                                        placeholder="Role (e.g. Neo)"
+                                        class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
+                                    <button type="button" @click="filmography.splice(i, 1)"
+                                        class="text-red-500 hover:text-red-700 text-xl leading-none px-1"
+                                        title="Remove">&times;</button>
+                                </div>
+                            </template>
+                            <button type="button" @click="filmography.push({ movie_id: '', role: '' })"
+                                class="mt-1 text-sm text-blue-600 hover:underline">+ Add movie</button>
                         </div>
 
                         <div class="flex items-center gap-4">

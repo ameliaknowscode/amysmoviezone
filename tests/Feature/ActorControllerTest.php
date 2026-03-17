@@ -96,6 +96,17 @@ class ActorControllerTest extends TestCase
             ->assertSee('The Aviator');
     }
 
+    public function test_show_displays_role_in_filmography(): void
+    {
+        $actor = Actor::factory()->create(['name' => 'Cate Blanchett']);
+        $movie = Movie::factory()->create(['title' => 'The Aviator']);
+        $actor->movies()->attach($movie, ['role' => 'Katharine Hepburn']);
+
+        $this->get(route('actors.show', $actor))
+            ->assertSee('The Aviator')
+            ->assertSee('Katharine Hepburn');
+    }
+
     public function test_show_returns_404_for_nonexistent_actor(): void
     {
         $this->get(route('actors.show', 999999))
@@ -204,14 +215,19 @@ class ActorControllerTest extends TestCase
 
         $this->actingAs($user)
             ->post(route('admin.actors.store'), [
-                'name'      => 'Film Actor',
-                'movie_ids' => [$movie1->id, $movie2->id],
+                'name'        => 'Film Actor',
+                'filmography' => [
+                    ['movie_id' => $movie1->id, 'role' => 'Lead'],
+                    ['movie_id' => $movie2->id, 'role' => 'Support'],
+                ],
             ]);
 
         $actor = Actor::where('name', 'Film Actor')->firstOrFail();
         $this->assertCount(2, $actor->movies);
         $this->assertTrue($actor->movies->contains($movie1));
         $this->assertTrue($actor->movies->contains($movie2));
+        $this->assertEquals('Lead', $actor->movies->find($movie1->id)->pivot->role);
+        $this->assertEquals('Support', $actor->movies->find($movie2->id)->pivot->role);
     }
 
     // -------------------------------------------------------------------------
@@ -293,14 +309,17 @@ class ActorControllerTest extends TestCase
 
         $this->actingAs($user)
             ->patch(route('admin.actors.update', $actor), [
-                'name'      => $actor->name,
-                'movie_ids' => [$movie2->id],
+                'name'        => $actor->name,
+                'filmography' => [
+                    ['movie_id' => $movie2->id, 'role' => 'Protagonist'],
+                ],
             ]);
 
         $actor->refresh();
         $this->assertCount(1, $actor->movies);
         $this->assertTrue($actor->movies->contains($movie2));
         $this->assertFalse($actor->movies->contains($movie1));
+        $this->assertEquals('Protagonist', $actor->movies->find($movie2->id)->pivot->role);
     }
 
     // -------------------------------------------------------------------------

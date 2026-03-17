@@ -16,18 +16,20 @@ class ActorController extends Controller
 
     public function create()
     {
-        $movies = Movie::orderBy('title')->get();
-        return view('actors.create', compact('movies'));
+        $movies             = Movie::orderBy('title')->get();
+        $initialFilmography = [['movie_id' => '', 'role' => '']];
+        return view('actors.create', compact('movies', 'initialFilmography'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'          => 'required|string|max:255',
-            'date_of_birth' => 'nullable|date|before:today',
-            'nationality'   => 'nullable|string|max:255',
-            'movie_ids'     => 'nullable|array',
-            'movie_ids.*'   => 'integer|exists:movies,id',
+            'name'                    => 'required|string|max:255',
+            'date_of_birth'           => 'nullable|date|before:today',
+            'nationality'             => 'nullable|string|max:255',
+            'filmography'             => 'nullable|array',
+            'filmography.*.movie_id'  => 'nullable|integer|exists:movies,id',
+            'filmography.*.role'      => 'nullable|string|max:255',
         ]);
 
         $actor = Actor::create([
@@ -36,26 +38,43 @@ class ActorController extends Controller
             'nationality'   => $validated['nationality'] ?? null,
         ]);
 
-        $actor->movies()->sync($validated['movie_ids'] ?? []);
+        $syncData = [];
+        foreach ($request->input('filmography', []) as $row) {
+            if (!empty($row['movie_id'])) {
+                $syncData[(int)$row['movie_id']] = ['role' => $row['role'] ?? null];
+            }
+        }
+        $actor->movies()->sync($syncData);
 
         return redirect()->route('admin.actors.index')->with('success', 'Actor added successfully.');
+    }
+
+    public function show(Actor $actor)
+    {
+        $actor->load(['movies' => fn($q) => $q->orderBy('release_year', 'desc')]);
+        return view('actors.show', compact('actor'));
     }
 
     public function edit(Actor $actor)
     {
         $movies = Movie::orderBy('title')->get();
         $actor->load('movies');
-        return view('actors.edit', compact('actor', 'movies'));
+        $initialFilmography = $actor->movies->map(fn($m) => [
+            'movie_id' => (string) $m->id,
+            'role'     => $m->pivot->role ?? '',
+        ])->values()->toArray();
+        return view('actors.edit', compact('actor', 'movies', 'initialFilmography'));
     }
 
     public function update(Request $request, Actor $actor)
     {
         $validated = $request->validate([
-            'name'          => 'required|string|max:255',
-            'date_of_birth' => 'nullable|date|before:today',
-            'nationality'   => 'nullable|string|max:255',
-            'movie_ids'     => 'nullable|array',
-            'movie_ids.*'   => 'integer|exists:movies,id',
+            'name'                    => 'required|string|max:255',
+            'date_of_birth'           => 'nullable|date|before:today',
+            'nationality'             => 'nullable|string|max:255',
+            'filmography'             => 'nullable|array',
+            'filmography.*.movie_id'  => 'nullable|integer|exists:movies,id',
+            'filmography.*.role'      => 'nullable|string|max:255',
         ]);
 
         $actor->update([
@@ -64,15 +83,15 @@ class ActorController extends Controller
             'nationality'   => $validated['nationality'] ?? null,
         ]);
 
-        $actor->movies()->sync($validated['movie_ids'] ?? []);
+        $syncData = [];
+        foreach ($request->input('filmography', []) as $row) {
+            if (!empty($row['movie_id'])) {
+                $syncData[(int)$row['movie_id']] = ['role' => $row['role'] ?? null];
+            }
+        }
+        $actor->movies()->sync($syncData);
 
         return redirect()->route('admin.actors.index')->with('success', 'Actor updated successfully.');
-    }
-
-    public function show(Actor $actor)
-    {
-        $actor->load(['movies' => fn($q) => $q->orderBy('release_year', 'desc')]);
-        return view('actors.show', compact('actor'));
     }
 
     public function destroy(Actor $actor)

@@ -17,18 +17,20 @@ class MovieController extends Controller
 
     public function create()
     {
-        $actors = Actor::orderBy('name')->get();
-        return view('movies.create', compact('actors'));
+        $actors      = Actor::orderBy('name')->get();
+        $initialCast = [['actor_id' => '', 'role' => '']];
+        return view('movies.create', compact('actors', 'initialCast'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'        => 'required|string|max:255',
-            'director'     => 'required|string|max:255',
-            'release_year' => 'required|integer|min:1888|max:' . (date('Y') + 5),
-            'actor_ids'    => 'nullable|array',
-            'actor_ids.*'  => 'integer|exists:actors,id',
+            'title'              => 'required|string|max:255',
+            'director'           => 'required|string|max:255',
+            'release_year'       => 'required|integer|min:1888|max:' . (date('Y') + 5),
+            'cast'               => 'nullable|array',
+            'cast.*.actor_id'    => 'nullable|integer|exists:actors,id',
+            'cast.*.role'        => 'nullable|string|max:255',
         ]);
 
         $movie = Movie::create([
@@ -37,7 +39,13 @@ class MovieController extends Controller
             'release_year' => $validated['release_year'],
         ]);
 
-        $movie->actors()->sync($validated['actor_ids'] ?? []);
+        $syncData = [];
+        foreach ($request->input('cast', []) as $row) {
+            if (!empty($row['actor_id'])) {
+                $syncData[(int)$row['actor_id']] = ['role' => $row['role'] ?? null];
+            }
+        }
+        $movie->actors()->sync($syncData);
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie added successfully.');
     }
@@ -50,19 +58,24 @@ class MovieController extends Controller
 
     public function edit(Movie $movie)
     {
-        $actors = Actor::orderBy('name')->get();
+        $actors      = Actor::orderBy('name')->get();
         $movie->load('actors');
-        return view('movies.edit', compact('movie', 'actors'));
+        $initialCast = $movie->actors->map(fn($a) => [
+            'actor_id' => (string) $a->id,
+            'role'     => $a->pivot->role ?? '',
+        ])->values()->toArray();
+        return view('movies.edit', compact('movie', 'actors', 'initialCast'));
     }
 
     public function update(Request $request, Movie $movie)
     {
         $validated = $request->validate([
-            'title'        => 'required|string|max:255',
-            'director'     => 'required|string|max:255',
-            'release_year' => 'required|integer|min:1888|max:' . (date('Y') + 5),
-            'actor_ids'    => 'nullable|array',
-            'actor_ids.*'  => 'integer|exists:actors,id',
+            'title'              => 'required|string|max:255',
+            'director'           => 'required|string|max:255',
+            'release_year'       => 'required|integer|min:1888|max:' . (date('Y') + 5),
+            'cast'               => 'nullable|array',
+            'cast.*.actor_id'    => 'nullable|integer|exists:actors,id',
+            'cast.*.role'        => 'nullable|string|max:255',
         ]);
 
         $movie->update([
@@ -71,7 +84,13 @@ class MovieController extends Controller
             'release_year' => $validated['release_year'],
         ]);
 
-        $movie->actors()->sync($validated['actor_ids'] ?? []);
+        $syncData = [];
+        foreach ($request->input('cast', []) as $row) {
+            if (!empty($row['actor_id'])) {
+                $syncData[(int)$row['actor_id']] = ['role' => $row['role'] ?? null];
+            }
+        }
+        $movie->actors()->sync($syncData);
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie updated successfully.');
     }

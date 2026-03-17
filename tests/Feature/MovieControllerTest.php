@@ -207,13 +207,18 @@ class MovieControllerTest extends TestCase
                 'title'        => 'Cast Movie',
                 'director'     => 'Some Director',
                 'release_year' => 2000,
-                'actor_ids'    => [$actor1->id, $actor2->id],
+                'cast'         => [
+                    ['actor_id' => $actor1->id, 'role' => 'Hero'],
+                    ['actor_id' => $actor2->id, 'role' => 'Villain'],
+                ],
             ]);
 
         $movie = Movie::where('title', 'Cast Movie')->firstOrFail();
         $this->assertCount(2, $movie->actors);
         $this->assertTrue($movie->actors->contains($actor1));
         $this->assertTrue($movie->actors->contains($actor2));
+        $this->assertEquals('Hero', $movie->actors->find($actor1->id)->pivot->role);
+        $this->assertEquals('Villain', $movie->actors->find($actor2->id)->pivot->role);
     }
 
     // -------------------------------------------------------------------------
@@ -276,13 +281,16 @@ class MovieControllerTest extends TestCase
                 'title'        => $movie->title,
                 'director'     => $movie->director,
                 'release_year' => $movie->release_year,
-                'actor_ids'    => [$actor2->id],
+                'cast'         => [
+                    ['actor_id' => $actor2->id, 'role' => 'Protagonist'],
+                ],
             ]);
 
         $movie->refresh();
         $this->assertCount(1, $movie->actors);
         $this->assertTrue($movie->actors->contains($actor2));
         $this->assertFalse($movie->actors->contains($actor1));
+        $this->assertEquals('Protagonist', $movie->actors->find($actor2->id)->pivot->role);
     }
 
     // -------------------------------------------------------------------------
@@ -325,6 +333,17 @@ class MovieControllerTest extends TestCase
 
         $this->get(route('movies.show', $movie))
             ->assertSee('Keanu Reeves');
+    }
+
+    public function test_show_displays_role_in_cast(): void
+    {
+        $movie = Movie::factory()->create();
+        $actor = Actor::factory()->create(['name' => 'Keanu Reeves']);
+        $movie->actors()->attach($actor, ['role' => 'Neo']);
+
+        $this->get(route('movies.show', $movie))
+            ->assertSee('Keanu Reeves')
+            ->assertSee('Neo');
     }
 
     // -------------------------------------------------------------------------

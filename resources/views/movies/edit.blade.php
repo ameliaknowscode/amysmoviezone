@@ -41,17 +41,27 @@
                                 class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
                         </div>
 
-                        @php $selectedIds = old('actor_ids', $movie->actors->pluck('id')->toArray()); @endphp
-                        <div class="mb-4">
-                            <label for="actor_ids" class="block font-medium text-sm text-gray-700 mb-1">Cast</label>
-                            <select id="actor_ids" name="actor_ids[]" multiple class="tom-select w-full max-w-md">
-                                @foreach($actors as $actor)
-                                    <option value="{{ $actor->id }}"
-                                        {{ in_array($actor->id, $selectedIds) ? 'selected' : '' }}>
-                                        {{ $actor->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div x-data="{ cast: {{ Js::from(old('cast', $initialCast)) }} }" class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Cast</label>
+                            <template x-for="(row, i) in cast" :key="i">
+                                <div class="flex gap-2 mb-2 max-w-2xl items-center">
+                                    <select :name="`cast[${i}][actor_id]`" x-model="row.actor_id"
+                                        class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
+                                        <option value="">Select actor…</option>
+                                        @foreach($actors as $actor)
+                                            <option value="{{ $actor->id }}">{{ $actor->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="text" :name="`cast[${i}][role]`" x-model="row.role"
+                                        placeholder="Role (e.g. Neo)"
+                                        class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
+                                    <button type="button" @click="cast.splice(i, 1)"
+                                        class="text-red-500 hover:text-red-700 text-xl leading-none px-1"
+                                        title="Remove">&times;</button>
+                                </div>
+                            </template>
+                            <button type="button" @click="cast.push({ actor_id: '', role: '' })"
+                                class="mt-1 text-sm text-blue-600 hover:underline">+ Add actor</button>
                         </div>
 
                         <div class="flex items-center gap-4">

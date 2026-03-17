@@ -31,7 +31,12 @@
                                 @else
                                     <ul class="space-y-1">
                                         @foreach($movie->actors as $actor)
-                                            <li><a href="{{ route('actors.show', $actor) }}" class="text-indigo-600 hover:underline">{{ $actor->name }}</a></li>
+                                            <li>
+                                                <a href="{{ route('actors.show', $actor) }}" class="text-indigo-600 hover:underline">{{ $actor->name }}</a>
+                                                @if($actor->pivot->role)
+                                                    <span class="text-gray-500 text-sm">as {{ $actor->pivot->role }}</span>
+                                                @endif
+                                            </li>
                                         @endforeach
                                     </ul>
                                 @endif
