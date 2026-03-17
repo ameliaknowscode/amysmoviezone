@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActorController;
+use App\Http\Controllers\MovieBySlugController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\PersonTypeCreditsController;
@@ -70,5 +71,6 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Wildcard — must be last so it cannot shadow any specific route above.
+// Wildcards — must be last so they cannot shadow any specific route above.
+Route::get('/{movieSlug}', MovieBySlugController::class)->name('movies.public');
 Route::get('/{typeSlug}/{personSlug}', PersonTypeCreditsController::class)->name('credits.by-type');

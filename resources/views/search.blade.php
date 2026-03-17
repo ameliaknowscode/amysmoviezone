@@ -28,7 +28,7 @@
                                 @foreach($movies as $movie)
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">
-                                            <a href="{{ route('movies.show', $movie) }}" class="text-indigo-600 hover:underline">{{ $movie->title }}</a>
+                                            <a href="{{ $movie->publicUrl() }}" class="text-indigo-600 hover:underline">{{ $movie->title }}</a>
                                         </td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             {{ $movie->credits->map(fn($c) => $c->person->name)->join(', ') ?: '—' }}
