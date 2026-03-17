@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Actor;
 use App\Models\Movie;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,6 +25,14 @@ class MovieControllerTest extends TestCase
     public function test_unauthenticated_user_is_redirected_from_create(): void
     {
         $this->get(route('admin.movies.create'))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_unauthenticated_user_is_redirected_from_edit(): void
+    {
+        $movie = Movie::factory()->create();
+
+        $this->get(route('admin.movies.edit', $movie))
             ->assertRedirect(route('login'));
     }
 
@@ -84,6 +93,20 @@ class MovieControllerTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('admin.movies.create'))
+            ->assertOk();
+    }
+
+    // -------------------------------------------------------------------------
+    // Edit
+    // -------------------------------------------------------------------------
+
+    public function test_edit_returns_200_for_authenticated_user(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        $this->actingAs($user)
+            ->get(route('admin.movies.edit', $movie))
             ->assertOk();
     }
 
@@ -173,6 +196,95 @@ class MovieControllerTest extends TestCase
             ->assertSessionHasErrors('release_year');
     }
 
+    public function test_store_syncs_actors(): void
+    {
+        $user   = User::factory()->create();
+        $actor1 = Actor::factory()->create();
+        $actor2 = Actor::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'        => 'Cast Movie',
+                'director'     => 'Some Director',
+                'release_year' => 2000,
+                'actor_ids'    => [$actor1->id, $actor2->id],
+            ]);
+
+        $movie = Movie::where('title', 'Cast Movie')->firstOrFail();
+        $this->assertCount(2, $movie->actors);
+        $this->assertTrue($movie->actors->contains($actor1));
+        $this->assertTrue($movie->actors->contains($actor2));
+    }
+
+    // -------------------------------------------------------------------------
+    // Update
+    // -------------------------------------------------------------------------
+
+    public function test_update_updates_movie_and_redirects(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create(['title' => 'Old Title']);
+
+        $this->actingAs($user)
+            ->patch(route('admin.movies.update', $movie), [
+                'title'        => 'New Title',
+                'director'     => 'New Director',
+                'release_year' => 2005,
+            ])
+            ->assertRedirect(route('admin.movies.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('movies', ['id' => $movie->id, 'title' => 'New Title']);
+    }
+
+    public function test_update_validates_required_title(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        $this->actingAs($user)
+            ->patch(route('admin.movies.update', $movie), [
+                'director'     => 'Some Director',
+                'release_year' => 2000,
+            ])
+            ->assertSessionHasErrors('title');
+    }
+
+    public function test_update_requires_authentication(): void
+    {
+        $movie = Movie::factory()->create(['title' => 'Original']);
+
+        $this->patch(route('admin.movies.update', $movie), [
+            'title'        => 'Changed',
+            'director'     => 'Someone',
+            'release_year' => 2000,
+        ])->assertRedirect(route('login'));
+
+        $this->assertDatabaseHas('movies', ['id' => $movie->id, 'title' => 'Original']);
+    }
+
+    public function test_update_syncs_actors(): void
+    {
+        $user   = User::factory()->create();
+        $movie  = Movie::factory()->create();
+        $actor1 = Actor::factory()->create();
+        $actor2 = Actor::factory()->create();
+        $movie->actors()->sync([$actor1->id]);
+
+        $this->actingAs($user)
+            ->patch(route('admin.movies.update', $movie), [
+                'title'        => $movie->title,
+                'director'     => $movie->director,
+                'release_year' => $movie->release_year,
+                'actor_ids'    => [$actor2->id],
+            ]);
+
+        $movie->refresh();
+        $this->assertCount(1, $movie->actors);
+        $this->assertTrue($movie->actors->contains($actor2));
+        $this->assertFalse($movie->actors->contains($actor1));
+    }
+
     // -------------------------------------------------------------------------
     // Show (public — no auth required)
     // -------------------------------------------------------------------------
@@ -203,6 +315,16 @@ class MovieControllerTest extends TestCase
     {
         $this->get(route('movies.show', 999999))
             ->assertNotFound();
+    }
+
+    public function test_show_displays_cast(): void
+    {
+        $movie = Movie::factory()->create();
+        $actor = Actor::factory()->create(['name' => 'Keanu Reeves']);
+        $movie->actors()->attach($actor);
+
+        $this->get(route('movies.show', $movie))
+            ->assertSee('Keanu Reeves');
     }
 
     // -------------------------------------------------------------------------
@@ -250,6 +372,26 @@ class MovieControllerTest extends TestCase
         $this->get(route('search', ['q' => 'zzznomatch']))
             ->assertViewHas('movies', function ($movies) {
                 return $movies->isEmpty();
+            });
+    }
+
+    public function test_search_finds_actors_by_name(): void
+    {
+        Actor::factory()->create(['name' => 'Meryl Streep']);
+        Actor::factory()->create(['name' => 'Tom Hanks']);
+
+        $this->get(route('search', ['q' => 'Meryl']))
+            ->assertSee('Meryl Streep')
+            ->assertDontSee('Tom Hanks');
+    }
+
+    public function test_search_with_no_query_returns_empty_actors(): void
+    {
+        Actor::factory()->count(2)->create();
+
+        $this->get(route('search'))
+            ->assertViewHas('actors', function ($actors) {
+                return $actors->isEmpty();
             });
     }
 

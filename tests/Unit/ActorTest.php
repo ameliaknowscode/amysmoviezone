@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Actor;
+use App\Models\Movie;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -56,5 +57,16 @@ class ActorTest extends TestCase
         $actor = Actor::factory()->create(['name' => 'Tom Hanks']);
 
         $this->assertIsString($actor->name);
+    }
+
+    public function test_actor_belongs_to_many_movies(): void
+    {
+        $actor  = Actor::factory()->create();
+        $movie1 = Movie::factory()->create();
+        $movie2 = Movie::factory()->create();
+        $actor->movies()->attach([$movie1->id, $movie2->id]);
+
+        $this->assertCount(2, $actor->movies);
+        $this->assertInstanceOf(Movie::class, $actor->movies->first());
     }
 }

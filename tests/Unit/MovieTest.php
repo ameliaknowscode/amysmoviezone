@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Models\Actor;
 use App\Models\Movie;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -45,5 +46,16 @@ class MovieTest extends TestCase
         $movie = Movie::factory()->create(['release_year' => 2005]);
 
         $this->assertIsInt($movie->release_year);
+    }
+
+    public function test_movie_belongs_to_many_actors(): void
+    {
+        $movie  = Movie::factory()->create();
+        $actor1 = Actor::factory()->create();
+        $actor2 = Actor::factory()->create();
+        $movie->actors()->attach([$actor1->id, $actor2->id]);
+
+        $this->assertCount(2, $movie->actors);
+        $this->assertInstanceOf(Actor::class, $movie->actors->first());
     }
 }
