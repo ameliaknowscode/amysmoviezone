@@ -14,8 +14,22 @@
                         <p class="mb-4 text-green-600">{{ session('success') }}</p>
                     @endif
 
-                    <div class="mb-4">
-                        <a href="{{ route('admin.movies.create') }}" class="text-blue-600 hover:underline">+ Add Movie</a>
+                    <div class="flex items-center justify-between mb-4 gap-4">
+                        <form method="GET" action="{{ route('admin.movies.index') }}" class="flex items-center gap-2">
+                            <input type="hidden" name="sort" value="{{ $direction }}">
+                            <input type="text" name="search" value="{{ $search }}"
+                                placeholder="Filter by title or director…"
+                                class="border-gray-300 rounded-md shadow-sm text-sm w-72">
+                            <button type="submit"
+                                class="px-3 py-1.5 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">
+                                Filter
+                            </button>
+                            @if($search)
+                                <a href="{{ route('admin.movies.index', ['sort' => $direction]) }}"
+                                   class="text-sm text-gray-500 hover:underline">Clear</a>
+                            @endif
+                        </form>
+                        <a href="{{ route('admin.movies.create') }}" class="text-blue-600 hover:underline text-sm shrink-0">+ Add Movie</a>
                     </div>
 
                     @if($movies->isEmpty())
@@ -28,7 +42,7 @@
                                     <th class="border border-gray-300 px-4 py-2">Title</th>
                                     <th class="border border-gray-300 px-4 py-2">Director</th>
                                     <th class="border border-gray-300 px-4 py-2">
-                                        <a href="{{ route('admin.movies.index', ['sort' => $direction === 'asc' ? 'desc' : 'asc']) }}"
+                                        <a href="{{ route('admin.movies.index', ['sort' => $direction === 'asc' ? 'desc' : 'asc', 'search' => $search]) }}"
                                             class="flex items-center gap-1 hover:underline">
                                             Release Year
                                             @if($direction === 'asc')

@@ -12,14 +12,24 @@ class MovieController extends Controller
     public function index(Request $request)
     {
         $direction = $request->query('sort') === 'asc' ? 'asc' : 'desc';
+        $search    = trim($request->query('search', ''));
+
         $movies = Movie::orderBy('release_year', $direction)
+            ->when($search, fn($q) => $q
+                ->where('title', 'like', '%' . $search . '%')
+                ->orWhereHas('credits', fn($q) => $q
+                    ->whereHas('person', fn($p) => $p->where('name', 'like', '%' . $search . '%'))
+                    ->whereHas('type',   fn($t) => $t->where('name', 'Director'))
+                )
+            )
             ->with(['credits' => fn($q) => $q
                 ->with('person')
                 ->whereHas('type', fn($t) => $t->where('name', 'Director'))
             ])
             ->paginate(20)
-            ->appends(['sort' => $direction]);
-        return view('movies.index', compact('movies', 'direction'));
+            ->appends(['sort' => $direction, 'search' => $search]);
+
+        return view('movies.index', compact('movies', 'direction', 'search'));
     }
 
     public function create()
