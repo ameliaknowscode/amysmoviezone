@@ -71,7 +71,7 @@ class ActorController extends Controller
 
     public function show(Actor $actor)
     {
-        $actor->load('movies');
+        $actor->load(['movies' => fn($q) => $q->orderBy('release_year', 'desc')]);
         return view('actors.show', compact('actor'));
     }
 

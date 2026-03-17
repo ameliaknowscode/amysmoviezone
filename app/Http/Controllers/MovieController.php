@@ -44,7 +44,7 @@ class MovieController extends Controller
 
     public function show(Movie $movie)
     {
-        $movie->load('actors');
+        $movie->load(['actors' => fn($q) => $q->orderBy('name')]);
         return view('movies.show', compact('movie'));
     }
 

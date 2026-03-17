@@ -30,7 +30,7 @@
                                     <span class="text-gray-400">No cast listed.</span>
                                 @else
                                     <ul class="space-y-1">
-                                        @foreach($movie->actors->sortBy('name') as $actor)
+                                        @foreach($movie->actors as $actor)
                                             <li><a href="{{ route('actors.show', $actor) }}" class="text-indigo-600 hover:underline">{{ $actor->name }}</a></li>
                                         @endforeach
                                     </ul>
