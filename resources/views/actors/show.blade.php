@@ -34,7 +34,7 @@
                                     <ul class="space-y-1">
                                         @foreach($actor->movies as $movie)
                                             <li>
-                                                <a href="{{ route('movies.show', $movie) }}" class="text-indigo-600 hover:underline">{{ $movie->title }}</a>
+                                                <a href="{{ $movie->publicUrl() }}" class="text-indigo-600 hover:underline">{{ $movie->title }}</a>
                                                 <span class="text-gray-400">({{ $movie->release_year }})</span>
                                                 @if($movie->pivot->role)
                                                     <span class="text-gray-500 text-sm">— {{ $movie->pivot->role }}</span>

@@ -34,7 +34,7 @@
                                     <ul class="space-y-1">
                                         @foreach($person->credits as $credit)
                                             <li>
-                                                <a href="{{ route('movies.show', $credit->movie) }}" class="text-indigo-600 hover:underline">{{ $credit->movie->title }}</a>
+                                                <a href="{{ $credit->movie->publicUrl() }}" class="text-indigo-600 hover:underline">{{ $credit->movie->title }}</a>
                                                 <span class="text-gray-400">({{ $credit->movie->release_year }})</span>
                                                 <span class="text-gray-500 text-sm">— {{ $credit->type->name }}</span>
                                                 @if($credit->character)

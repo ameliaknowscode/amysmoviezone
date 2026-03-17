@@ -14,7 +14,7 @@
                     <ul class="divide-y divide-gray-100">
                         @foreach($credits as $credit)
                             <li class="py-3 flex items-baseline gap-3">
-                                <a href="{{ route('movies.show', $credit->movie) }}"
+                                <a href="{{ $credit->movie->publicUrl() }}"
                                    class="text-sm font-medium text-indigo-600 hover:underline">
                                     {{ $credit->movie->title }}
                                 </a>
