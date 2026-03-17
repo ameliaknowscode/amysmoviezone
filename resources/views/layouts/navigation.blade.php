@@ -36,6 +36,9 @@
                             <x-dropdown-link :href="route('admin.actors.index')">
                                 {{ __('Actors') }}
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.people.index')">
+                                {{ __('People') }}
+                            </x-dropdown-link>
                         </x-slot>
                     </x-dropdown>
                     </div>
@@ -175,6 +178,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.actors.index')" :active="request()->routeIs('admin.actors.*')" class="pl-8">
                 {{ __('— Actors') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.people.index')" :active="request()->routeIs('admin.people.*')" class="pl-8">
+                {{ __('— People') }}
             </x-responsive-nav-link>
             @endauth
         </div>
