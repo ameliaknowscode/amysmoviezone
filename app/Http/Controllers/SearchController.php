@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\Person;
 use Illuminate\Http\Request;
@@ -30,5 +31,45 @@ class SearchController extends Controller
             : collect();
 
         return view('search', compact('movies', 'people', 'query'));
+    }
+
+    public function directorSearch(Request $request)
+    {
+        $directors = Person::whereHas('credits', fn($q) =>
+            $q->whereHas('type', fn($t) => $t->where('name', 'Director'))
+        )->orderBy('name')->get();
+
+        $ids = array_filter($request->query('directors', []));
+
+        $actors = collect();
+        $selectedDirectors = collect();
+
+        if (!empty($ids)) {
+            $selectedDirectors = $directors->whereIn('id', $ids)->values();
+
+            // For each director, find the set of actor IDs who appeared in their films.
+            // Then intersect all sets to keep only actors who worked with every director.
+            $actorSets = collect($ids)->map(function ($directorId) {
+                $movieIds = Credit::where('person_id', $directorId)
+                    ->whereHas('type', fn($q) => $q->where('name', 'Director'))
+                    ->pluck('movie_id');
+
+                return Credit::whereIn('movie_id', $movieIds)
+                    ->whereHas('type', fn($q) => $q->where('name', 'Actor'))
+                    ->pluck('person_id')
+                    ->unique()
+                    ->values();
+            });
+
+            $sharedActorIds = $actorSets->reduce(
+                fn($carry, $set) => $carry === null ? $set : $carry->intersect($set)->values()
+            );
+
+            $actors = $sharedActorIds && $sharedActorIds->isNotEmpty()
+                ? Person::whereIn('id', $sharedActorIds)->orderBy('name')->get()
+                : collect();
+        }
+
+        return view('director-search', compact('directors', 'selectedDirectors', 'actors'));
     }
 }

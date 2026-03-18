@@ -33,9 +33,6 @@
                             <x-dropdown-link :href="route('admin.movies.index')">
                                 {{ __('Movies') }}
                             </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.actors.index')">
-                                {{ __('Actors') }}
-                            </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.people.index')">
                                 {{ __('People') }}
                             </x-dropdown-link>
@@ -49,8 +46,14 @@
                 </div>
             </div>
 
-            <!-- Search Button (desktop) -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <!-- Search Buttons (desktop) -->
+            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-2">
+                <a
+                    href="{{ route('director-search') }}"
+                    class="inline-flex items-center gap-1 px-3 py-2 text-sm {{ request()->routeIs('director-search') ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700' }} focus:outline-none transition"
+                >
+                    Director Search
+                </a>
                 <button
                     @click="searchOpen = true"
                     class="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none transition"
@@ -80,7 +83,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="Auth::user()->username ? route('profile.show', Auth::user()->username) : route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
@@ -128,14 +131,14 @@
             x-transition.scale
             class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4"
         >
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Search movies &amp; actors</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Search movies &amp; people</h3>
 
             <form method="GET" action="{{ route('search') }}">
                 <div class="flex items-center gap-2">
                     <input
                         type="text"
                         name="q"
-                        placeholder="Enter title or actor name…"
+                        placeholder="Enter title or person name…"
                         x-init="$watch('searchOpen', val => { if (val) $nextTick(() => $el.focus()) })"
                         class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
@@ -166,6 +169,9 @@
             >
                 Search
             </button>
+            <x-responsive-nav-link :href="route('director-search')" :active="request()->routeIs('director-search')">
+                {{ __('Director Search') }}
+            </x-responsive-nav-link>
             @auth
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
@@ -178,9 +184,6 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.movies.index')" :active="request()->routeIs('admin.movies.*')" class="pl-8">
                 {{ __('— Movies') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.actors.index')" :active="request()->routeIs('admin.actors.*')" class="pl-8">
-                {{ __('— Actors') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.people.index')" :active="request()->routeIs('admin.people.*')" class="pl-8">
                 {{ __('— People') }}
@@ -200,7 +203,7 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
+                <x-responsive-nav-link :href="Auth::user()->username ? route('profile.show', Auth::user()->username) : route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 

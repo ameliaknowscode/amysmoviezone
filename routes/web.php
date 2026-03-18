@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActorController;
 use App\Http\Controllers\MovieBySlugController;
+use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\PersonTypeCreditsController;
@@ -16,9 +17,11 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/director-search', [SearchController::class, 'directorSearch'])->name('director-search');
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/actors/{actor}', [ActorController::class, 'show'])->name('actors.show');
 Route::get('/people/{person}', [PersonController::class, 'show'])->name('people.show');
+Route::get('/u/{username}', [UserProfileController::class, 'show'])->name('profile.show');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
