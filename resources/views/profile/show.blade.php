@@ -24,11 +24,17 @@
                 <div class="bg-indigo-600 h-24"></div>
 
                 <div class="px-6 pb-6">
-                    <!-- Avatar initials circle -->
+                    <!-- Avatar -->
                     <div class="-mt-10 mb-4">
-                        <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-white ring-4 ring-white shadow text-indigo-600 text-2xl font-bold select-none">
-                            {{ strtoupper(substr($profileUser->name, 0, 1)) }}
-                        </div>
+                        @if($profileUser->avatar)
+                            <img src="{{ asset('storage/' . $profileUser->avatar) }}"
+                                 alt="{{ $profileUser->name }}"
+                                 class="h-20 w-20 rounded-full object-cover ring-4 ring-white shadow">
+                        @else
+                            <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-white ring-4 ring-white shadow text-indigo-600 text-2xl font-bold select-none">
+                                {{ strtoupper(substr($profileUser->name, 0, 1)) }}
+                            </div>
+                        @endif
                     </div>
 
                     <h1 class="text-2xl font-bold text-gray-900">{{ $profileUser->name }}</h1>
