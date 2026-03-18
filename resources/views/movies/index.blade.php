@@ -29,6 +29,7 @@
                                    class="text-sm text-gray-500 hover:underline">Clear</a>
                             @endif
                         </form>
+                        <a href="{{ route('admin.movies.import') }}" class="text-indigo-600 hover:underline text-sm shrink-0">↑ Import CSV</a>
                         <a href="{{ route('admin.movies.create') }}" class="text-blue-600 hover:underline text-sm shrink-0">+ Add Movie</a>
                     </div>
 
