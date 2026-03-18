@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PersonRequest;
 use App\Models\Person;
-use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PersonController extends Controller
 {
@@ -18,14 +19,10 @@ class PersonController extends Controller
         return view('people.create');
     }
 
-    public function store(Request $request)
+    public function store(PersonRequest $request)
     {
-        $validated = $request->validate([
-            'name'          => 'required|string|max:255',
-            'date_of_birth' => 'nullable|date|before:today',
-            'nationality'   => 'nullable|string|max:255',
-        ]);
-
+        $validated = $request->validated();
+        $validated['slug'] = Str::slug($validated['name']);
         Person::create($validated);
 
         return redirect()->route('admin.people.index')->with('success', 'Person added successfully.');
@@ -45,14 +42,10 @@ class PersonController extends Controller
         return view('people.edit', compact('person'));
     }
 
-    public function update(Request $request, Person $person)
+    public function update(PersonRequest $request, Person $person)
     {
-        $validated = $request->validate([
-            'name'          => 'required|string|max:255',
-            'date_of_birth' => 'nullable|date|before:today',
-            'nationality'   => 'nullable|string|max:255',
-        ]);
-
+        $validated = $request->validated();
+        $validated['slug'] = Str::slug($validated['name']);
         $person->update($validated);
 
         return redirect()->route('admin.people.index')->with('success', 'Person updated successfully.');

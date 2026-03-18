@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MovieRequest;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Type;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class MovieController extends Controller
 {
@@ -40,19 +42,13 @@ class MovieController extends Controller
         return view('movies.create', compact('people', 'types', 'initialCredits'));
     }
 
-    public function store(Request $request)
+    public function store(MovieRequest $request)
     {
-        $validated = $request->validate([
-            'title'               => 'required|string|max:255',
-            'release_year'        => 'required|integer|min:1888|max:' . (date('Y') + 5),
-            'credits'             => 'nullable|array',
-            'credits.*.person_id' => 'nullable|integer|exists:people,id',
-            'credits.*.type_id'   => 'nullable|integer|exists:types,id',
-            'credits.*.character' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $movie = Movie::create([
             'title'        => $validated['title'],
+            'slug'         => Str::slug($validated['title']),
             'release_year' => $validated['release_year'],
         ]);
 
@@ -64,9 +60,11 @@ class MovieController extends Controller
     public function show(Movie $movie)
     {
         $movie->load(['credits' => fn($q) => $q->with(['person', 'type'])->orderBy('id')]);
-        $cast = $movie->credits->filter(fn($c) => !$c->type->is_crew)->values();
-        $crew = $movie->credits->filter(fn($c) =>  $c->type->is_crew)->groupBy(fn($c) => $c->type->name);
-        return view('movies.show', compact('movie', 'cast', 'crew'));
+        return view('movies.show', [
+            'movie' => $movie,
+            'cast'  => $movie->getCast(),
+            'crew'  => $movie->getCrew(),
+        ]);
     }
 
     public function edit(Movie $movie)
@@ -82,19 +80,13 @@ class MovieController extends Controller
         return view('movies.edit', compact('movie', 'people', 'types', 'initialCredits'));
     }
 
-    public function update(Request $request, Movie $movie)
+    public function update(MovieRequest $request, Movie $movie)
     {
-        $validated = $request->validate([
-            'title'               => 'required|string|max:255',
-            'release_year'        => 'required|integer|min:1888|max:' . (date('Y') + 5),
-            'credits'             => 'nullable|array',
-            'credits.*.person_id' => 'nullable|integer|exists:people,id',
-            'credits.*.type_id'   => 'nullable|integer|exists:types,id',
-            'credits.*.character' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $movie->update([
             'title'        => $validated['title'],
+            'slug'         => Str::slug($validated['title']),
             'release_year' => $validated['release_year'],
         ]);
 

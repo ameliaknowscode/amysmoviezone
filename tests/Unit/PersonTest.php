@@ -23,7 +23,7 @@ class PersonTest extends TestCase
     {
         $person = new Person();
 
-        $this->assertEquals(['name', 'date_of_birth', 'nationality'], $person->getFillable());
+        $this->assertEquals(['name', 'slug', 'date_of_birth', 'nationality'], $person->getFillable());
     }
 
     public function test_person_stores_all_fields_correctly(): void

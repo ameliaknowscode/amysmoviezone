@@ -11,12 +11,11 @@ class PersonTypeCreditsController extends Controller
 {
     public function __invoke(string $typeSlug, string $personSlug)
     {
-        // Match type by slugified name.
+        // Types are few — loading all is negligible, avoids needing a slug column on types.
         $type = Type::all()->first(fn($t) => Str::slug($t->name) === $typeSlug);
         abort_unless($type, 404);
 
-        // Match person by slugified name.
-        $person = Person::all()->first(fn($p) => Str::slug($p->name) === $personSlug);
+        $person = Person::where('slug', $personSlug)->first();
         abort_unless($person, 404);
 
         $credits = Credit::with('movie')

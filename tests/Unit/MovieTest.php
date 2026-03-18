@@ -24,7 +24,7 @@ class MovieTest extends TestCase
     {
         $movie = new Movie();
 
-        $this->assertEquals(['title', 'director', 'release_year'], $movie->getFillable());
+        $this->assertEquals(['title', 'slug', 'director', 'release_year'], $movie->getFillable());
     }
 
     public function test_movie_stores_all_fields_correctly(): void

@@ -11,7 +11,7 @@ class Person extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'date_of_birth', 'nationality'];
+    protected $fillable = ['name', 'slug', 'date_of_birth', 'nationality'];
 
     public function credits(): HasMany
     {
@@ -43,7 +43,7 @@ class Person extends Model
 
         return route('credits.by-type', [
             'typeSlug'   => Str::slug($type->name),
-            'personSlug' => Str::slug($this->name),
+            'personSlug' => $this->slug ?? Str::slug($this->name),
         ]);
     }
 }

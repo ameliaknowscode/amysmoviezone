@@ -66,7 +66,7 @@ class SearchController extends Controller
             );
 
             $actors = $sharedActorIds && $sharedActorIds->isNotEmpty()
-                ? Person::whereIn('id', $sharedActorIds)->orderBy('name')->get()
+                ? Person::whereIn('id', $sharedActorIds)->with('credits.type')->orderBy('name')->get()
                 : collect();
         }
 

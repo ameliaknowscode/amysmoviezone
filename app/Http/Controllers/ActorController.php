@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ActorRequest;
 use App\Models\Actor;
 use App\Models\Movie;
-use Illuminate\Http\Request;
 
 class ActorController extends Controller
 {
@@ -21,16 +21,9 @@ class ActorController extends Controller
         return view('actors.create', compact('movies', 'initialFilmography'));
     }
 
-    public function store(Request $request)
+    public function store(ActorRequest $request)
     {
-        $validated = $request->validate([
-            'name'                    => 'required|string|max:255',
-            'date_of_birth'           => 'nullable|date|before:today',
-            'nationality'             => 'nullable|string|max:255',
-            'filmography'             => 'nullable|array',
-            'filmography.*.movie_id'  => 'nullable|integer|exists:movies,id',
-            'filmography.*.role'      => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $actor = Actor::create([
             'name'          => $validated['name'],
@@ -38,13 +31,7 @@ class ActorController extends Controller
             'nationality'   => $validated['nationality'] ?? null,
         ]);
 
-        $syncData = [];
-        foreach ($request->input('filmography', []) as $row) {
-            if (!empty($row['movie_id'])) {
-                $syncData[(int)$row['movie_id']] = ['role' => $row['role'] ?? null];
-            }
-        }
-        $actor->movies()->sync($syncData);
+        $this->syncFilmography($actor, $request->input('filmography', []));
 
         return redirect()->route('admin.actors.index')->with('success', 'Actor added successfully.');
     }
@@ -66,16 +53,9 @@ class ActorController extends Controller
         return view('actors.edit', compact('actor', 'movies', 'initialFilmography'));
     }
 
-    public function update(Request $request, Actor $actor)
+    public function update(ActorRequest $request, Actor $actor)
     {
-        $validated = $request->validate([
-            'name'                    => 'required|string|max:255',
-            'date_of_birth'           => 'nullable|date|before:today',
-            'nationality'             => 'nullable|string|max:255',
-            'filmography'             => 'nullable|array',
-            'filmography.*.movie_id'  => 'nullable|integer|exists:movies,id',
-            'filmography.*.role'      => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $actor->update([
             'name'          => $validated['name'],
@@ -83,13 +63,7 @@ class ActorController extends Controller
             'nationality'   => $validated['nationality'] ?? null,
         ]);
 
-        $syncData = [];
-        foreach ($request->input('filmography', []) as $row) {
-            if (!empty($row['movie_id'])) {
-                $syncData[(int)$row['movie_id']] = ['role' => $row['role'] ?? null];
-            }
-        }
-        $actor->movies()->sync($syncData);
+        $this->syncFilmography($actor, $request->input('filmography', []));
 
         return redirect()->route('admin.actors.index')->with('success', 'Actor updated successfully.');
     }
@@ -99,5 +73,16 @@ class ActorController extends Controller
         $actor->delete();
 
         return redirect()->route('admin.actors.index')->with('success', 'Actor deleted successfully.');
+    }
+
+    private function syncFilmography(Actor $actor, array $rows): void
+    {
+        $syncData = [];
+        foreach ($rows as $row) {
+            if (!empty($row['movie_id'])) {
+                $syncData[(int)$row['movie_id']] = ['role' => $row['role'] ?? null];
+            }
+        }
+        $actor->movies()->sync($syncData);
     }
 }
