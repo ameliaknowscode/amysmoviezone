@@ -1,0 +1,47 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ $profileUser->name }}
+            </h2>
+
+            @auth
+                @if (Auth::id() === $profileUser->id && $profileUser->username)
+                    <a href="{{ route('profile.edit') }}"
+                       class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        Edit Profile
+                    </a>
+                @endif
+            @endauth
+        </div>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white shadow sm:rounded-lg overflow-hidden">
+
+                <!-- Avatar / header band -->
+                <div class="bg-indigo-600 h-24"></div>
+
+                <div class="px-6 pb-6">
+                    <!-- Avatar initials circle -->
+                    <div class="-mt-10 mb-4">
+                        <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-white ring-4 ring-white shadow text-indigo-600 text-2xl font-bold select-none">
+                            {{ strtoupper(substr($profileUser->name, 0, 1)) }}
+                        </div>
+                    </div>
+
+                    <h1 class="text-2xl font-bold text-gray-900">{{ $profileUser->name }}</h1>
+                    <p class="text-sm text-gray-500 mt-0.5">&#64;{{ $profileUser->username }}</p>
+
+                    <dl class="mt-6 space-y-3 text-sm text-gray-700">
+                        <div class="flex gap-2">
+                            <dt class="font-medium text-gray-500 w-32 shrink-0">Member since</dt>
+                            <dd>{{ $profileUser->created_at->format('F j, Y') }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
