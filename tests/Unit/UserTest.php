@@ -22,7 +22,7 @@ class UserTest extends TestCase
     {
         $user = new User();
 
-        $this->assertEquals(['name', 'username', 'email', 'password'], $user->getFillable());
+        $this->assertEquals(['name', 'username', 'email', 'password', 'avatar'], $user->getFillable());
     }
 
     public function test_user_password_is_hidden_from_array(): void
