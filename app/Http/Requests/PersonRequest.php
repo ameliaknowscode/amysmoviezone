@@ -14,9 +14,13 @@ class PersonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'          => 'required|string|max:255',
-            'date_of_birth' => 'nullable|date|before:today',
-            'nationality'   => 'nullable|string|max:255',
+            'name'               => 'required|string|max:255',
+            'date_of_birth'      => 'nullable|date|before:today',
+            'nationality'        => 'nullable|string|max:255',
+            'credits'            => ['nullable', 'array'],
+            'credits.*.movie_id' => ['nullable', 'integer', 'exists:movies,id'],
+            'credits.*.type_id'  => ['nullable', 'integer', 'exists:types,id'],
+            'credits.*.character'=> ['nullable', 'string', 'max:255'],
         ];
     }
 }

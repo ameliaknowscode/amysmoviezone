@@ -291,6 +291,98 @@ class PersonControllerTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
+    // Credits on edit page
+    // -------------------------------------------------------------------------
+
+    public function test_edit_passes_initial_credits_to_view(): void
+    {
+        $user   = User::factory()->create();
+        $person = Person::factory()->create();
+        $movie  = Movie::factory()->create(['title' => 'Interstellar']);
+        $type   = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
+        Credit::factory()->create([
+            'person_id' => $person->id,
+            'movie_id'  => $movie->id,
+            'type_id'   => $type->id,
+            'character' => 'Cooper',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('admin.people.edit', $person))
+            ->assertOk()
+            ->assertSee('Interstellar')
+            ->assertSee($type->name);
+    }
+
+    public function test_update_saves_credits(): void
+    {
+        $user   = User::factory()->create();
+        $person = Person::factory()->create(['name' => 'Some Actor']);
+        $movie  = Movie::factory()->create();
+        $type   = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
+
+        $this->actingAs($user)
+            ->patch(route('admin.people.update', $person), [
+                'name'    => $person->name,
+                'credits' => [
+                    ['movie_id' => $movie->id, 'type_id' => $type->id, 'character' => 'Hero'],
+                ],
+            ])
+            ->assertRedirect(route('admin.people.index'));
+
+        $this->assertDatabaseHas('credits', [
+            'person_id' => $person->id,
+            'movie_id'  => $movie->id,
+            'type_id'   => $type->id,
+            'character' => 'Hero',
+        ]);
+    }
+
+    public function test_update_syncs_credits_replacing_old_ones(): void
+    {
+        $user   = User::factory()->create();
+        $person = Person::factory()->create();
+        $movie1 = Movie::factory()->create();
+        $movie2 = Movie::factory()->create();
+        $type   = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
+
+        Credit::factory()->create([
+            'person_id' => $person->id,
+            'movie_id'  => $movie1->id,
+            'type_id'   => $type->id,
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('admin.people.update', $person), [
+                'name'    => $person->name,
+                'credits' => [
+                    ['movie_id' => $movie2->id, 'type_id' => $type->id, 'character' => ''],
+                ],
+            ]);
+
+        $this->assertDatabaseMissing('credits', ['person_id' => $person->id, 'movie_id' => $movie1->id]);
+        $this->assertDatabaseHas('credits',    ['person_id' => $person->id, 'movie_id' => $movie2->id]);
+    }
+
+    public function test_update_ignores_incomplete_credit_rows(): void
+    {
+        $user   = User::factory()->create();
+        $person = Person::factory()->create();
+        $movie  = Movie::factory()->create();
+
+        $this->actingAs($user)
+            ->patch(route('admin.people.update', $person), [
+                'name'    => $person->name,
+                'credits' => [
+                    ['movie_id' => $movie->id, 'type_id' => '', 'character' => ''],
+                    ['movie_id' => '',          'type_id' => '', 'character' => ''],
+                ],
+            ]);
+
+        $this->assertSame(0, Credit::where('person_id', $person->id)->count());
+    }
+
+    // -------------------------------------------------------------------------
     // Destroy
     // -------------------------------------------------------------------------
 

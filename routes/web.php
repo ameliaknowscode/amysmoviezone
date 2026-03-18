@@ -6,6 +6,7 @@ use App\Http\Controllers\MovieImportController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\PersonController;
+use App\Http\Controllers\PersonCreditImportController;
 use App\Http\Controllers\PersonTypeCreditsController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\ProfileController;
@@ -65,6 +66,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/people/{person}/edit', [PersonController::class, 'edit'])->name('people.edit');
         Route::patch('/people/{person}', [PersonController::class, 'update'])->name('people.update');
         Route::delete('/people/{person}', [PersonController::class, 'destroy'])->name('people.destroy');
+        Route::get('/people/{person}/credits/import', [PersonCreditImportController::class, 'create'])->name('people.credits.import');
+        Route::post('/people/{person}/credits/import', [PersonCreditImportController::class, 'store'])->name('people.credits.import.store');
 
         Route::get('/types', [TypeController::class, 'index'])->name('types.index');
         Route::get('/types/create', [TypeController::class, 'create'])->name('types.create');
