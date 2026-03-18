@@ -76,12 +76,12 @@ class SearchControllerTest extends TestCase
 
     public function test_director_search_page_loads_without_params(): void
     {
-        $this->get(route('director-search'))->assertOk();
+        $this->get(route('director-connections'))->assertOk();
     }
 
     public function test_director_search_is_accessible_without_authentication(): void
     {
-        $this->get(route('director-search'))->assertOk();
+        $this->get(route('director-connections'))->assertOk();
     }
 
     public function test_director_search_lists_directors_in_dropdowns(): void
@@ -95,7 +95,7 @@ class SearchControllerTest extends TestCase
             'movie_id'  => $movie->id,
         ]);
 
-        $this->get(route('director-search'))
+        $this->get(route('director-connections'))
             ->assertSee('Stanley Kubrick');
     }
 
@@ -110,7 +110,7 @@ class SearchControllerTest extends TestCase
             'movie_id'  => $movie->id,
         ]);
 
-        $this->get(route('director-search'))
+        $this->get(route('director-connections'))
             ->assertDontSee('Jack Nicholson');
     }
 
@@ -126,7 +126,7 @@ class SearchControllerTest extends TestCase
         Credit::factory()->create(['person_id' => $director->id, 'type_id' => $directorType->id, 'movie_id' => $movie->id]);
         Credit::factory()->create(['person_id' => $actor->id,    'type_id' => $actorType->id,    'movie_id' => $movie->id]);
 
-        $this->get(route('director-search', ['directors' => [$director->id]]))
+        $this->get(route('director-connections', ['directors' => [$director->id]]))
             ->assertSee('Jack Nicholson');
     }
 
@@ -150,7 +150,7 @@ class SearchControllerTest extends TestCase
         // This actor only worked with director 1 — should be excluded.
         Credit::factory()->create(['person_id' => $onlyD1Actor->id, 'type_id' => $actorType->id,    'movie_id' => $movie1->id]);
 
-        $response = $this->get(route('director-search', [
+        $response = $this->get(route('director-connections', [
             'directors' => [$director1->id, $director2->id],
         ]));
 
@@ -173,7 +173,7 @@ class SearchControllerTest extends TestCase
         Credit::factory()->create(['person_id' => $actor->id,          'type_id' => $actorType->id,    'movie_id' => $movie->id]);
         Credit::factory()->create(['person_id' => $unrelatedActor->id, 'type_id' => $actorType->id,    'movie_id' => $unrelatedMovie->id]);
 
-        $this->get(route('director-search', ['directors' => [$director->id]]))
+        $this->get(route('director-connections', ['directors' => [$director->id]]))
             ->assertSee('Jack Nicholson')
             ->assertDontSee('Tom Hanks');
     }
@@ -187,7 +187,7 @@ class SearchControllerTest extends TestCase
         Credit::factory()->create(['person_id' => $director->id, 'type_id' => $directorType->id, 'movie_id' => $movie->id]);
 
         // Director has no actor credit — results should be empty.
-        $this->get(route('director-search', ['directors' => [$director->id]]))
+        $this->get(route('director-connections', ['directors' => [$director->id]]))
             ->assertSee('No actors found for the selected director(s).');
     }
 
@@ -207,7 +207,7 @@ class SearchControllerTest extends TestCase
         Credit::factory()->create(['person_id' => $sharedActor->id, 'type_id' => $actorType->id,    'movie_id' => $movie1->id]);
         Credit::factory()->create(['person_id' => $sharedActor->id, 'type_id' => $actorType->id,    'movie_id' => $movie2->id]);
 
-        $response = $this->get(route('director-search', [
+        $response = $this->get(route('director-connections', [
             'directors' => [$director1->id, $director2->id],
         ]));
 
@@ -222,7 +222,7 @@ class SearchControllerTest extends TestCase
         $movie = Movie::factory()->create();
         Credit::factory()->create(['person_id' => $actor->id, 'type_id' => $actorType->id, 'movie_id' => $movie->id]);
 
-        $this->get(route('director-search'))
+        $this->get(route('director-connections'))
             ->assertDontSee('Jack Nicholson');
     }
 
@@ -250,7 +250,7 @@ class SearchControllerTest extends TestCase
         // This actor only worked with director 1 — should be excluded.
         Credit::factory()->create(['person_id' => $onlyD1Actor->id, 'type_id' => $actorType->id,    'movie_id' => $movie1->id]);
 
-        $response = $this->get(route('director-search', [
+        $response = $this->get(route('director-connections', [
             'directors' => [$director1->id, $director2->id, $director3->id],
         ]));
 

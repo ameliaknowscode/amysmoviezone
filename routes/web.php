@@ -17,7 +17,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/search', [SearchController::class, 'search'])->name('search');
-Route::get('/director-search', [SearchController::class, 'directorSearch'])->name('director-search');
+Route::get('/director-connections', [SearchController::class, 'directorConnections'])->name('director-connections');
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/actors/{actor}', [ActorController::class, 'show'])->name('actors.show');
 Route::get('/people/{person}', [PersonController::class, 'show'])->name('people.show');

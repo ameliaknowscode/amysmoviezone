@@ -49,10 +49,10 @@
             <!-- Search Buttons (desktop) -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 gap-2">
                 <a
-                    href="{{ route('director-search') }}"
-                    class="inline-flex items-center gap-1 px-3 py-2 text-sm {{ request()->routeIs('director-search') ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700' }} focus:outline-none transition"
+                    href="{{ route('director-connections') }}"
+                    class="inline-flex items-center gap-1 px-3 py-2 text-sm {{ request()->routeIs('director-connections') ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700' }} focus:outline-none transition"
                 >
-                    Director Search
+                    Director Connections
                 </a>
                 <button
                     @click="searchOpen = true"
@@ -169,8 +169,8 @@
             >
                 Search
             </button>
-            <x-responsive-nav-link :href="route('director-search')" :active="request()->routeIs('director-search')">
-                {{ __('Director Search') }}
+            <x-responsive-nav-link :href="route('director-connections')" :active="request()->routeIs('director-connections')">
+                {{ __('Director Connections') }}
             </x-responsive-nav-link>
             @auth
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">

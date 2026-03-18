@@ -33,7 +33,7 @@ class SearchController extends Controller
         return view('search', compact('movies', 'people', 'query'));
     }
 
-    public function directorSearch(Request $request)
+    public function directorConnections(Request $request)
     {
         $directors = Person::whereHas('credits', fn($q) =>
             $q->whereHas('type', fn($t) => $t->where('name', 'Director'))
@@ -70,6 +70,6 @@ class SearchController extends Controller
                 : collect();
         }
 
-        return view('director-search', compact('directors', 'selectedDirectors', 'actors'));
+        return view('director-connections', compact('directors', 'selectedDirectors', 'actors'));
     }
 }
