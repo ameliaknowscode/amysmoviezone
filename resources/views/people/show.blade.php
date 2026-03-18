@@ -31,18 +31,27 @@
                                 @if($person->credits->isEmpty())
                                     <span class="text-gray-400">No credits listed.</span>
                                 @else
-                                    <ul class="space-y-1">
-                                        @foreach($person->credits as $credit)
-                                            <li>
-                                                <a href="{{ $credit->movie->publicUrl() }}" class="text-indigo-600 hover:underline">{{ $credit->movie->title }}</a>
-                                                <span class="text-gray-400">({{ $credit->movie->release_year }})</span>
-                                                <span class="text-gray-500 text-sm">— {{ $credit->type->name }}</span>
-                                                @if($credit->character)
-                                                    <span class="text-gray-500 text-sm">as {{ $credit->character }}</span>
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
+                                    @php
+                                        $creditTypes = $person->credits->map(fn($c) => $c->type->name)->unique()->values();
+                                    @endphp
+                                    <div x-data="{ selectedType: '{{ $creditTypes->first() }}' }">
+                                        <select x-model="selectedType" class="mb-3 rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            @foreach($creditTypes as $type)
+                                                <option value="{{ $type }}">{{ $type }}</option>
+                                            @endforeach
+                                        </select>
+                                        <ul class="space-y-1">
+                                            @foreach($person->credits as $credit)
+                                                <li x-show="selectedType === '{{ $credit->type->name }}'">
+                                                    <a href="{{ $credit->movie->publicUrl() }}" class="text-indigo-600 hover:underline">{{ $credit->movie->title }}</a>
+                                                    <span class="text-gray-400">({{ $credit->movie->release_year }})</span>
+                                                    @if($credit->character)
+                                                        <span class="text-gray-500 text-sm">as {{ $credit->character }}</span>
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
                                 @endif
                             </dd>
                         </div>

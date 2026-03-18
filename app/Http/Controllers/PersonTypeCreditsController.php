@@ -28,6 +28,9 @@ class PersonTypeCreditsController extends Controller
 
         abort_if($credits->isEmpty(), 404);
 
-        return view('credits.by-type', compact('person', 'type', 'credits'));
+        $personTypeIds = Credit::where('person_id', $person->id)->pluck('type_id')->unique();
+        $personTypes = Type::whereIn('id', $personTypeIds)->get();
+
+        return view('credits.by-type', compact('person', 'type', 'credits', 'personTypes'));
     }
 }
