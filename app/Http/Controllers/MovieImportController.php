@@ -36,7 +36,10 @@ class MovieImportController extends Controller
         $titleIdx = array_search('title', $header);
         $yearIdx  = array_search('release_year', $header);
 
+        $updateExisting = $request->boolean('update_existing');
+
         $imported = 0;
+        $updated  = 0;
         $errors   = [];
         $row      = 1;
 
@@ -65,12 +68,20 @@ class MovieImportController extends Controller
             }
 
             // Duplicate check (case-insensitive title + same year)
-            $duplicate = Movie::whereRaw('LOWER(title) = ?', [strtolower($title)])
+            $existing = Movie::whereRaw('LOWER(title) = ?', [strtolower($title)])
                 ->where('release_year', (int) $year)
-                ->exists();
+                ->first();
 
-            if ($duplicate) {
-                $errors[] = ['row' => $row, 'title' => $title, 'reason' => "A movie called \"{$title}\" ({$year}) already exists."];
+            if ($existing) {
+                if ($updateExisting) {
+                    $existing->update([
+                        'title' => $title,
+                        'slug'  => Str::slug($title),
+                    ]);
+                    $updated++;
+                } else {
+                    $errors[] = ['row' => $row, 'title' => $title, 'reason' => "A movie called \"{$title}\" ({$year}) already exists."];
+                }
                 continue;
             }
 
@@ -86,6 +97,6 @@ class MovieImportController extends Controller
         fclose($handle);
 
         $rowErrors = $errors;
-        return view('movies.import', compact('imported', 'rowErrors'));
+        return view('movies.import', compact('imported', 'updated', 'rowErrors'));
     }
 }

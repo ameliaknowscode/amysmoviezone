@@ -37,12 +37,19 @@ Inception,2010</pre>
 
                     <form method="POST" action="{{ route('admin.movies.import.store') }}" enctype="multipart/form-data">
                         @csrf
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 mb-3">
                             <input type="file"
                                    name="file"
                                    accept=".csv,.txt"
                                    class="block text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
                                    required>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                                <input type="checkbox" name="update_existing" value="1"
+                                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                Update existing movies if title &amp; year match
+                            </label>
                             <button type="submit"
                                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition">
                                 Import
@@ -54,11 +61,18 @@ Inception,2010</pre>
 
             {{-- Results --}}
             @isset($imported)
-                @if($imported > 0)
-                    <div class="p-4 bg-green-50 border border-green-200 rounded-md">
-                        <p class="text-green-700 text-sm font-medium">
-                            ✓ {{ $imported }} {{ Str::plural('movie', $imported) }} imported successfully.
-                        </p>
+                @if($imported > 0 || $updated > 0)
+                    <div class="p-4 bg-green-50 border border-green-200 rounded-md space-y-1">
+                        @if($imported > 0)
+                            <p class="text-green-700 text-sm font-medium">
+                                ✓ {{ $imported }} {{ Str::plural('movie', $imported) }} imported successfully.
+                            </p>
+                        @endif
+                        @if($updated > 0)
+                            <p class="text-green-700 text-sm font-medium">
+                                ✓ {{ $updated }} {{ Str::plural('movie', $updated) }} updated successfully.
+                            </p>
+                        @endif
                     </div>
                 @endif
 
@@ -90,7 +104,7 @@ Inception,2010</pre>
                     </div>
                 @endif
 
-                @if($imported === 0 && empty($rowErrors))
+                @if($imported === 0 && $updated === 0 && empty($rowErrors))
                     <p class="text-sm text-gray-500">The file was empty or contained no data rows.</p>
                 @endif
             @endisset

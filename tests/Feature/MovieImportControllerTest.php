@@ -80,7 +80,7 @@ class MovieImportControllerTest extends TestCase
     }
 
     // -----------------------------------------------------------------------
-    // Duplicate handling
+    // Duplicate handling — skip mode (default)
     // -----------------------------------------------------------------------
 
     public function test_duplicate_movie_is_skipped_and_reported(): void
@@ -110,6 +110,55 @@ class MovieImportControllerTest extends TestCase
             ->post(route('admin.movies.import.store'), ['file' => $file]);
 
         $this->assertSame(1, Movie::whereRaw('LOWER(title) = ?', ['the matrix'])->count());
+    }
+
+    // -----------------------------------------------------------------------
+    // Duplicate handling — update mode
+    // -----------------------------------------------------------------------
+
+    public function test_update_existing_updates_title_and_slug(): void
+    {
+        $user = User::factory()->create();
+        Movie::factory()->create(['title' => 'the matrix', 'slug' => 'the-matrix', 'release_year' => 1999]);
+
+        $csv  = "title,release_year\nThe Matrix,1999\n";
+        $file = UploadedFile::fake()->createWithContent('movies.csv', $csv);
+
+        $response = $this->actingAs($user)
+            ->post(route('admin.movies.import.store'), ['file' => $file, 'update_existing' => '1']);
+
+        $response->assertOk()->assertSee('1 movie updated successfully');
+
+        $this->assertDatabaseHas('movies', ['title' => 'The Matrix', 'slug' => 'the-matrix', 'release_year' => 1999]);
+        $this->assertSame(1, Movie::count());
+    }
+
+    public function test_update_existing_does_not_create_duplicate(): void
+    {
+        $user = User::factory()->create();
+        Movie::factory()->create(['title' => 'Inception', 'release_year' => 2010]);
+
+        $csv  = "title,release_year\nInception,2010\n";
+        $file = UploadedFile::fake()->createWithContent('movies.csv', $csv);
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.import.store'), ['file' => $file, 'update_existing' => '1']);
+
+        $this->assertSame(1, Movie::where('title', 'Inception')->count());
+    }
+
+    public function test_without_update_flag_duplicate_is_still_reported(): void
+    {
+        $user = User::factory()->create();
+        Movie::factory()->create(['title' => 'Inception', 'release_year' => 2010]);
+
+        $csv  = "title,release_year\nInception,2010\n";
+        $file = UploadedFile::fake()->createWithContent('movies.csv', $csv);
+
+        $response = $this->actingAs($user)
+            ->post(route('admin.movies.import.store'), ['file' => $file]);
+
+        $response->assertOk()->assertSee('already exists');
     }
 
     // -----------------------------------------------------------------------
