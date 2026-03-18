@@ -125,19 +125,20 @@ class PersonCreditImportControllerTest extends TestCase
     // Row-level errors
     // -----------------------------------------------------------------------
 
-    public function test_row_with_unknown_type_is_skipped(): void
+    public function test_row_with_unknown_type_is_created_automatically(): void
     {
         $user   = User::factory()->create();
         $person = Person::factory()->create();
 
-        $csv  = "movie_title,release_year,type,character\nSome Film,2000,UnknownType,\n";
+        $csv  = "movie_title,release_year,type,character\nSome Film,2000,NewType,\n";
         $file = UploadedFile::fake()->createWithContent('credits.csv', $csv);
 
-        $response = $this->actingAs($user)
-            ->post(route('admin.people.credits.import.store', $person), ['file' => $file]);
+        $this->actingAs($user)
+            ->post(route('admin.people.credits.import.store', $person), ['file' => $file])
+            ->assertOk()->assertSee('1 credit imported successfully');
 
-        $response->assertOk()->assertSee('does not exist');
-        $this->assertSame(0, Credit::where('person_id', $person->id)->count());
+        $this->assertDatabaseHas('types', ['name' => 'NewType']);
+        $this->assertSame(1, Credit::where('person_id', $person->id)->count());
     }
 
     public function test_row_with_empty_movie_title_is_skipped(): void
@@ -193,6 +194,89 @@ class PersonCreditImportControllerTest extends TestCase
             ->post(route('admin.people.credits.import.store', $person), ['file' => $file]);
 
         $this->assertSame(1, Credit::where('person_id', $person->id)->count());
+    }
+
+    // -----------------------------------------------------------------------
+    // Pipe-separated multi-credit rows
+    // -----------------------------------------------------------------------
+
+    public function test_actor_type_receives_character_non_actor_does_not(): void
+    {
+        $user   = User::factory()->create();
+        $person = Person::factory()->create();
+        Movie::factory()->create(['title' => 'The Matrix', 'release_year' => 1999]);
+        Type::firstOrCreate(['name' => 'Actor'],    ['is_crew' => false]);
+        Type::firstOrCreate(['name' => 'Director'], ['is_crew' => true]);
+
+        $csv  = "movie_title,release_year,type,character\nThe Matrix,1999,Actor|Director,Neo\n";
+        $file = UploadedFile::fake()->createWithContent('credits.csv', $csv);
+
+        $this->actingAs($user)
+            ->post(route('admin.people.credits.import.store', $person), ['file' => $file])
+            ->assertOk()->assertSee('2 credits imported successfully');
+
+        $this->assertDatabaseHas('credits', ['person_id' => $person->id, 'character' => 'Neo']);
+        $this->assertDatabaseHas('credits', ['person_id' => $person->id, 'character' => null]);
+    }
+
+    public function test_multiple_rows_each_with_actor_and_director_credits(): void
+    {
+        $user   = User::factory()->create();
+        $person = Person::factory()->create();
+        Movie::factory()->create(['title' => 'Adaptation',  'release_year' => 2002]);
+        Movie::factory()->create(['title' => 'Being John Malkovich', 'release_year' => 1999]);
+        Type::firstOrCreate(['name' => 'Actor'],    ['is_crew' => false]);
+        Type::firstOrCreate(['name' => 'Director'], ['is_crew' => true]);
+
+        // Each row: one Actor credit (with character) + one Director credit (no character)
+        $csv  = "movie_title,release_year,type,character\n"
+              . "Adaptation,2002,Actor|Director,Charlie\n"
+              . "Being John Malkovich,1999,Actor|Director,Craig\n";
+        $file = UploadedFile::fake()->createWithContent('credits.csv', $csv);
+
+        $this->actingAs($user)
+            ->post(route('admin.people.credits.import.store', $person), ['file' => $file])
+            ->assertOk()->assertSee('4 credits imported successfully');
+
+        $this->assertDatabaseHas('credits', ['person_id' => $person->id, 'character' => 'Charlie']);
+        $this->assertDatabaseHas('credits', ['person_id' => $person->id, 'character' => 'Craig']);
+        $this->assertSame(2, Credit::where('person_id', $person->id)->whereNull('character')->count());
+    }
+
+    public function test_character_value_ignored_when_type_is_not_actor(): void
+    {
+        $user   = User::factory()->create();
+        $person = Person::factory()->create();
+        Movie::factory()->create(['title' => 'Some Film', 'release_year' => 2000]);
+        Type::firstOrCreate(['name' => 'Director'], ['is_crew' => true]);
+
+        // Character provided but no Actor type — should be stored as null
+        $csv  = "movie_title,release_year,type,character\nSome Film,2000,Director,Some Character\n";
+        $file = UploadedFile::fake()->createWithContent('credits.csv', $csv);
+
+        $this->actingAs($user)
+            ->post(route('admin.people.credits.import.store', $person), ['file' => $file])
+            ->assertOk()->assertSee('1 credit imported successfully');
+
+        $this->assertDatabaseHas('credits', ['person_id' => $person->id, 'character' => null]);
+    }
+
+    public function test_pipe_separated_row_creates_unknown_type_automatically(): void
+    {
+        $user   = User::factory()->create();
+        $person = Person::factory()->create();
+        Movie::factory()->create(['title' => 'The Matrix', 'release_year' => 1999]);
+        Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
+
+        $csv  = "movie_title,release_year,type,character\nThe Matrix,1999,Actor|NewType,Neo\n";
+        $file = UploadedFile::fake()->createWithContent('credits.csv', $csv);
+
+        $this->actingAs($user)
+            ->post(route('admin.people.credits.import.store', $person), ['file' => $file])
+            ->assertOk()->assertSee('2 credits imported successfully');
+
+        $this->assertDatabaseHas('types', ['name' => 'NewType']);
+        $this->assertSame(2, Credit::where('person_id', $person->id)->count());
     }
 
     // -----------------------------------------------------------------------

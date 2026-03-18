@@ -52,10 +52,10 @@ class PersonCreditImportController extends Controller
         while (($line = fgetcsv($handle)) !== false) {
             $row++;
 
-            $movieTitle = isset($line[$titleIdx]) ? trim($line[$titleIdx]) : '';
-            $year       = isset($line[$yearIdx])  ? trim($line[$yearIdx])  : '';
-            $typeName   = isset($line[$typeIdx])  ? trim($line[$typeIdx])  : '';
-            $character  = ($charIdx !== false && isset($line[$charIdx])) ? trim($line[$charIdx]) : null;
+            $movieTitle   = isset($line[$titleIdx]) ? trim($line[$titleIdx]) : '';
+            $year         = isset($line[$yearIdx])  ? trim($line[$yearIdx])  : '';
+            $typeNameRaw  = isset($line[$typeIdx])  ? trim($line[$typeIdx])  : '';
+            $characterRaw = ($charIdx !== false && isset($line[$charIdx])) ? trim($line[$charIdx]) : '';
 
             if ($movieTitle === '') {
                 $errors[] = ['row' => $row, 'movie' => '(empty)', 'reason' => 'Movie title is required.'];
@@ -67,23 +67,39 @@ class PersonCreditImportController extends Controller
                 continue;
             }
 
-            if ($typeName === '') {
-                $errors[] = ['row' => $row, 'movie' => $movieTitle, 'reason' => 'Type is required.'];
-                continue;
-            }
+            // Expand pipe-separated types; characters are positionally mapped to Actor entries only
+            $typeNames  = array_map('trim', explode('|', $typeNameRaw));
+            $characters = array_map('trim', explode('|', $characterRaw));
+            $count      = count($typeNames);
+            $charI      = 0;
 
-            $type = Type::whereRaw('LOWER(name) = ?', [strtolower($typeName)])->first();
-            if (! $type) {
-                $errors[] = ['row' => $row, 'movie' => $movieTitle, 'reason' => "Type \"{$typeName}\" does not exist."];
-                continue;
-            }
+            for ($i = 0; $i < $count; $i++) {
+                $typeName = $typeNames[$i];
 
-            $rows[] = [
-                'movie_title' => $movieTitle,
-                'year'        => (int) $year,
-                'type'        => $type,
-                'character'   => $character ?: null,
-            ];
+                if ($typeName === '') {
+                    $errors[] = ['row' => $row, 'movie' => $movieTitle, 'reason' => 'Type is required.'];
+                    continue;
+                }
+
+                $type = Type::whereRaw('LOWER(name) = ?', [strtolower($typeName)])->first()
+                    ?? Type::create(['name' => $typeName, 'is_crew' => false]);
+
+                // Only Actor-type credits receive a character value
+                $isActor   = strtolower($typeName) === 'actor';
+                $character = ($isActor && isset($characters[$charI]) && $characters[$charI] !== '')
+                    ? $characters[$charI]
+                    : null;
+                if ($isActor) {
+                    $charI++;
+                }
+
+                $rows[] = [
+                    'movie_title' => $movieTitle,
+                    'year'        => (int) $year,
+                    'type'        => $type,
+                    'character'   => $character,
+                ];
+            }
         }
 
         fclose($handle);

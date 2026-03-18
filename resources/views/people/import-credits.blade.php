@@ -27,15 +27,16 @@
                         <strong>This will replace all existing credits</strong> for this person.
                     </p>
                     <p class="text-sm text-gray-600 mb-4">
-                        Movies that don't exist yet will be created automatically.
-                        The <code class="bg-gray-100 px-1 rounded text-xs font-mono">type</code> must match an existing credit type (e.g. Actor, Director).
+                        Movies and credit types that don't exist yet will be created automatically.
                     </p>
 
                     <div class="mb-5 p-3 bg-gray-50 border border-gray-200 rounded-md">
                         <p class="text-xs font-medium text-gray-500 mb-1">Expected format:</p>
                         <pre class="text-xs font-mono text-gray-700">movie_title,release_year,type,character
 The Matrix,1999,Actor,Neo
-Inception,2010,Actor,</pre>
+Inception,2010,Actor,
+Adaptation,2002,Actor|Director|Actor,Charlie|Donald</pre>
+                        <p class="text-xs text-gray-500 mt-2">Use <code class="bg-gray-100 px-1 rounded font-mono">|</code> in the <code class="bg-gray-100 px-1 rounded font-mono">type</code> column to assign multiple credit types for the same movie. Character values are consumed in order by <strong>Actor</strong> credits only — other types always have no character.</p>
                     </div>
 
                     <form method="POST" action="{{ route('admin.people.credits.import.store', $person) }}" enctype="multipart/form-data">
