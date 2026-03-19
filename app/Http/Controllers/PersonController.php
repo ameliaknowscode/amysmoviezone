@@ -12,9 +12,13 @@ class PersonController extends Controller
 {
     public function index(\Illuminate\Http\Request $request)
     {
-        $search = trim($request->query('search', ''));
+        $search    = trim($request->query('search', ''));
+        $sortBy    = in_array($request->query('sort_by'), ['name', 'date_of_birth', 'nationality'])
+                        ? $request->query('sort_by')
+                        : 'name';
+        $direction = $request->query('direction') === 'desc' ? 'desc' : 'asc';
 
-        $people = Person::orderBy('name')
+        $people = Person::orderBy($sortBy, $direction)
             ->when($search, fn($q) => $q
                 ->where('name', 'like', '%' . $search . '%')
                 ->orWhere('nationality', 'like', '%' . $search . '%')
@@ -22,7 +26,7 @@ class PersonController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('people.index', compact('people', 'search'));
+        return view('people.index', compact('people', 'search', 'sortBy', 'direction'));
     }
 
     public function create()

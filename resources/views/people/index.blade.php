@@ -14,8 +14,21 @@
                         <p class="mb-4 text-green-600">{{ session('success') }}</p>
                     @endif
 
+                    @php
+                        $sortLink = fn(string $col) => route('admin.people.index', [
+                            'search'    => $search,
+                            'sort_by'   => $col,
+                            'direction' => ($sortBy === $col && $direction === 'asc') ? 'desc' : 'asc',
+                        ]);
+                        $sortIcon = fn(string $col) => $sortBy === $col
+                            ? ($direction === 'asc' ? ' ↑' : ' ↓')
+                            : '';
+                    @endphp
+
                     <div class="flex items-center justify-between mb-4 gap-4">
                         <form method="GET" action="{{ route('admin.people.index') }}" class="flex items-center gap-2">
+                            <input type="hidden" name="sort_by"   value="{{ $sortBy }}">
+                            <input type="hidden" name="direction" value="{{ $direction }}">
                             <input type="text" name="search" value="{{ $search }}"
                                 placeholder="Filter by name or nationality…"
                                 class="border-gray-300 rounded-md shadow-sm text-sm w-72">
@@ -24,7 +37,7 @@
                                 Filter
                             </button>
                             @if($search)
-                                <a href="{{ route('admin.people.index') }}"
+                                <a href="{{ route('admin.people.index', ['sort_by' => $sortBy, 'direction' => $direction]) }}"
                                    class="text-sm text-gray-500 hover:underline">Clear</a>
                             @endif
                         </form>
@@ -38,9 +51,15 @@
                             <thead>
                                 <tr class="bg-gray-100 text-left">
                                     <th class="border border-gray-300 px-4 py-2">ID</th>
-                                    <th class="border border-gray-300 px-4 py-2">Name</th>
-                                    <th class="border border-gray-300 px-4 py-2">Date of Birth</th>
-                                    <th class="border border-gray-300 px-4 py-2">Nationality</th>
+                                    <th class="border border-gray-300 px-4 py-2">
+                                        <a href="{{ $sortLink('name') }}" class="hover:underline">Name{{ $sortIcon('name') }}</a>
+                                    </th>
+                                    <th class="border border-gray-300 px-4 py-2">
+                                        <a href="{{ $sortLink('date_of_birth') }}" class="hover:underline">Date of Birth{{ $sortIcon('date_of_birth') }}</a>
+                                    </th>
+                                    <th class="border border-gray-300 px-4 py-2">
+                                        <a href="{{ $sortLink('nationality') }}" class="hover:underline">Nationality{{ $sortIcon('nationality') }}</a>
+                                    </th>
                                     <th class="border border-gray-300 px-4 py-2"></th>
                                 </tr>
                             </thead>
