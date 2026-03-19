@@ -37,7 +37,7 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $actor->id }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $actor->name }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
-                                            {{ $actor->date_of_birth ? \Carbon\Carbon::parse($actor->date_of_birth)->format('d M Y') : '—' }}
+                                            {{ $actor->date_of_birth ? \Carbon\Carbon::parse($actor->date_of_birth)->format('F j, Y') : '—' }}
                                         </td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $actor->nationality ?? '—' }}</td>
                                         <td class="border border-gray-300 px-4 py-2 text-center">

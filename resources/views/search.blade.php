@@ -66,7 +66,7 @@
                                         </td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $person->nationality ?? '—' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
-                                            {{ $person->date_of_birth ? \Carbon\Carbon::parse($person->date_of_birth)->format('d M Y') : '—' }}
+                                            {{ $person->date_of_birth ? \Carbon\Carbon::parse($person->date_of_birth)->format('F j, Y') : '—' }}
                                         </td>
                                     </tr>
                                 @endforeach

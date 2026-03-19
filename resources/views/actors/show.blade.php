@@ -22,7 +22,7 @@
                         <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
                             <dt class="text-sm font-medium text-gray-500">Date of Birth</dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                                {{ $actor->date_of_birth ? \Carbon\Carbon::parse($actor->date_of_birth)->format('d M Y') : '—' }}
+                                {{ $actor->date_of_birth ? \Carbon\Carbon::parse($actor->date_of_birth)->format('F j, Y') : '—' }}
                             </dd>
                         </div>
                         <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
