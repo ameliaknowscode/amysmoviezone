@@ -65,6 +65,11 @@
                                 class="mt-1 text-sm text-blue-600 hover:underline">+ Add credit</button>
                         </div>
 
+                        <div class="mb-4">
+                            <a href="{{ route('admin.movies.credits.import', $movie) }}"
+                               class="text-sm text-indigo-600 hover:underline">↑ Import Credits from CSV</a>
+                        </div>
+
                         <div class="flex items-center gap-4">
                             <button type="submit"
                                 class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700">

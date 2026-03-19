@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActorController;
 use App\Http\Controllers\MovieBySlugController;
+use App\Http\Controllers\MovieCreditImportController;
 use App\Http\Controllers\MovieImportController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\MovieController;
@@ -49,6 +50,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/movies/import', [MovieImportController::class, 'store'])->name('movies.import.store');
         Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
         Route::post('/movies', [MovieController::class, 'store'])->name('movies.store');
+        Route::get('/movies/{movie}/credits/import', [MovieCreditImportController::class, 'create'])->name('movies.credits.import');
+        Route::post('/movies/{movie}/credits/import', [MovieCreditImportController::class, 'store'])->name('movies.credits.import.store');
         Route::get('/movies/{movie}/edit', [MovieController::class, 'edit'])->name('movies.edit');
         Route::patch('/movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
         Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
