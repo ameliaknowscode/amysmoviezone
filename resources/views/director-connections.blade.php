@@ -40,7 +40,7 @@
                                         @foreach($directors as $director)
                                             <option
                                                 value="{{ $director->id }}"
-                                                x-show="!directors.some((v, j) => j !== idx && v === '{{ $director->id }}')"
+                                                x-show="!directors.some((v, j) => j !== idx && v === {{ json_encode((string) $director->id) }})"
                                             >{{ $director->name }}</option>
                                         @endforeach
                                     </select>

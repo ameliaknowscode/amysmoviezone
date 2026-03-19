@@ -35,24 +35,49 @@ class SearchController extends Controller
 
     public function directorConnections(Request $request)
     {
-        $directors = Person::whereHas('credits', fn($q) =>
+        $allDirectors = Person::whereHas('credits', fn($q) =>
             $q->whereHas('type', fn($t) => $t->where('name', 'Director'))
         )->orderBy('name')->get();
 
+        // Build the Coen Brothers virtual entry: any film directed by Joel or Ethan counts.
+        $coenNames   = ['Joel Coen', 'Ethan Coen'];
+        $coens       = $allDirectors->whereIn('name', $coenNames);
+        $coenIds     = $coens->pluck('id')->all();
+
+        // Replace individual Coen entries with one virtual entry in the dropdown list.
+        $directors = $allDirectors->reject(fn($d) => in_array($d->name, $coenNames))->values();
+        if ($coens->isNotEmpty()) {
+            $coenEntry = (object) ['id' => 'coen-brothers', 'name' => 'The Coen Brothers'];
+            $directors = $directors->push($coenEntry)->sortBy('name')->values();
+        }
+
         $ids = array_filter($request->query('directors', []));
 
-        $actors = collect();
+        $actors           = collect();
         $selectedDirectors = collect();
 
         if (!empty($ids)) {
-            $selectedDirectors = $directors->whereIn('id', $ids)->values();
+            // Build display labels for selected slots.
+            $selectedDirectors = collect($ids)->map(function ($id) use ($allDirectors, $coens) {
+                if ($id === 'coen-brothers') {
+                    return (object) ['id' => 'coen-brothers', 'name' => 'The Coen Brothers'];
+                }
+                return $allDirectors->firstWhere('id', (int) $id);
+            })->filter()->values();
 
-            // For each director, find the set of actor IDs who appeared in their films.
-            // Then intersect all sets to keep only actors who worked with every director.
-            $actorSets = collect($ids)->map(function ($directorId) {
-                $movieIds = Credit::where('person_id', $directorId)
-                    ->whereHas('type', fn($q) => $q->where('name', 'Director'))
-                    ->pluck('movie_id');
+            // For each slot, collect the actor IDs who appeared in that director's films.
+            $actorSets = collect($ids)->map(function ($directorId) use ($coenIds) {
+                if ($directorId === 'coen-brothers') {
+                    // Union every film where Joel OR Ethan is credited as Director.
+                    $movieIds = Credit::whereIn('person_id', $coenIds)
+                        ->whereHas('type', fn($q) => $q->where('name', 'Director'))
+                        ->pluck('movie_id')
+                        ->unique();
+                } else {
+                    $movieIds = Credit::where('person_id', (int) $directorId)
+                        ->whereHas('type', fn($q) => $q->where('name', 'Director'))
+                        ->pluck('movie_id');
+                }
 
                 return Credit::whereIn('movie_id', $movieIds)
                     ->whereHas('type', fn($q) => $q->where('name', 'Actor'))
