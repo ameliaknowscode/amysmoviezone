@@ -34,6 +34,12 @@
                         </div>
 
                         <div class="mb-4">
+                            <label for="date_of_death" class="block font-medium text-sm text-gray-700 mb-1">Date of Death</label>
+                            <input type="date" id="date_of_death" name="date_of_death" value="{{ old('date_of_death') }}"
+                                class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                        </div>
+
+                        <div class="mb-4">
                             <label for="nationality" class="block font-medium text-sm text-gray-700 mb-1">Nationality</label>
                             <input type="text" id="nationality" name="nationality" value="{{ old('nationality') }}"
                                 class="w-full max-w-md border-gray-300 rounded-md shadow-sm">

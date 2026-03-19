@@ -16,6 +16,7 @@ class PersonRequest extends FormRequest
         return [
             'name'               => 'required|string|max:255',
             'date_of_birth'      => 'nullable|date|before:today',
+            'date_of_death'      => 'nullable|date|after_or_equal:date_of_birth',
             'nationality'        => 'nullable|string|max:255',
             'credits'            => ['nullable', 'array'],
             'credits.*.movie_id' => ['nullable', 'integer', 'exists:movies,id'],
