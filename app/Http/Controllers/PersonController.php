@@ -10,10 +10,19 @@ use Illuminate\Support\Str;
 
 class PersonController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        $people = Person::orderBy('name')->paginate(20);
-        return view('people.index', compact('people'));
+        $search = trim($request->query('search', ''));
+
+        $people = Person::orderBy('name')
+            ->when($search, fn($q) => $q
+                ->where('name', 'like', '%' . $search . '%')
+                ->orWhere('nationality', 'like', '%' . $search . '%')
+            )
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('people.index', compact('people', 'search'));
     }
 
     public function create()

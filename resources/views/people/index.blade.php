@@ -14,8 +14,21 @@
                         <p class="mb-4 text-green-600">{{ session('success') }}</p>
                     @endif
 
-                    <div class="mb-4">
-                        <a href="{{ route('admin.people.create') }}" class="text-blue-600 hover:underline">+ Add Person</a>
+                    <div class="flex items-center justify-between mb-4 gap-4">
+                        <form method="GET" action="{{ route('admin.people.index') }}" class="flex items-center gap-2">
+                            <input type="text" name="search" value="{{ $search }}"
+                                placeholder="Filter by name or nationality…"
+                                class="border-gray-300 rounded-md shadow-sm text-sm w-72">
+                            <button type="submit"
+                                class="px-3 py-1.5 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">
+                                Filter
+                            </button>
+                            @if($search)
+                                <a href="{{ route('admin.people.index') }}"
+                                   class="text-sm text-gray-500 hover:underline">Clear</a>
+                            @endif
+                        </form>
+                        <a href="{{ route('admin.people.create') }}" class="text-blue-600 hover:underline text-sm shrink-0">+ Add Person</a>
                     </div>
 
                     @if($people->isEmpty())
