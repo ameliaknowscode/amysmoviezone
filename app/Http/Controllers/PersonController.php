@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PersonRequest;
+use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Type;
@@ -87,14 +88,23 @@ class PersonController extends Controller
     private function syncCredits(Person $person, array $rows): void
     {
         $person->credits()->delete();
+
+        $batch = [];
         foreach ($rows as $row) {
             if (!empty($row['movie_id']) && !empty($row['type_id'])) {
-                $person->credits()->create([
-                    'movie_id'  => (int) $row['movie_id'],
-                    'type_id'   => (int) $row['type_id'],
-                    'character' => $row['character'] ?? null,
-                ]);
+                $batch[] = [
+                    'person_id'  => $person->id,
+                    'movie_id'   => (int) $row['movie_id'],
+                    'type_id'    => (int) $row['type_id'],
+                    'character'  => $row['character'] ?? null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
             }
+        }
+
+        if (!empty($batch)) {
+            Credit::insert($batch);
         }
     }
 }

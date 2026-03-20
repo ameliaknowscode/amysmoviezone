@@ -5,19 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\Person;
+use App\Models\Type;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SearchController extends Controller
 {
     public function search(Request $request)
     {
-        $query = $request->query('q', '');
+        $query          = $request->query('q', '');
+        $directorTypeId = Cache::rememberForever('director_type_id', fn() => Type::where('name', 'Director')->value('id'));
 
         $movies = $query
             ? Movie::where('title', 'like', '%' . $query . '%')
                 ->with(['credits' => fn($q) => $q
                     ->with('person')
-                    ->whereHas('type', fn($t) => $t->where('name', 'Director'))
+                    ->where('type_id', $directorTypeId)
                 ])
                 ->orderBy('release_year', 'desc')
                 ->get()
@@ -35,9 +38,14 @@ class SearchController extends Controller
 
     public function directorConnections(Request $request)
     {
-        $allDirectors = Person::whereHas('credits', fn($q) =>
-            $q->whereHas('type', fn($t) => $t->where('name', 'Director'))
-        )->orderBy('name')->get();
+        $directorTypeId = Cache::rememberForever('director_type_id', fn() => Type::where('name', 'Director')->value('id'));
+        $actorTypeId    = Cache::rememberForever('actor_type_id',    fn() => Type::where('name', 'Actor')->value('id'));
+
+        $allDirectors = Cache::remember('all_directors', now()->addHour(), fn() =>
+            Person::whereHas('credits', fn($q) => $q->where('type_id', $directorTypeId))
+                ->orderBy('name')
+                ->get()
+        );
 
         // Build the Coen Brothers virtual entry: any film directed by Joel or Ethan counts.
         $coenNames   = ['Joel Coen', 'Ethan Coen'];
@@ -66,21 +74,21 @@ class SearchController extends Controller
             })->filter()->values();
 
             // For each slot, collect the actor IDs who appeared in that director's films.
-            $actorSets = collect($ids)->map(function ($directorId) use ($coenIds) {
+            $actorSets = collect($ids)->map(function ($directorId) use ($coenIds, $directorTypeId, $actorTypeId) {
                 if ($directorId === 'coen-brothers') {
                     // Union every film where Joel OR Ethan is credited as Director.
                     $movieIds = Credit::whereIn('person_id', $coenIds)
-                        ->whereHas('type', fn($q) => $q->where('name', 'Director'))
+                        ->where('type_id', $directorTypeId)
                         ->pluck('movie_id')
                         ->unique();
                 } else {
                     $movieIds = Credit::where('person_id', (int) $directorId)
-                        ->whereHas('type', fn($q) => $q->where('name', 'Director'))
+                        ->where('type_id', $directorTypeId)
                         ->pluck('movie_id');
                 }
 
                 return Credit::whereIn('movie_id', $movieIds)
-                    ->whereHas('type', fn($q) => $q->where('name', 'Actor'))
+                    ->where('type_id', $actorTypeId)
                     ->pluck('person_id')
                     ->unique()
                     ->values();

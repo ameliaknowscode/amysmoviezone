@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TypeRequest;
 use App\Models\Type;
+use Illuminate\Support\Str;
 
 class TypeController extends Controller
 {
@@ -22,6 +23,7 @@ class TypeController extends Controller
     {
         $validated = $request->validated();
         $validated['is_crew'] = $request->has('is_crew') ? $request->boolean('is_crew') : true;
+        $validated['slug']    = Str::slug($validated['name']);
         Type::create($validated);
 
         return redirect()->route('admin.types.index')->with('success', 'Type added successfully.');
@@ -36,6 +38,7 @@ class TypeController extends Controller
     {
         $validated = $request->validated();
         $validated['is_crew'] = $request->has('is_crew') ? $request->boolean('is_crew') : true;
+        $validated['slug']    = Str::slug($validated['name']);
         $type->update($validated);
 
         return redirect()->route('admin.types.index')->with('success', 'Type updated successfully.');

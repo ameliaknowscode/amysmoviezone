@@ -22,7 +22,7 @@ class TypeTest extends TestCase
     {
         $type = new Type();
 
-        $this->assertEquals(['name', 'is_crew'], $type->getFillable());
+        $this->assertEquals(['name', 'slug', 'is_crew'], $type->getFillable());
     }
 
     public function test_type_stores_all_fields_correctly(): void
@@ -50,7 +50,7 @@ class TypeTest extends TestCase
 
     public function test_is_crew_defaults_to_true(): void
     {
-        $type = Type::create(['name' => 'Extra']);
+        $type = Type::create(['name' => 'Extra', 'slug' => 'extra']);
 
         $this->assertTrue($type->is_crew);
     }

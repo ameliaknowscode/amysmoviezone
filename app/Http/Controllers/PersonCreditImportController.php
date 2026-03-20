@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Type;
@@ -42,11 +43,12 @@ class PersonCreditImportController extends Controller
         $typeIdx      = array_search('type',          $header);
         $charIdx      = array_search('character',     $header);
 
-        $imported = 0;
-        $errors   = [];
-        $row      = 1;
-        $maxYear  = (int) date('Y') + 5;
-        $rows     = [];
+        $imported  = 0;
+        $errors    = [];
+        $row       = 1;
+        $maxYear   = (int) date('Y') + 5;
+        $rows      = [];
+        $typeCache = [];
 
         // First pass: validate all rows before making any changes
         while (($line = fgetcsv($handle)) !== false) {
@@ -81,8 +83,10 @@ class PersonCreditImportController extends Controller
                     continue;
                 }
 
-                $type = Type::whereRaw('LOWER(name) = ?', [strtolower($typeName)])->first()
-                    ?? Type::create(['name' => $typeName, 'is_crew' => false]);
+                $key  = strtolower($typeName);
+                $type = $typeCache[$key]
+                    ?? ($typeCache[$key] = Type::whereRaw('LOWER(name) = ?', [$key])->first()
+                        ?? Type::create(['name' => $typeName, 'slug' => Str::slug($typeName), 'is_crew' => false]));
 
                 // Only Actor-type credits receive a character value
                 $isActor   = strtolower($typeName) === 'actor';
@@ -113,27 +117,33 @@ class PersonCreditImportController extends Controller
         // Replace all existing credits then import valid rows
         $person->credits()->delete();
 
+        $movieCache = [];
+        $batch      = [];
         foreach ($rows as $r) {
-            // Find existing movie (case-insensitive) or create it
-            $movie = Movie::whereRaw('LOWER(title) = ?', [strtolower($r['movie_title'])])
-                ->where('release_year', $r['year'])
-                ->first();
+            $key   = strtolower($r['movie_title']) . '|' . $r['year'];
+            $movie = $movieCache[$key]
+                ?? ($movieCache[$key] = Movie::whereRaw('LOWER(title) = ?', [strtolower($r['movie_title'])])
+                    ->where('release_year', $r['year'])
+                    ->first()
+                    ?? Movie::create([
+                        'title'        => $r['movie_title'],
+                        'slug'         => Str::slug($r['movie_title']),
+                        'release_year' => $r['year'],
+                    ]));
 
-            if (! $movie) {
-                $movie = Movie::create([
-                    'title'        => $r['movie_title'],
-                    'slug'         => Str::slug($r['movie_title']),
-                    'release_year' => $r['year'],
-                ]);
-            }
-
-            $person->credits()->create([
-                'movie_id'  => $movie->id,
-                'type_id'   => $r['type']->id,
-                'character' => $r['character'],
-            ]);
-
+            $batch[] = [
+                'person_id'  => $person->id,
+                'movie_id'   => $movie->id,
+                'type_id'    => $r['type']->id,
+                'character'  => $r['character'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
             $imported++;
+        }
+
+        if (! empty($batch)) {
+            Credit::insert($batch);
         }
 
         $rowErrors = $errors;

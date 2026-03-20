@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ActorController;
 use App\Http\Controllers\MovieBySlugController;
 use App\Http\Controllers\MovieCreditImportController;
 use App\Http\Controllers\MovieImportController;
@@ -22,7 +21,6 @@ Route::get('/', function () {
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/director-connections', [SearchController::class, 'directorConnections'])->name('director-connections');
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
-Route::get('/actors/{actor}', [ActorController::class, 'show'])->name('actors.show');
 Route::get('/people/{person}', [PersonController::class, 'show'])->name('people.show');
 Route::get('/u/{username}', [UserProfileController::class, 'show'])->name('profile.show');
 
@@ -55,13 +53,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/movies/{movie}/edit', [MovieController::class, 'edit'])->name('movies.edit');
         Route::patch('/movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
         Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
-
-        Route::get('/actors', [ActorController::class, 'index'])->name('actors.index');
-        Route::get('/actors/create', [ActorController::class, 'create'])->name('actors.create');
-        Route::post('/actors', [ActorController::class, 'store'])->name('actors.store');
-        Route::get('/actors/{actor}/edit', [ActorController::class, 'edit'])->name('actors.edit');
-        Route::patch('/actors/{actor}', [ActorController::class, 'update'])->name('actors.update');
-        Route::delete('/actors/{actor}', [ActorController::class, 'destroy'])->name('actors.destroy');
 
         Route::get('/people', [PersonController::class, 'index'])->name('people.index');
         Route::get('/people/create', [PersonController::class, 'create'])->name('people.create');

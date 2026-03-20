@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Type;
@@ -41,10 +42,11 @@ class MovieCreditImportController extends Controller
         $typeIdx   = array_search('type',        $header);
         $charIdx   = array_search('character',   $header);
 
-        $imported = 0;
-        $errors   = [];
-        $row      = 1;
-        $rows     = [];
+        $imported  = 0;
+        $errors    = [];
+        $row       = 1;
+        $rows      = [];
+        $typeCache = [];
 
         // First pass: validate all rows before making any changes
         while (($line = fgetcsv($handle)) !== false) {
@@ -73,8 +75,10 @@ class MovieCreditImportController extends Controller
                     continue;
                 }
 
-                $type = Type::whereRaw('LOWER(name) = ?', [strtolower($typeName)])->first()
-                    ?? Type::create(['name' => $typeName, 'is_crew' => false]);
+                $key  = strtolower($typeName);
+                $type = $typeCache[$key]
+                    ?? ($typeCache[$key] = Type::whereRaw('LOWER(name) = ?', [$key])->first()
+                        ?? Type::create(['name' => $typeName, 'slug' => Str::slug($typeName), 'is_crew' => false]));
 
                 // Only Actor-type credits receive a character value
                 $isActor   = strtolower($typeName) === 'actor';
@@ -104,24 +108,27 @@ class MovieCreditImportController extends Controller
         // Replace all existing credits then import valid rows
         $movie->credits()->delete();
 
+        $personCache = [];
+        $batch       = [];
         foreach ($rows as $r) {
-            // Find existing person (case-insensitive) or create them
-            $person = Person::whereRaw('LOWER(name) = ?', [strtolower($r['person_name'])])->first();
+            $key    = strtolower($r['person_name']);
+            $person = $personCache[$key]
+                ?? ($personCache[$key] = Person::whereRaw('LOWER(name) = ?', [$key])->first()
+                    ?? Person::create(['name' => $r['person_name'], 'slug' => Str::slug($r['person_name'])]));
 
-            if (! $person) {
-                $person = Person::create([
-                    'name' => $r['person_name'],
-                    'slug' => Str::slug($r['person_name']),
-                ]);
-            }
-
-            $movie->credits()->create([
-                'person_id' => $person->id,
-                'type_id'   => $r['type']->id,
-                'character' => $r['character'],
-            ]);
-
+            $batch[] = [
+                'movie_id'   => $movie->id,
+                'person_id'  => $person->id,
+                'type_id'    => $r['type']->id,
+                'character'  => $r['character'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
             $imported++;
+        }
+
+        if (! empty($batch)) {
+            Credit::insert($batch);
         }
 
         $rowErrors = $errors;

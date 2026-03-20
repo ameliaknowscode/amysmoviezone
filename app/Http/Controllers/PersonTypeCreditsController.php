@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Credit;
 use App\Models\Person;
 use App\Models\Type;
-use Illuminate\Support\Str;
 
 class PersonTypeCreditsController extends Controller
 {
     public function __invoke(string $typeSlug, string $personSlug)
     {
-        // Types are few — loading all is negligible, avoids needing a slug column on types.
-        $type = Type::all()->first(fn($t) => Str::slug($t->name) === $typeSlug);
+        $type = Type::where('slug', $typeSlug)->first();
         abort_unless($type, 404);
 
         $person = Person::where('slug', $personSlug)->first();
@@ -28,8 +26,9 @@ class PersonTypeCreditsController extends Controller
 
         abort_if($credits->isEmpty(), 404);
 
-        $personTypeIds = Credit::where('person_id', $person->id)->pluck('type_id')->unique();
-        $personTypes = Type::whereIn('id', $personTypeIds)->get();
+        $personTypes = Type::whereIn('id',
+            Credit::where('person_id', $person->id)->select('type_id')->distinct()
+        )->get();
 
         return view('credits.by-type', compact('person', 'type', 'credits', 'personTypes'));
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MovieRequest;
+use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Type;
@@ -13,20 +14,21 @@ class MovieController extends Controller
 {
     public function index(Request $request)
     {
-        $direction = $request->query('sort') === 'asc' ? 'asc' : 'desc';
-        $search    = trim($request->query('search', ''));
+        $direction      = $request->query('sort') === 'asc' ? 'asc' : 'desc';
+        $search         = trim($request->query('search', ''));
+        $directorTypeId = Type::where('name', 'Director')->value('id');
 
         $movies = Movie::orderBy('release_year', $direction)
             ->when($search, fn($q) => $q
                 ->where('title', 'like', '%' . $search . '%')
                 ->orWhereHas('credits', fn($q) => $q
                     ->whereHas('person', fn($p) => $p->where('name', 'like', '%' . $search . '%'))
-                    ->whereHas('type',   fn($t) => $t->where('name', 'Director'))
+                    ->where('type_id', $directorTypeId)
                 )
             )
             ->with(['credits' => fn($q) => $q
                 ->with('person')
-                ->whereHas('type', fn($t) => $t->where('name', 'Director'))
+                ->where('type_id', $directorTypeId)
             ])
             ->paginate(20)
             ->appends(['sort' => $direction, 'search' => $search]);
@@ -105,14 +107,23 @@ class MovieController extends Controller
     private function syncCredits(Movie $movie, array $rows): void
     {
         $movie->credits()->delete();
+
+        $batch = [];
         foreach ($rows as $row) {
             if (!empty($row['person_id']) && !empty($row['type_id'])) {
-                $movie->credits()->create([
-                    'person_id' => (int) $row['person_id'],
-                    'type_id'   => (int) $row['type_id'],
-                    'character' => $row['character'] ?? null,
-                ]);
+                $batch[] = [
+                    'movie_id'   => $movie->id,
+                    'person_id'  => (int) $row['person_id'],
+                    'type_id'    => (int) $row['type_id'],
+                    'character'  => $row['character'] ?? null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
             }
+        }
+
+        if (!empty($batch)) {
+            Credit::insert($batch);
         }
     }
 }
