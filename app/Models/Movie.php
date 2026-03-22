@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Movie extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'slug', 'release_year'];
+    protected $fillable = ['title', 'slug', 'release_year', 'poster'];
 
     public function credits(): HasMany
     {
@@ -27,6 +28,11 @@ class Movie extends Model
     public function watchlistEntries(): HasMany
     {
         return $this->hasMany(WatchlistEntry::class);
+    }
+
+    public function posterUrl(): ?string
+    {
+        return $this->poster ? Storage::url($this->poster) : null;
     }
 
     public function publicUrl(): string

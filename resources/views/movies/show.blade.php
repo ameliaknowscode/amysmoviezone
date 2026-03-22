@@ -10,6 +10,12 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
+                    @if($movie->posterUrl())
+                    <div class="mb-6">
+                        <img src="{{ $movie->posterUrl() }}" alt="{{ $movie->title }} poster" class="max-w-xs rounded-md shadow-sm">
+                    </div>
+                    @endif
+
                     @auth
                     <div class="mb-6 pb-6 border-b border-gray-100">
                         <h3 class="text-sm font-semibold text-gray-700 mb-4">Your Rating &amp; Watchlist</h3>

@@ -11,6 +11,7 @@ use App\Models\Type;
 use App\Models\WatchlistEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MovieController extends Controller
@@ -56,6 +57,11 @@ class MovieController extends Controller
             'slug'         => Str::slug($validated['title']),
             'release_year' => $validated['release_year'],
         ]);
+
+        if ($request->hasFile('poster')) {
+            $movie->poster = $request->file('poster')->store('posters', 'public');
+            $movie->save();
+        }
 
         $this->syncCredits($movie, $request->input('credits', []));
 
@@ -107,6 +113,18 @@ class MovieController extends Controller
             'release_year' => $validated['release_year'],
         ]);
 
+        if ($request->boolean('remove_poster') && $movie->poster) {
+            Storage::disk('public')->delete($movie->poster);
+            $movie->poster = null;
+            $movie->save();
+        } elseif ($request->hasFile('poster')) {
+            if ($movie->poster) {
+                Storage::disk('public')->delete($movie->poster);
+            }
+            $movie->poster = $request->file('poster')->store('posters', 'public');
+            $movie->save();
+        }
+
         $this->syncCredits($movie, $request->input('credits', []));
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie updated successfully.');
@@ -114,6 +132,10 @@ class MovieController extends Controller
 
     public function destroy(Movie $movie)
     {
+        if ($movie->poster) {
+            Storage::disk('public')->delete($movie->poster);
+        }
+
         $movie->delete();
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie deleted successfully.');
