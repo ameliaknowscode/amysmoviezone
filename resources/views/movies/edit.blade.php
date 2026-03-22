@@ -18,7 +18,7 @@
                         </ul>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.movies.update', $movie) }}">
+                    <form method="POST" action="{{ route('admin.movies.update', $movie) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PATCH')
 
@@ -33,6 +33,50 @@
                             <input type="number" id="release_year" name="release_year" value="{{ old('release_year', $movie->release_year) }}"
                                 min="1888" max="{{ date('Y') + 5 }}"
                                 class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                        </div>
+
+                        <div class="mb-4" x-data="{ preview: null, remove: false }">
+                            <label class="block font-medium text-sm text-gray-700 mb-1">Poster</label>
+                            <div class="max-w-xs">
+                                <label for="poster"
+                                    class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-md cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                                    :class="(preview || ('{{ $movie->posterUrl() }}' && !remove)) ? 'p-2' : 'p-6'">
+                                    <template x-if="preview">
+                                        <img :src="preview" alt="Poster preview" class="w-full rounded-md shadow-sm">
+                                    </template>
+                                    <template x-if="!preview && '{{ $movie->posterUrl() }}' && !remove">
+                                        <img src="{{ $movie->posterUrl() }}" alt="Current poster" class="w-full rounded-md shadow-sm">
+                                    </template>
+                                    <template x-if="!preview && (!('{{ $movie->posterUrl() }}') || remove)">
+                                        <div class="flex flex-col items-center gap-2 text-gray-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16.5V19a1 1 0 001 1h16a1 1 0 001-1v-2.5M16 9l-4-4-4 4M12 5v10"/>
+                                            </svg>
+                                            <span class="text-sm">Click to upload poster</span>
+                                            <span class="text-xs text-gray-400">PNG, JPG, GIF up to 2MB</span>
+                                        </div>
+                                    </template>
+                                    <input type="file" id="poster" name="poster" accept="image/*" class="hidden"
+                                        @change="preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null; remove = false">
+                                </label>
+                                <div class="mt-1 flex gap-3">
+                                    <template x-if="preview">
+                                        <button type="button" @click="preview = null"
+                                            class="text-xs text-gray-400 hover:text-gray-600 underline">Cancel upload</button>
+                                    </template>
+                                    @if($movie->posterUrl())
+                                    <template x-if="!remove && !preview">
+                                        <button type="button" @click="remove = true"
+                                            class="text-xs text-red-400 hover:text-red-600 underline">Remove poster</button>
+                                    </template>
+                                    <template x-if="remove">
+                                        <button type="button" @click="remove = false"
+                                            class="text-xs text-gray-400 hover:text-gray-600 underline">Undo remove</button>
+                                    </template>
+                                    @endif
+                                </div>
+                                <input type="hidden" name="remove_poster" :value="remove ? '1' : '0'">
+                            </div>
                         </div>
 
                         <div x-data="{ credits: {{ Js::from(old('credits', $initialCredits)) }} }" class="mb-4">

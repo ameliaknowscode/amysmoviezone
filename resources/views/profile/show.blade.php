@@ -46,6 +46,61 @@
                             <dd>{{ $profileUser->created_at->format('F j, Y') }}</dd>
                         </div>
                     </dl>
+
+                    {{-- Watchlist links --}}
+                    @if(!$profileUser->want_to_watch_private || !$profileUser->watched_private)
+                    <div class="mt-6 pt-6 border-t border-gray-100">
+                        <h2 class="text-sm font-semibold text-gray-700 mb-3">Watchlists</h2>
+                        <div class="flex gap-3">
+                            @if(!$profileUser->want_to_watch_private)
+                            <a href="{{ route('profile.watchlist', $profileUser->username) }}#want-to-watch"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                                Want to Watch
+                            </a>
+                            @endif
+                            @if(!$profileUser->watched_private)
+                            <a href="{{ route('profile.watchlist', $profileUser->username) }}#watched"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                                Watched
+                            </a>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Recently rated --}}
+                    @if($recentRatings->isNotEmpty())
+                    <div class="mt-6 pt-6 border-t border-gray-100">
+                        <h2 class="text-sm font-semibold text-gray-700 mb-3">Recently Rated</h2>
+                        <div class="grid grid-cols-4 gap-3">
+                            @foreach($recentRatings as $rating)
+                            <a href="{{ $rating->movie->publicUrl() }}" class="group">
+                                <div class="aspect-[2/3] bg-gray-200 rounded overflow-hidden shadow-sm">
+                                    @if($rating->movie->posterUrl())
+                                        <img src="{{ $rating->movie->posterUrl() }}" alt="{{ $rating->movie->title }}"
+                                            class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center p-1 text-center">
+                                            <span class="text-xs text-gray-500 leading-snug">{{ $rating->movie->title }}</span>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="mt-1">
+                                    <div class="text-xs font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">{{ $rating->movie->title }}</div>
+                                    @if($rating->stars)
+                                    <div class="text-xs">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <span class="{{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
+                                        @endfor
+                                    </div>
+                                    @endif
+                                </div>
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
                 </div>
             </div>
         </div>

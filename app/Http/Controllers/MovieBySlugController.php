@@ -24,12 +24,21 @@ class MovieBySlugController extends Controller
             $userWatchlistEntry = WatchlistEntry::where('user_id', $userId)->where('movie_id', $movie->id)->first();
         }
 
+        $avgRating        = $movie->ratings()->whereNotNull('stars')->avg('stars');
+        $ratingCount      = $movie->ratings()->whereNotNull('stars')->count();
+        $wantToWatchCount = $movie->watchlistEntries()->where('list_type', WatchlistEntry::WANT_TO_WATCH)->count();
+        $watchedCount     = $movie->watchlistEntries()->where('list_type', WatchlistEntry::WATCHED)->count();
+
         return view('movies.show', [
-            'movie'             => $movie,
-            'cast'              => $movie->getCast(),
-            'crew'              => $movie->getCrew(),
-            'userRating'        => $userRating,
+            'movie'              => $movie,
+            'cast'               => $movie->getCast(),
+            'crew'               => $movie->getCrew(),
+            'userRating'         => $userRating,
             'userWatchlistEntry' => $userWatchlistEntry,
+            'avgRating'          => $avgRating,
+            'ratingCount'        => $ratingCount,
+            'wantToWatchCount'   => $wantToWatchCount,
+            'watchedCount'       => $watchedCount,
         ]);
     }
 }

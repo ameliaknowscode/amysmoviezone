@@ -11,6 +11,7 @@ use App\Models\Type;
 use App\Models\WatchlistEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MovieController extends Controller
@@ -57,6 +58,11 @@ class MovieController extends Controller
             'release_year' => $validated['release_year'],
         ]);
 
+        if ($request->hasFile('poster')) {
+            $movie->poster = $request->file('poster')->store('posters', 'public');
+            $movie->save();
+        }
+
         $this->syncCredits($movie, $request->input('credits', []));
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie added successfully.');
@@ -75,12 +81,21 @@ class MovieController extends Controller
             $userWatchlistEntry = WatchlistEntry::where('user_id', $userId)->where('movie_id', $movie->id)->first();
         }
 
+        $avgRating      = $movie->ratings()->whereNotNull('stars')->avg('stars');
+        $ratingCount    = $movie->ratings()->whereNotNull('stars')->count();
+        $wantToWatchCount = $movie->watchlistEntries()->where('list_type', WatchlistEntry::WANT_TO_WATCH)->count();
+        $watchedCount   = $movie->watchlistEntries()->where('list_type', WatchlistEntry::WATCHED)->count();
+
         return view('movies.show', [
             'movie'              => $movie,
             'cast'               => $movie->getCast(),
             'crew'               => $movie->getCrew(),
             'userRating'         => $userRating,
             'userWatchlistEntry' => $userWatchlistEntry,
+            'avgRating'          => $avgRating,
+            'ratingCount'        => $ratingCount,
+            'wantToWatchCount'   => $wantToWatchCount,
+            'watchedCount'       => $watchedCount,
         ]);
     }
 
@@ -107,6 +122,18 @@ class MovieController extends Controller
             'release_year' => $validated['release_year'],
         ]);
 
+        if ($request->boolean('remove_poster') && $movie->poster) {
+            Storage::disk('public')->delete($movie->poster);
+            $movie->poster = null;
+            $movie->save();
+        } elseif ($request->hasFile('poster')) {
+            if ($movie->poster) {
+                Storage::disk('public')->delete($movie->poster);
+            }
+            $movie->poster = $request->file('poster')->store('posters', 'public');
+            $movie->save();
+        }
+
         $this->syncCredits($movie, $request->input('credits', []));
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie updated successfully.');
@@ -114,6 +141,10 @@ class MovieController extends Controller
 
     public function destroy(Movie $movie)
     {
+        if ($movie->poster) {
+            Storage::disk('public')->delete($movie->poster);
+        }
+
         $movie->delete();
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie deleted successfully.');

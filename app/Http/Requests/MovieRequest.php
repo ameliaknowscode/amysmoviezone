@@ -16,6 +16,7 @@ class MovieRequest extends FormRequest
         return [
             'title'               => 'required|string|max:255',
             'release_year'        => 'required|integer|min:1888|max:' . (date('Y') + 5),
+            'poster'              => 'nullable|file|image|max:2048',
             'credits'             => 'nullable|array',
             'credits.*.person_id' => 'nullable|integer|exists:people,id',
             'credits.*.type_id'   => 'nullable|integer|exists:types,id',
