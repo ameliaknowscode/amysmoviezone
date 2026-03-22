@@ -19,6 +19,7 @@
                         <table class="w-full border-collapse">
                             <thead>
                                 <tr class="bg-gray-100 text-left">
+                                    <th class="border border-gray-300 px-4 py-2 w-[91px]"></th>
                                     <th class="border border-gray-300 px-4 py-2">Title</th>
                                     <th class="border border-gray-300 px-4 py-2">Director</th>
                                     <th class="border border-gray-300 px-4 py-2">Release Year</th>
@@ -28,10 +29,27 @@
                                 @foreach($movies as $movie)
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">
+                                            @if($movie->posterUrl())
+                                                <img src="{{ $movie->posterUrl() }}" alt="{{ $movie->title }}"
+                                                    class="h-[110px] w-[75px] object-cover rounded shadow-sm">
+                                            @else
+                                                <div class="h-[110px] w-[75px] rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
+                                                    &#127902;
+                                                </div>
+                                            @endif
+                                        </td>
+                                        <td class="border border-gray-300 px-4 py-2">
                                             <a href="{{ $movie->publicUrl() }}" class="text-indigo-600 hover:underline">{{ $movie->title }}</a>
                                         </td>
                                         <td class="border border-gray-300 px-4 py-2">
-                                            {{ $movie->credits->map(fn($c) => $c->person->name)->join(', ') ?: '—' }}
+                                            @if($movie->credits->isEmpty())
+                                                —
+                                            @else
+                                                @foreach($movie->credits as $i => $credit)
+                                                    @if($i > 0), @endif
+                                                    <a href="{{ $credit->byTypeUrl() }}" class="text-indigo-600 hover:underline">{{ $credit->person->name }}</a>
+                                                @endforeach
+                                            @endif
                                         </td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $movie->release_year }}</td>
                                     </tr>

@@ -31,9 +31,14 @@
                             @foreach($wantToWatch as $entry)
                             <li class="py-3 flex items-center gap-4">
                                 {{-- Poster placeholder --}}
-                                <div class="h-16 w-11 rounded bg-gray-200 shrink-0 flex items-center justify-center text-gray-400 text-xs">
-                                    &#127902;
-                                </div>
+                                @if($entry->movie->posterUrl())
+                                    <img src="{{ $entry->movie->posterUrl() }}" alt="{{ $entry->movie->title }}"
+                                        class="h-[110px] w-[75px] object-cover rounded shrink-0 shadow-sm">
+                                @else
+                                    <div class="h-[110px] w-[75px] rounded bg-gray-200 shrink-0 flex items-center justify-center text-gray-400 text-xs">
+                                        &#127902;
+                                    </div>
+                                @endif
                                 <div class="flex-1 min-w-0">
                                     <a href="{{ route('movies.show', $entry->movie) }}" class="text-sm font-medium text-indigo-600 hover:underline">
                                         {{ $entry->movie->title }}
@@ -76,9 +81,14 @@
                             @php $rating = $ratings[$entry->movie_id] ?? null; @endphp
                             <li class="py-3 flex items-center gap-4">
                                 {{-- Poster placeholder --}}
-                                <div class="h-16 w-11 rounded bg-gray-200 shrink-0 flex items-center justify-center text-gray-400 text-xs">
-                                    &#127902;
-                                </div>
+                                @if($entry->movie->posterUrl())
+                                    <img src="{{ $entry->movie->posterUrl() }}" alt="{{ $entry->movie->title }}"
+                                        class="h-[110px] w-[75px] object-cover rounded shrink-0 shadow-sm">
+                                @else
+                                    <div class="h-[110px] w-[75px] rounded bg-gray-200 shrink-0 flex items-center justify-center text-gray-400 text-xs">
+                                        &#127902;
+                                    </div>
+                                @endif
                                 <div class="flex-1 min-w-0">
                                     <a href="{{ route('movies.show', $entry->movie) }}" class="text-sm font-medium text-indigo-600 hover:underline">
                                         {{ $entry->movie->title }}
