@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\MovieBySlugController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\MovieCreditImportController;
 use App\Http\Controllers\MovieImportController;
 use App\Http\Controllers\UserProfileController;
@@ -32,6 +34,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/movies/{movie}/rate', [RatingController::class, 'store'])->name('movies.rate');
+    Route::delete('/movies/{movie}/rating', [RatingController::class, 'destroy'])->name('movies.rating.destroy');
+
+    Route::get('/watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
+    Route::post('/movies/{movie}/watchlist', [WatchlistController::class, 'store'])->name('movies.watchlist.store');
+    Route::delete('/movies/{movie}/watchlist', [WatchlistController::class, 'destroy'])->name('movies.watchlist.destroy');
+    Route::patch('/watchlist/privacy', [WatchlistController::class, 'updatePrivacy'])->name('watchlist.privacy');
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', function () {

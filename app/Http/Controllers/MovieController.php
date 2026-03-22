@@ -6,8 +6,11 @@ use App\Http\Requests\MovieRequest;
 use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\Person;
+use App\Models\Rating;
 use App\Models\Type;
+use App\Models\WatchlistEntry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class MovieController extends Controller
@@ -62,10 +65,22 @@ class MovieController extends Controller
     public function show(Movie $movie)
     {
         $movie->load(['credits' => fn($q) => $q->with(['person', 'type'])->orderBy('id')]);
+
+        $userRating        = null;
+        $userWatchlistEntry = null;
+
+        if (Auth::check()) {
+            $userId = Auth::id();
+            $userRating        = Rating::where('user_id', $userId)->where('movie_id', $movie->id)->first();
+            $userWatchlistEntry = WatchlistEntry::where('user_id', $userId)->where('movie_id', $movie->id)->first();
+        }
+
         return view('movies.show', [
-            'movie' => $movie,
-            'cast'  => $movie->getCast(),
-            'crew'  => $movie->getCrew(),
+            'movie'              => $movie,
+            'cast'               => $movie->getCast(),
+            'crew'               => $movie->getCrew(),
+            'userRating'         => $userRating,
+            'userWatchlistEntry' => $userWatchlistEntry,
         ]);
     }
 

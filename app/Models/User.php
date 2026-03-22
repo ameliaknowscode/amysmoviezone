@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -24,6 +25,9 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'ratings_private',
+        'want_to_watch_private',
+        'watched_private',
     ];
 
     /**
@@ -44,8 +48,21 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'email_verified_at'     => 'datetime',
+            'password'              => 'hashed',
+            'ratings_private'       => 'boolean',
+            'want_to_watch_private' => 'boolean',
+            'watched_private'       => 'boolean',
         ];
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    public function watchlistEntries(): HasMany
+    {
+        return $this->hasMany(WatchlistEntry::class);
     }
 }

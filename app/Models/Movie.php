@@ -19,6 +19,16 @@ class Movie extends Model
         return $this->hasMany(Credit::class);
     }
 
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    public function watchlistEntries(): HasMany
+    {
+        return $this->hasMany(WatchlistEntry::class);
+    }
+
     public function publicUrl(): string
     {
         return route('movies.public', ['movieSlug' => $this->slug ?? Str::slug($this->title)]);
