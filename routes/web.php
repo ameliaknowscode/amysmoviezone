@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MovieBrowseController;
 use App\Http\Controllers\MovieBySlugController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\WatchlistController;
@@ -17,14 +18,30 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $movieCount  = \App\Models\Movie::count();
+    $peopleCount = \App\Models\Person::count();
+    $creditCount = \App\Models\Credit::count();
+
+    $recentMovies = \App\Models\Movie::latest()->limit(12)->get();
+
+    $recentRatings = \App\Models\Rating::with('movie', 'user')
+        ->whereHas('user', fn ($q) => $q->where('ratings_private', false))
+        ->latest()
+        ->limit(50)
+        ->get()
+        ->unique('movie_id')
+        ->take(8);
+
+    return view('welcome', compact('movieCount', 'peopleCount', 'creditCount', 'recentMovies', 'recentRatings'));
 })->name('home');
 
 Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/movies', MovieBrowseController::class)->name('movies.browse');
 Route::get('/director-connections', [SearchController::class, 'directorConnections'])->name('director-connections');
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/people/{person}', [PersonController::class, 'show'])->name('people.show');
 Route::get('/u/{username}', [UserProfileController::class, 'show'])->name('profile.show');
+Route::get('/u/{username}/watchlist', [UserProfileController::class, 'watchlist'])->name('profile.watchlist');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -85,5 +102,5 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 // Wildcards — must be last so they cannot shadow any specific route above.
-Route::get('/{movieSlug}', MovieBySlugController::class)->name('movies.public');
+Route::get('/movie/{movieSlug}', MovieBySlugController::class)->name('movies.public');
 Route::get('/{typeSlug}/{personSlug}', PersonTypeCreditsController::class)->name('credits.by-type');
