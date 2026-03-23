@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\BuildMovieShowData;
+use App\Actions\SyncCredits;
 use App\Http\Requests\MovieRequest;
-use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\Person;
-use App\Models\Rating;
 use App\Models\Type;
-use App\Models\WatchlistEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -63,40 +62,14 @@ class MovieController extends Controller
             $movie->save();
         }
 
-        $this->syncCredits($movie, $request->input('credits', []));
+        SyncCredits::for($movie, $request->input('credits', []));
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie added successfully.');
     }
 
     public function show(Movie $movie)
     {
-        $movie->load(['credits' => fn($q) => $q->with(['person', 'type'])->orderBy('id')]);
-
-        $userRating        = null;
-        $userWatchlistEntry = null;
-
-        if (Auth::check()) {
-            $userId = Auth::id();
-            $userRating        = Rating::where('user_id', $userId)->where('movie_id', $movie->id)->first();
-            $userWatchlistEntry = WatchlistEntry::where('user_id', $userId)->where('movie_id', $movie->id)->first();
-        }
-
-        $avgRating      = $movie->ratings()->whereNotNull('stars')->avg('stars');
-        $ratingCount    = $movie->ratings()->whereNotNull('stars')->count();
-        $wantToWatchCount = $movie->watchlistEntries()->where('list_type', WatchlistEntry::WANT_TO_WATCH)->count();
-        $watchedCount   = $movie->watchlistEntries()->where('list_type', WatchlistEntry::WATCHED)->count();
-
-        return view('movies.show', [
-            'movie'              => $movie,
-            'cast'               => $movie->getCast(),
-            'crew'               => $movie->getCrew(),
-            'userRating'         => $userRating,
-            'userWatchlistEntry' => $userWatchlistEntry,
-            'avgRating'          => $avgRating,
-            'ratingCount'        => $ratingCount,
-            'wantToWatchCount'   => $wantToWatchCount,
-            'watchedCount'       => $watchedCount,
-        ]);
+        return view('movies.show', BuildMovieShowData::for($movie, Auth::id()));
     }
 
     public function edit(Movie $movie)
@@ -134,7 +107,7 @@ class MovieController extends Controller
             $movie->save();
         }
 
-        $this->syncCredits($movie, $request->input('credits', []));
+        SyncCredits::for($movie, $request->input('credits', []));
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie updated successfully.');
     }
@@ -150,26 +123,4 @@ class MovieController extends Controller
         return redirect()->route('admin.movies.index')->with('success', 'Movie deleted successfully.');
     }
 
-    private function syncCredits(Movie $movie, array $rows): void
-    {
-        $movie->credits()->delete();
-
-        $batch = [];
-        foreach ($rows as $row) {
-            if (!empty($row['person_id']) && !empty($row['type_id'])) {
-                $batch[] = [
-                    'movie_id'   => $movie->id,
-                    'person_id'  => (int) $row['person_id'],
-                    'type_id'    => (int) $row['type_id'],
-                    'character'  => $row['character'] ?? null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-        }
-
-        if (!empty($batch)) {
-            Credit::insert($batch);
-        }
-    }
 }
