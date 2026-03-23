@@ -29,7 +29,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_import_page_is_accessible_when_authenticated(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
 
         $this->actingAs($user)
@@ -44,7 +44,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_valid_csv_imports_credits(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $movie  = Movie::factory()->create();
         $person = Person::factory()->create(['name' => 'Keanu Reeves']);
         Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
@@ -66,7 +66,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_missing_person_is_created_automatically(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
         Type::firstOrCreate(['name' => 'Director'], ['is_crew' => true]);
 
@@ -84,7 +84,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_import_replaces_all_existing_credits(): void
     {
-        $user      = User::factory()->create();
+        $user      = User::factory()->admin()->create();
         $movie     = Movie::factory()->create();
         $oldPerson = Person::factory()->create();
         $newPerson = Person::factory()->create(['name' => 'New Person']);
@@ -105,7 +105,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_character_column_is_optional(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
         Person::factory()->create(['name' => 'Some Person']);
         Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
@@ -123,7 +123,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_unknown_type_is_created_automatically(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
 
         $csv  = "person_name,type,character\nJane Smith,Choreographer,\n";
@@ -143,7 +143,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_actor_type_receives_character_non_actor_does_not(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
         Person::factory()->create(['name' => 'Keanu Reeves']);
         Type::firstOrCreate(['name' => 'Actor'],    ['is_crew' => false]);
@@ -163,7 +163,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_character_value_ignored_when_type_is_not_actor(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
         Person::factory()->create(['name' => 'Some Director']);
         Type::firstOrCreate(['name' => 'Director'], ['is_crew' => true]);
@@ -185,7 +185,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_row_with_empty_person_name_is_skipped(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
 
         $csv  = "person_name,type,character\n,Actor,Neo\n";
@@ -199,7 +199,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_existing_credits_are_not_wiped_when_all_rows_are_invalid(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $movie  = Movie::factory()->create();
         $person = Person::factory()->create();
         $type   = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
@@ -223,7 +223,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_missing_file_is_rejected(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
 
         $this->actingAs($user)
@@ -233,7 +233,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_non_csv_file_is_rejected(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
         $file  = UploadedFile::fake()->create('credits.pdf', 100, 'application/pdf');
 
@@ -244,7 +244,7 @@ class MovieCreditImportControllerTest extends TestCase
 
     public function test_csv_missing_required_columns_is_rejected(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
 
         $csv  = "name,role\nKeanu Reeves,Actor\n";

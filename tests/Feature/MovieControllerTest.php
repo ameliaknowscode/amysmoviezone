@@ -45,7 +45,7 @@ class MovieControllerTest extends TestCase
 
     public function test_index_returns_200_for_authenticated_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->get(route('admin.movies.index'))
@@ -54,7 +54,7 @@ class MovieControllerTest extends TestCase
 
     public function test_index_lists_movies(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $movies = Movie::factory()->count(3)->create();
 
         $response = $this->actingAs($user)
@@ -67,7 +67,7 @@ class MovieControllerTest extends TestCase
 
     public function test_index_sorts_descending_by_default(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         Movie::factory()->create(['release_year' => 2000]);
         Movie::factory()->create(['release_year' => 2020]);
         Movie::factory()->create(['release_year' => 1990]);
@@ -79,7 +79,7 @@ class MovieControllerTest extends TestCase
 
     public function test_index_sorts_ascending_when_requested(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->get(route('admin.movies.index', ['sort' => 'asc']))
@@ -92,7 +92,7 @@ class MovieControllerTest extends TestCase
 
     public function test_create_returns_200_for_authenticated_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->get(route('admin.movies.create'))
@@ -105,7 +105,7 @@ class MovieControllerTest extends TestCase
 
     public function test_edit_returns_200_for_authenticated_user(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
 
         $this->actingAs($user)
@@ -119,7 +119,7 @@ class MovieControllerTest extends TestCase
 
     public function test_store_creates_movie_and_redirects(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
@@ -137,7 +137,7 @@ class MovieControllerTest extends TestCase
 
     public function test_store_validates_required_title(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
@@ -148,7 +148,7 @@ class MovieControllerTest extends TestCase
 
     public function test_store_validates_required_release_year(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
@@ -159,7 +159,7 @@ class MovieControllerTest extends TestCase
 
     public function test_store_rejects_release_year_before_1888(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
@@ -171,7 +171,7 @@ class MovieControllerTest extends TestCase
 
     public function test_store_rejects_non_integer_release_year(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.movies.store'), [
@@ -183,7 +183,7 @@ class MovieControllerTest extends TestCase
 
     public function test_store_syncs_credits(): void
     {
-        $user          = User::factory()->create();
+        $user          = User::factory()->admin()->create();
         $person1       = Person::factory()->create();
         $person2       = Person::factory()->create();
         $actorType     = Type::firstOrCreate(['name' => 'Actor'],    ['is_crew' => false]);
@@ -221,7 +221,7 @@ class MovieControllerTest extends TestCase
 
     public function test_update_updates_movie_and_redirects(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create(['title' => 'Old Title']);
 
         $this->actingAs($user)
@@ -237,7 +237,7 @@ class MovieControllerTest extends TestCase
 
     public function test_update_validates_required_title(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
 
         $this->actingAs($user)
@@ -261,7 +261,7 @@ class MovieControllerTest extends TestCase
 
     public function test_update_syncs_credits(): void
     {
-        $user      = User::factory()->create();
+        $user      = User::factory()->admin()->create();
         $movie     = Movie::factory()->create();
         $person1   = Person::factory()->create();
         $person2   = Person::factory()->create();
@@ -434,7 +434,7 @@ class MovieControllerTest extends TestCase
 
     public function test_destroy_deletes_movie_and_redirects(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
 
         $this->actingAs($user)

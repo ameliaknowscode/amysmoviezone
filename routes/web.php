@@ -67,7 +67,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/u/{username}/follow', [FollowController::class, 'store'])->name('follow.store');
     Route::delete('/u/{username}/follow', [FollowController::class, 'destroy'])->name('follow.destroy');
 

@@ -33,7 +33,7 @@ class UserControllerTest extends TestCase
 
     public function test_index_returns_200_for_authenticated_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->get(route('admin.users.index'))
@@ -42,7 +42,7 @@ class UserControllerTest extends TestCase
 
     public function test_index_lists_users(): void
     {
-        $actor = User::factory()->create();
+        $actor = User::factory()->admin()->create();
         $other = User::factory()->create(['name' => 'Jane Doe']);
 
         $this->actingAs($actor)
@@ -56,7 +56,7 @@ class UserControllerTest extends TestCase
 
     public function test_create_returns_200_for_authenticated_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->get(route('admin.users.create'))
@@ -69,7 +69,7 @@ class UserControllerTest extends TestCase
 
     public function test_store_creates_user_and_redirects(): void
     {
-        $actor = User::factory()->create();
+        $actor = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
@@ -91,7 +91,7 @@ class UserControllerTest extends TestCase
 
     public function test_store_hashes_password(): void
     {
-        $actor = User::factory()->create();
+        $actor = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
@@ -109,7 +109,7 @@ class UserControllerTest extends TestCase
 
     public function test_store_validates_required_name(): void
     {
-        $actor = User::factory()->create();
+        $actor = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
@@ -123,7 +123,7 @@ class UserControllerTest extends TestCase
 
     public function test_store_validates_required_username(): void
     {
-        $actor = User::factory()->create();
+        $actor = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
@@ -138,7 +138,7 @@ class UserControllerTest extends TestCase
     public function test_store_validates_unique_username(): void
     {
         User::factory()->create(['username' => 'taken_user']);
-        $actor = User::factory()->create();
+        $actor = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
@@ -153,7 +153,7 @@ class UserControllerTest extends TestCase
 
     public function test_store_validates_required_email(): void
     {
-        $actor = User::factory()->create();
+        $actor = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
@@ -168,7 +168,7 @@ class UserControllerTest extends TestCase
     public function test_store_validates_unique_email(): void
     {
         $existing = User::factory()->create(['email' => 'taken@example.com']);
-        $actor    = User::factory()->create();
+        $actor    = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
@@ -183,7 +183,7 @@ class UserControllerTest extends TestCase
 
     public function test_store_validates_password_confirmation(): void
     {
-        $actor = User::factory()->create();
+        $actor = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
@@ -198,7 +198,7 @@ class UserControllerTest extends TestCase
 
     public function test_store_validates_password_minimum_length(): void
     {
-        $actor = User::factory()->create();
+        $actor = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->post(route('admin.users.store'), [
@@ -217,8 +217,8 @@ class UserControllerTest extends TestCase
 
     public function test_destroy_deletes_user_and_redirects(): void
     {
-        $actor  = User::factory()->create();
-        $target = User::factory()->create();
+        $actor  = User::factory()->admin()->create();
+        $target = User::factory()->admin()->create();
 
         $this->actingAs($actor)
             ->delete(route('admin.users.destroy', $target))
@@ -230,7 +230,7 @@ class UserControllerTest extends TestCase
 
     public function test_destroy_requires_authentication(): void
     {
-        $target = User::factory()->create();
+        $target = User::factory()->admin()->create();
 
         $this->delete(route('admin.users.destroy', $target))
             ->assertRedirect(route('login'));

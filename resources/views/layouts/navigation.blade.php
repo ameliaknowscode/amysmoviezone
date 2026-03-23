@@ -118,6 +118,9 @@
                     </x-slot>
                 </x-dropdown>
                 @else
+                <a href="{{ route('register') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none transition ease-in-out duration-150">
+                    {{ __('Sign Up') }}
+                </a>
                 <a href="{{ route('login') }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                     {{ __('Log In') }}
                 </a>
@@ -258,6 +261,9 @@
             </div>
             @else
             <div class="mt-3 space-y-1">
+                <x-responsive-nav-link :href="route('register')">
+                    {{ __('Sign Up') }}
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('login')">
                     {{ __('Log In') }}
                 </x-responsive-nav-link>

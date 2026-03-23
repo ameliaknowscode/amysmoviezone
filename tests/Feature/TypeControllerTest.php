@@ -41,7 +41,7 @@ class TypeControllerTest extends TestCase
 
     public function test_index_returns_200_for_authenticated_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->get(route('admin.types.index'))
@@ -50,7 +50,7 @@ class TypeControllerTest extends TestCase
 
     public function test_index_lists_types(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         $types = Type::factory()->count(3)->create();
 
         $response = $this->actingAs($user)
@@ -67,7 +67,7 @@ class TypeControllerTest extends TestCase
 
     public function test_create_returns_200_for_authenticated_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->get(route('admin.types.create'))
@@ -80,7 +80,7 @@ class TypeControllerTest extends TestCase
 
     public function test_store_creates_non_crew_type_and_redirects(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.types.store'), [
@@ -95,7 +95,7 @@ class TypeControllerTest extends TestCase
 
     public function test_store_creates_crew_type_and_redirects(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.types.store'), [
@@ -110,7 +110,7 @@ class TypeControllerTest extends TestCase
 
     public function test_store_defaults_is_crew_to_true_when_omitted(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.types.store'), [
@@ -123,7 +123,7 @@ class TypeControllerTest extends TestCase
 
     public function test_store_validates_required_name(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.types.store'), [])
@@ -132,7 +132,7 @@ class TypeControllerTest extends TestCase
 
     public function test_store_rejects_duplicate_name(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         Type::factory()->create(['name' => 'Director']);
 
         $this->actingAs($user)
@@ -154,7 +154,7 @@ class TypeControllerTest extends TestCase
 
     public function test_edit_returns_200_for_authenticated_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $type = Type::factory()->create();
 
         $this->actingAs($user)
@@ -164,7 +164,7 @@ class TypeControllerTest extends TestCase
 
     public function test_edit_prepopulates_fields(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $type = Type::factory()->create(['name' => 'Producer', 'is_crew' => true]);
 
         $this->actingAs($user)
@@ -178,7 +178,7 @@ class TypeControllerTest extends TestCase
 
     public function test_update_updates_type_and_redirects(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $type = Type::factory()->create(['name' => 'Old Name', 'is_crew' => false]);
 
         $this->actingAs($user)
@@ -194,7 +194,7 @@ class TypeControllerTest extends TestCase
 
     public function test_update_validates_required_name(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $type = Type::factory()->create();
 
         $this->actingAs($user)
@@ -204,7 +204,7 @@ class TypeControllerTest extends TestCase
 
     public function test_update_rejects_duplicate_name_for_different_type(): void
     {
-        $user  = User::factory()->create();
+        $user  = User::factory()->admin()->create();
         Type::factory()->create(['name' => 'Director']);
         $type = Type::factory()->create(['name' => 'Cinematographer']);
 
@@ -215,7 +215,7 @@ class TypeControllerTest extends TestCase
 
     public function test_update_allows_keeping_same_name(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $type = Type::factory()->create(['name' => 'Director']);
 
         $this->actingAs($user)
@@ -242,7 +242,7 @@ class TypeControllerTest extends TestCase
 
     public function test_destroy_deletes_type_and_redirects(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $type = Type::factory()->create();
 
         $this->actingAs($user)
