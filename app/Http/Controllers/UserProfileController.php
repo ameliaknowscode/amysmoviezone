@@ -13,8 +13,11 @@ class UserProfileController extends Controller
     {
         $profileUser = User::where('username', $username)->firstOrFail();
 
-        $recentRatings = $profileUser->ratings_private ? collect()
+        $recentRatings = $profileUser->profile_private ? collect()
             : $profileUser->ratings()->with('movie')->latest()->limit(4)->get();
+
+        $recentReviews = $profileUser->profile_private ? collect()
+            : $profileUser->reviews()->with('movie')->latest()->limit(3)->get();
 
         $followerCount  = $profileUser->followers()->count();
         $followingCount = $profileUser->following()->count();
@@ -23,7 +26,7 @@ class UserProfileController extends Controller
             : false;
 
         return view('profile.show', compact(
-            'profileUser', 'recentRatings', 'followerCount', 'followingCount', 'isFollowing'
+            'profileUser', 'recentRatings', 'recentReviews', 'followerCount', 'followingCount', 'isFollowing'
         ));
     }
 
@@ -31,14 +34,14 @@ class UserProfileController extends Controller
     {
         $profileUser = User::where('username', $username)->firstOrFail();
 
-        $wantToWatch = $profileUser->want_to_watch_private ? null
+        $wantToWatch = $profileUser->profile_private ? null
             : $profileUser->watchlistEntries()
                 ->where('list_type', WatchlistEntry::WANT_TO_WATCH)
                 ->with('movie')
                 ->latest()
                 ->get();
 
-        $watched = $profileUser->watched_private ? null
+        $watched = $profileUser->profile_private ? null
             : $profileUser->watchlistEntries()
                 ->where('list_type', WatchlistEntry::WATCHED)
                 ->with('movie')

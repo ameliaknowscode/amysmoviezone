@@ -13,15 +13,6 @@
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-semibold text-gray-800">Want to Watch</h3>
-                        <form method="POST" action="{{ route('watchlist.privacy') }}">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="want_to_watch_private" value="{{ $user->want_to_watch_private ? '0' : '1' }}">
-                            <input type="hidden" name="watched_private" value="{{ $user->watched_private ? '1' : '0' }}">
-                            <button type="submit" class="text-xs text-gray-500 hover:text-gray-700 underline">
-                                {{ $user->want_to_watch_private ? 'Private — make public' : 'Public — make private' }}
-                            </button>
-                        </form>
                     </div>
 
                     @if($wantToWatch->isEmpty())
@@ -62,15 +53,6 @@
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-semibold text-gray-800">Watched</h3>
-                        <form method="POST" action="{{ route('watchlist.privacy') }}">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="want_to_watch_private" value="{{ $user->want_to_watch_private ? '1' : '0' }}">
-                            <input type="hidden" name="watched_private" value="{{ $user->watched_private ? '0' : '1' }}">
-                            <button type="submit" class="text-xs text-gray-500 hover:text-gray-700 underline">
-                                {{ $user->watched_private ? 'Private — make public' : 'Public — make private' }}
-                            </button>
-                        </form>
                     </div>
 
                     @if($watched->isEmpty())

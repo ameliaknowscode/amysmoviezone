@@ -10,6 +10,7 @@ use App\Models\Person;
 use App\Models\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -19,7 +20,7 @@ class MovieController extends Controller
     {
         $direction      = $request->query('sort') === 'asc' ? 'asc' : 'desc';
         $search         = trim($request->query('search', ''));
-        $directorTypeId = Type::where('name', 'Director')->value('id');
+        $directorTypeId = Cache::rememberForever('director_type_id', fn() => Type::where('name', 'Director')->value('id'));
 
         $movies = Movie::orderBy('release_year', $direction)
             ->when($search, fn($q) => $q

@@ -81,22 +81,18 @@
                     </dl>
 
                     {{-- Watchlist links --}}
-                    @if(!$profileUser->want_to_watch_private || !$profileUser->watched_private)
+                    @if(!$profileUser->profile_private)
                     <div class="mt-6 pt-6 border-t border-gray-100">
                         <h2 class="text-sm font-semibold text-gray-700 mb-3">Watchlists</h2>
                         <div class="flex gap-3">
-                            @if(!$profileUser->want_to_watch_private)
                             <a href="{{ route('profile.watchlist', $profileUser->username) }}#want-to-watch"
                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
                                 Want to Watch
                             </a>
-                            @endif
-                            @if(!$profileUser->watched_private)
                             <a href="{{ route('profile.watchlist', $profileUser->username) }}#watched"
                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
                                 Watched
                             </a>
-                            @endif
                         </div>
                     </div>
                     @endif
@@ -129,6 +125,24 @@
                                     @endif
                                 </div>
                             </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Recent reviews --}}
+                    @if($recentReviews->isNotEmpty())
+                    <div class="mt-6 pt-6 border-t border-gray-100">
+                        <h2 class="text-sm font-semibold text-gray-700 mb-3">Recent Reviews</h2>
+                        <div class="space-y-4">
+                            @foreach($recentReviews as $review)
+                            <div>
+                                <a href="{{ $review->movie->publicUrl() }}" class="text-sm font-medium text-indigo-600 hover:underline">
+                                    {{ $review->movie->title }}
+                                </a>
+                                <p class="text-sm text-gray-700 mt-1 leading-relaxed line-clamp-3">{{ $review->body }}</p>
+                                <p class="text-xs text-gray-400 mt-1">{{ $review->created_at->diffForHumans() }}</p>
+                            </div>
                             @endforeach
                         </div>
                     </div>
