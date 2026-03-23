@@ -237,6 +237,152 @@
                         </div>{{-- end flex-1 --}}
                     </div>{{-- end flex wrapper --}}
 
+                    {{-- Reviews --}}
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-4">Reviews</h3>
+
+                        <div class="space-y-5">
+
+                            {{-- Current user's own review (shown in list, editable inline) --}}
+                            @auth
+                            @if($userReview)
+                            <div x-data="{ editing: false }" class="flex gap-3">
+                                <div class="flex-shrink-0">
+                                    @if(auth()->user()->avatar)
+                                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
+                                             alt="{{ auth()->user()->name }}"
+                                             class="h-8 w-8 rounded-full object-cover ring-1 ring-gray-200">
+                                    @else
+                                        <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm select-none">
+                                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+
+                                    {{-- Read view --}}
+                                    <div x-show="!editing">
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</span>
+                                            <span class="text-xs text-gray-400">{{ $userReview->updated_at->diffForHumans() }}</span>
+                                            <button @click="editing = true"
+                                                    class="text-xs text-indigo-500 hover:text-indigo-700 transition underline">
+                                                Edit
+                                            </button>
+                                        </div>
+                                        <p class="text-sm text-gray-700 mt-1 leading-relaxed">{{ $userReview->body }}</p>
+                                        @if(session('status') === 'review-saved')
+                                            <p class="text-xs text-green-600 mt-1">Review saved.</p>
+                                        @endif
+                                    </div>
+
+                                    {{-- Edit form --}}
+                                    <div x-show="editing" x-cloak>
+                                        <form method="POST" action="{{ route('movies.review.store', $movie) }}">
+                                            @csrf
+                                            <textarea
+                                                name="body"
+                                                rows="4"
+                                                class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            >{{ old('body', $userReview->body) }}</textarea>
+                                            @error('body')
+                                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                            @enderror
+                                            <div class="flex items-center gap-3 mt-2">
+                                                <button type="submit"
+                                                        class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                                                    Update Review
+                                                </button>
+                                                <button type="button" @click="editing = false"
+                                                        class="text-xs text-gray-400 hover:text-gray-600 transition underline">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </form>
+                                        <form method="POST" action="{{ route('movies.review.destroy', $movie) }}" class="mt-2">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-xs text-red-400 hover:text-red-600 transition underline">
+                                                Delete review
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            @else
+                            {{-- Write a review form (no review yet) --}}
+                            <div x-data="{ open: false }">
+                                <button @click="open = true" x-show="!open"
+                                        class="text-sm text-indigo-600 hover:text-indigo-800 transition underline">
+                                    + Write a review
+                                </button>
+                                <div x-show="open" x-cloak>
+                                    <form method="POST" action="{{ route('movies.review.store', $movie) }}">
+                                        @csrf
+                                        <textarea
+                                            name="body"
+                                            rows="4"
+                                            placeholder="Write your review…"
+                                            class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        >{{ old('body') }}</textarea>
+                                        @error('body')
+                                            <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                        @enderror
+                                        <div class="flex items-center gap-3 mt-2">
+                                            <button type="submit"
+                                                    class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                                                Submit Review
+                                            </button>
+                                            <button type="button" @click="open = false"
+                                                    class="text-xs text-gray-400 hover:text-gray-600 transition underline">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            @endif
+                            @endauth
+
+                            {{-- Public reviews from other users --}}
+                            @foreach($reviews as $review)
+                            <div class="flex gap-3">
+                                <div class="flex-shrink-0">
+                                    @if($review->user->avatar)
+                                        <img src="{{ asset('storage/' . $review->user->avatar) }}"
+                                             alt="{{ $review->user->name }}"
+                                             class="h-8 w-8 rounded-full object-cover ring-1 ring-gray-200">
+                                    @else
+                                        <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm select-none">
+                                            {{ strtoupper(substr($review->user->name, 0, 1)) }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline gap-2">
+                                        <a href="{{ route('profile.show', $review->user->username) }}"
+                                           class="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors">
+                                            {{ $review->user->name }}
+                                        </a>
+                                        <span class="text-xs text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 mt-1 leading-relaxed">{{ $review->body }}</p>
+                                </div>
+                            </div>
+                            @endforeach
+
+                            {{-- Empty state (guests only — logged-in users see the write form above) --}}
+                            @guest
+                            @if($reviews->isEmpty())
+                            <p class="text-sm text-gray-400">No reviews yet. <a href="{{ route('login') }}" class="text-indigo-600 hover:underline">Sign in</a> to write one.</p>
+                            @endif
+                            @endguest
+
+                        </div>
+                    </div>
+
                     <div class="mt-6">
                         <a href="{{ url()->previous() }}" class="text-indigo-600 hover:underline text-sm">&larr; Back</a>
                     </div>

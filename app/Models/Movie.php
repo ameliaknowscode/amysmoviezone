@@ -30,6 +30,11 @@ class Movie extends Model
         return $this->hasMany(WatchlistEntry::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function posterUrl(): ?string
     {
         return $this->poster ? Storage::url($this->poster) : null;

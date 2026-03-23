@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Movie;
 use App\Models\Rating;
+use App\Models\Review;
 use App\Models\User;
 use App\Models\WatchlistEntry;
 use Illuminate\Database\Seeder;
@@ -30,6 +31,7 @@ class UserSeeder extends Seeder
         foreach ($users as $user) {
             $this->seedRatings($user, $movies);
             $this->seedWatchlist($user, $movies);
+            $this->seedReviews($user);
         }
 
         $this->seedFollows($users);
@@ -50,9 +52,9 @@ class UserSeeder extends Seeder
             ]);
         }
 
-        // 15% of users keep their ratings private.
+        // 15% of users keep their profile private.
         if (fake()->boolean(15)) {
-            $user->update(['ratings_private' => true]);
+            $user->update(['profile_private' => true]);
         }
     }
 
@@ -87,12 +89,26 @@ class UserSeeder extends Seeder
             ]);
         }
 
-        // 10% of users make one or both watchlists private.
-        if (fake()->boolean(10)) {
-            $user->update(['want_to_watch_private' => true]);
+    }
+
+    private function seedReviews(User $user): void
+    {
+        // Review roughly 30% of the movies they've rated.
+        $ratedMovieIds = $user->ratings()->pluck('movie_id')->toArray();
+
+        if (empty($ratedMovieIds)) {
+            return;
         }
-        if (fake()->boolean(10)) {
-            $user->update(['watched_private' => true]);
+
+        $count    = max(1, (int) round(count($ratedMovieIds) * 0.3));
+        $toReview = fake()->randomElements($ratedMovieIds, min($count, count($ratedMovieIds)));
+
+        foreach ($toReview as $movieId) {
+            Review::create([
+                'user_id'  => $user->id,
+                'movie_id' => $movieId,
+                'body'     => fake()->paragraphs(fake()->numberBetween(1, 3), true),
+            ]);
         }
     }
 

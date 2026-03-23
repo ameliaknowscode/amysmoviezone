@@ -70,14 +70,14 @@
 
                             {{-- Watched --}}
                             <td class="px-6 py-3 text-center text-sm text-gray-700 whitespace-nowrap">
-                                @if (!$user->watched_private)
+                                @if (!$user->profile_private)
                                     {{ number_format($user->watched_count) }}
                                 @endif
                             </td>
 
                             {{-- Want to Watch --}}
                             <td class="px-6 py-3 text-center text-sm text-gray-700 whitespace-nowrap">
-                                @if (!$user->want_to_watch_private)
+                                @if (!$user->profile_private)
                                     {{ number_format($user->want_to_watch_count) }}
                                 @endif
                             </td>

@@ -17,6 +17,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,7 @@ Route::get('/', function () {
     $movieCount  = \App\Models\Movie::count();
     $peopleCount = \App\Models\Person::count();
     $creditCount = \App\Models\Credit::count();
+    $memberCount = \App\Models\User::count();
 
     $recentMovies = \App\Models\Movie::latest()->limit(12)->get();
 
@@ -33,11 +35,17 @@ Route::get('/', function () {
             $sub->select(DB::raw('MAX(ratings.id)'))
                 ->from('ratings')
                 ->join('users', 'users.id', '=', 'ratings.user_id')
-                ->where('users.ratings_private', false)
+                ->where('users.profile_private', false)
                 ->groupBy('ratings.movie_id');
         })
         ->latest()
         ->limit(8)
+        ->get();
+
+    $recentReviews = \App\Models\Review::with('movie', 'user')
+        ->whereHas('user', fn ($q) => $q->where('profile_private', false))
+        ->latest()
+        ->limit(5)
         ->get();
 
     $followingRatings = collect();
@@ -49,7 +57,7 @@ Route::get('/', function () {
                     $sub->select(DB::raw('MAX(ratings.id)'))
                         ->from('ratings')
                         ->join('users', 'users.id', '=', 'ratings.user_id')
-                        ->where('users.ratings_private', false)
+                        ->where('users.profile_private', false)
                         ->whereIn('ratings.user_id', $followingIds)
                         ->groupBy('ratings.movie_id');
                 })
@@ -59,7 +67,7 @@ Route::get('/', function () {
         }
     }
 
-    return view('welcome', compact('movieCount', 'peopleCount', 'creditCount', 'recentMovies', 'recentRatings', 'followingRatings'));
+    return view('welcome', compact('movieCount', 'peopleCount', 'creditCount', 'memberCount', 'recentMovies', 'recentRatings', 'followingRatings', 'recentReviews'));
 })->name('home');
 
 Route::get('/search', [SearchController::class, 'search'])->name('search');
@@ -90,6 +98,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/movies/{movie}/rate', [RatingController::class, 'store'])->name('movies.rate');
     Route::delete('/movies/{movie}/rating', [RatingController::class, 'destroy'])->name('movies.rating.destroy');
+
+    Route::post('/movies/{movie}/review', [ReviewController::class, 'store'])->name('movies.review.store');
+    Route::delete('/movies/{movie}/review', [ReviewController::class, 'destroy'])->name('movies.review.destroy');
 
     Route::get('/watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
     Route::post('/movies/{movie}/watchlist', [WatchlistController::class, 'store'])->name('movies.watchlist.store');

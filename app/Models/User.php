@@ -26,9 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'avatar',
-        'ratings_private',
-        'want_to_watch_private',
-        'watched_private',
+        'profile_private',
         'is_admin',
     ];
 
@@ -50,18 +48,21 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function casts(): array
     {
         return [
-            'email_verified_at'     => 'datetime',
-            'password'              => 'hashed',
-            'ratings_private'       => 'boolean',
-            'want_to_watch_private' => 'boolean',
-            'watched_private'       => 'boolean',
-            'is_admin'              => 'boolean',
+            'email_verified_at' => 'datetime',
+            'password'          => 'hashed',
+            'profile_private'   => 'boolean',
+            'is_admin'          => 'boolean',
         ];
     }
 
     public function ratings(): HasMany
     {
         return $this->hasMany(Rating::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 
     public function watchlistEntries(): HasMany

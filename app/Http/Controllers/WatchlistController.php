@@ -26,8 +26,10 @@ class WatchlistController extends Controller
             ->latest()
             ->get();
 
-        // Attach the user's rating to each watched entry for convenience
-        $ratings = $user->ratings()->get()->keyBy('movie_id');
+        // Derive ratings from the already-loaded movie.ratings relationship
+        $ratings = $watched->mapWithKeys(
+            fn($entry) => [$entry->movie_id => $entry->movie->ratings->first()]
+        )->filter();
 
         return view('watchlist.index', compact('wantToWatch', 'watched', 'ratings', 'user'));
     }
@@ -59,28 +61,12 @@ class WatchlistController extends Controller
     public function updatePrivacy(Request $request): RedirectResponse
     {
         $request->validate([
-            'ratings_private'       => ['nullable', 'boolean'],
-            'want_to_watch_private' => ['nullable', 'boolean'],
-            'watched_private'       => ['nullable', 'boolean'],
+            'profile_private' => ['required', 'boolean'],
         ]);
 
-        $data = [];
-
-        if ($request->has('ratings_private')) {
-            $data['ratings_private'] = $request->boolean('ratings_private');
-        }
-
-        if ($request->has('want_to_watch_private')) {
-            $data['want_to_watch_private'] = $request->boolean('want_to_watch_private');
-        }
-
-        if ($request->has('watched_private')) {
-            $data['watched_private'] = $request->boolean('watched_private');
-        }
-
-        if (!empty($data)) {
-            $request->user()->update($data);
-        }
+        $request->user()->update([
+            'profile_private' => $request->boolean('profile_private'),
+        ]);
 
         return back()->with('status', 'privacy-updated');
     }

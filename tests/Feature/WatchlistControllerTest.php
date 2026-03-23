@@ -186,28 +186,33 @@ class WatchlistControllerTest extends TestCase
     // Privacy
     // -------------------------------------------------------------------------
 
-    public function test_user_can_update_watchlist_privacy(): void
+    public function test_user_can_make_profile_private(): void
     {
-        $user = User::factory()->create([
-            'want_to_watch_private' => false,
-            'watched_private'       => false,
-        ]);
+        $user = User::factory()->create(['profile_private' => false]);
 
         $this->actingAs($user)
-            ->patch(route('watchlist.privacy'), [
-                'want_to_watch_private' => '1',
-                'watched_private'       => '1',
-            ])
+            ->patch(route('watchlist.privacy'), ['profile_private' => '1'])
             ->assertRedirect();
 
         $user->refresh();
-        $this->assertTrue($user->want_to_watch_private);
-        $this->assertTrue($user->watched_private);
+        $this->assertTrue($user->profile_private);
+    }
+
+    public function test_user_can_make_profile_public(): void
+    {
+        $user = User::factory()->create(['profile_private' => true]);
+
+        $this->actingAs($user)
+            ->patch(route('watchlist.privacy'), ['profile_private' => '0'])
+            ->assertRedirect();
+
+        $user->refresh();
+        $this->assertFalse($user->profile_private);
     }
 
     public function test_unauthenticated_user_cannot_update_privacy(): void
     {
-        $this->patch(route('watchlist.privacy'), ['want_to_watch_private' => '1'])
+        $this->patch(route('watchlist.privacy'), ['profile_private' => '1'])
             ->assertRedirect(route('login'));
     }
 }
