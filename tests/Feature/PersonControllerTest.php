@@ -44,7 +44,7 @@ class PersonControllerTest extends TestCase
 
     public function test_index_returns_200_for_authenticated_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->get(route('admin.people.index'))
@@ -53,7 +53,7 @@ class PersonControllerTest extends TestCase
 
     public function test_index_lists_people(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $people = Person::factory()->count(3)->create();
 
         $response = $this->actingAs($user)
@@ -119,7 +119,7 @@ class PersonControllerTest extends TestCase
 
     public function test_create_returns_200_for_authenticated_user(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->get(route('admin.people.create'))
@@ -132,7 +132,7 @@ class PersonControllerTest extends TestCase
 
     public function test_store_creates_person_with_all_fields_and_redirects(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.people.store'), [
@@ -152,7 +152,7 @@ class PersonControllerTest extends TestCase
 
     public function test_store_creates_person_with_only_required_name(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.people.store'), [
@@ -166,7 +166,7 @@ class PersonControllerTest extends TestCase
 
     public function test_store_validates_required_name(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.people.store'), [
@@ -177,7 +177,7 @@ class PersonControllerTest extends TestCase
 
     public function test_store_rejects_future_date_of_birth(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.people.store'), [
@@ -189,7 +189,7 @@ class PersonControllerTest extends TestCase
 
     public function test_store_rejects_invalid_date_of_birth(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->post(route('admin.people.store'), [
@@ -213,7 +213,7 @@ class PersonControllerTest extends TestCase
 
     public function test_edit_returns_200_for_authenticated_user(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
 
         $this->actingAs($user)
@@ -223,7 +223,7 @@ class PersonControllerTest extends TestCase
 
     public function test_edit_prepopulates_fields(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create([
             'name'        => 'Existing Person',
             'nationality' => 'German',
@@ -241,7 +241,7 @@ class PersonControllerTest extends TestCase
 
     public function test_update_updates_person_and_redirects(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create(['name' => 'Old Name']);
 
         $this->actingAs($user)
@@ -257,7 +257,7 @@ class PersonControllerTest extends TestCase
 
     public function test_update_validates_required_name(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
 
         $this->actingAs($user)
@@ -269,7 +269,7 @@ class PersonControllerTest extends TestCase
 
     public function test_update_rejects_future_date_of_birth(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
 
         $this->actingAs($user)
@@ -296,7 +296,7 @@ class PersonControllerTest extends TestCase
 
     public function test_edit_passes_initial_credits_to_view(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         $movie  = Movie::factory()->create(['title' => 'Interstellar']);
         $type   = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
@@ -316,7 +316,7 @@ class PersonControllerTest extends TestCase
 
     public function test_update_saves_credits(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create(['name' => 'Some Actor']);
         $movie  = Movie::factory()->create();
         $type   = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
@@ -340,7 +340,7 @@ class PersonControllerTest extends TestCase
 
     public function test_update_syncs_credits_replacing_old_ones(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         $movie1 = Movie::factory()->create();
         $movie2 = Movie::factory()->create();
@@ -366,7 +366,7 @@ class PersonControllerTest extends TestCase
 
     public function test_update_ignores_incomplete_credit_rows(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         $movie  = Movie::factory()->create();
 
@@ -388,7 +388,7 @@ class PersonControllerTest extends TestCase
 
     public function test_destroy_deletes_person_and_redirects(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
 
         $this->actingAs($user)

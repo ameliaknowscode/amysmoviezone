@@ -29,7 +29,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_import_page_is_accessible_when_authenticated(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create(['name' => 'Cate Blanchett']);
 
         $this->actingAs($user)
@@ -44,7 +44,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_valid_csv_imports_credits(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         $movie  = Movie::factory()->create(['title' => 'The Matrix', 'release_year' => 1999]);
         Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
@@ -66,7 +66,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_missing_movie_is_created_automatically(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
 
@@ -82,7 +82,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_import_replaces_all_existing_credits(): void
     {
-        $user        = User::factory()->create();
+        $user        = User::factory()->admin()->create();
         $person      = Person::factory()->create();
         $oldMovie    = Movie::factory()->create();
         $newMovie    = Movie::factory()->create(['title' => 'New Movie', 'release_year' => 2020]);
@@ -106,7 +106,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_character_column_is_optional(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         Movie::factory()->create(['title' => 'Alien', 'release_year' => 1979]);
         Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
@@ -127,7 +127,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_row_with_unknown_type_is_created_automatically(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
 
         $csv  = "movie_title,release_year,type,character\nSome Film,2000,NewType,\n";
@@ -143,7 +143,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_row_with_empty_movie_title_is_skipped(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
 
@@ -159,7 +159,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_row_with_invalid_year_is_skipped(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
 
@@ -175,7 +175,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_existing_credits_are_not_wiped_when_all_rows_are_invalid(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         $movie  = Movie::factory()->create();
         $type   = Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
@@ -202,7 +202,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_actor_type_receives_character_non_actor_does_not(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         Movie::factory()->create(['title' => 'The Matrix', 'release_year' => 1999]);
         Type::firstOrCreate(['name' => 'Actor'],    ['is_crew' => false]);
@@ -221,7 +221,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_multiple_rows_each_with_actor_and_director_credits(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         Movie::factory()->create(['title' => 'Adaptation',  'release_year' => 2002]);
         Movie::factory()->create(['title' => 'Being John Malkovich', 'release_year' => 1999]);
@@ -245,7 +245,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_character_value_ignored_when_type_is_not_actor(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         Movie::factory()->create(['title' => 'Some Film', 'release_year' => 2000]);
         Type::firstOrCreate(['name' => 'Director'], ['is_crew' => true]);
@@ -263,7 +263,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_pipe_separated_row_creates_unknown_type_automatically(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
         Movie::factory()->create(['title' => 'The Matrix', 'release_year' => 1999]);
         Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
@@ -285,7 +285,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_missing_file_is_rejected(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
 
         $this->actingAs($user)
@@ -295,7 +295,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_non_csv_file_is_rejected(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
 
         $file = UploadedFile::fake()->create('credits.pdf', 100, 'application/pdf');
@@ -307,7 +307,7 @@ class PersonCreditImportControllerTest extends TestCase
 
     public function test_csv_missing_required_columns_is_rejected(): void
     {
-        $user   = User::factory()->create();
+        $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
 
         $csv  = "title,year\nThe Matrix,1999\n";
