@@ -16,7 +16,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,25 +29,33 @@ Route::get('/', function () {
     $recentMovies = \App\Models\Movie::latest()->limit(12)->get();
 
     $recentRatings = \App\Models\Rating::with('movie', 'user')
-        ->whereHas('user', fn ($q) => $q->where('ratings_private', false))
+        ->whereIn('id', function ($sub) {
+            $sub->select(DB::raw('MAX(ratings.id)'))
+                ->from('ratings')
+                ->join('users', 'users.id', '=', 'ratings.user_id')
+                ->where('users.ratings_private', false)
+                ->groupBy('ratings.movie_id');
+        })
         ->latest()
-        ->limit(50)
-        ->get()
-        ->unique('movie_id')
-        ->take(8);
+        ->limit(8)
+        ->get();
 
     $followingRatings = collect();
     if (auth()->check()) {
         $followingIds = auth()->user()->following()->pluck('users.id');
         if ($followingIds->isNotEmpty()) {
             $followingRatings = \App\Models\Rating::with('movie', 'user')
-                ->whereIn('user_id', $followingIds)
-                ->whereHas('user', fn ($q) => $q->where('ratings_private', false))
+                ->whereIn('id', function ($sub) use ($followingIds) {
+                    $sub->select(DB::raw('MAX(ratings.id)'))
+                        ->from('ratings')
+                        ->join('users', 'users.id', '=', 'ratings.user_id')
+                        ->where('users.ratings_private', false)
+                        ->whereIn('ratings.user_id', $followingIds)
+                        ->groupBy('ratings.movie_id');
+                })
                 ->latest()
-                ->limit(50)
-                ->get()
-                ->unique('movie_id')
-                ->take(8);
+                ->limit(8)
+                ->get();
         }
     }
 
@@ -64,6 +74,9 @@ Route::get('/u/{username}/followers', [UserProfileController::class, 'followers'
 Route::get('/u/{username}/following', [UserProfileController::class, 'following'])->name('profile.following');
 
 Route::get('/dashboard', function () {
+    if (auth()->user()->is_admin) {
+        return redirect()->route('admin.dashboard');
+    }
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -84,9 +97,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/watchlist/privacy', [WatchlistController::class, 'updatePrivacy'])->name('watchlist.privacy');
 
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
-        Route::get('/', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');

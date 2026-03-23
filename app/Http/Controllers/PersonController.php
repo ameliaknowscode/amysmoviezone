@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\SyncCredits;
 use App\Http\Requests\PersonRequest;
-use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Type;
@@ -73,7 +73,7 @@ class PersonController extends Controller
         $validated['slug'] = Str::slug($validated['name']);
         $person->update($validated);
 
-        $this->syncCredits($person, $request->input('credits', []));
+        SyncCredits::for($person, $request->input('credits', []));
 
         return redirect()->route('admin.people.index')->with('success', 'Person updated successfully.');
     }
@@ -85,26 +85,4 @@ class PersonController extends Controller
         return redirect()->route('admin.people.index')->with('success', 'Person deleted successfully.');
     }
 
-    private function syncCredits(Person $person, array $rows): void
-    {
-        $person->credits()->delete();
-
-        $batch = [];
-        foreach ($rows as $row) {
-            if (!empty($row['movie_id']) && !empty($row['type_id'])) {
-                $batch[] = [
-                    'person_id'  => $person->id,
-                    'movie_id'   => (int) $row['movie_id'],
-                    'type_id'    => (int) $row['type_id'],
-                    'character'  => $row['character'] ?? null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-        }
-
-        if (!empty($batch)) {
-            Credit::insert($batch);
-        }
-    }
 }
