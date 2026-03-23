@@ -115,9 +115,10 @@ class RatingControllerTest extends TestCase
             ->delete(route('movies.rating.destroy', $movie))
             ->assertRedirect();
 
-        $this->assertDatabaseMissing('ratings', [
+        $this->assertDatabaseHas('ratings', [
             'user_id'  => $user->id,
             'movie_id' => $movie->id,
+            'stars'    => null,
         ]);
     }
 

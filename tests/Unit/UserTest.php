@@ -47,4 +47,92 @@ class UserTest extends TestCase
 
         User::factory()->create(['email' => 'test@example.com']);
     }
+
+    // -------------------------------------------------------------------------
+    // Following relationships
+    // -------------------------------------------------------------------------
+
+    public function test_user_can_follow_another_user(): void
+    {
+        $alice = User::factory()->create();
+        $bob   = User::factory()->create();
+
+        $alice->following()->attach($bob->id);
+
+        $this->assertDatabaseHas('follows', [
+            'follower_id'  => $alice->id,
+            'following_id' => $bob->id,
+        ]);
+    }
+
+    public function test_following_relationship_returns_correct_users(): void
+    {
+        $alice = User::factory()->create();
+        $bob   = User::factory()->create();
+        $carol = User::factory()->create();
+
+        $alice->following()->attach([$bob->id, $carol->id]);
+
+        $following = $alice->following()->pluck('users.id');
+
+        $this->assertContains($bob->id, $following);
+        $this->assertContains($carol->id, $following);
+    }
+
+    public function test_followers_relationship_returns_correct_users(): void
+    {
+        $alice = User::factory()->create();
+        $bob   = User::factory()->create();
+        $carol = User::factory()->create();
+
+        $bob->following()->attach($alice->id);
+        $carol->following()->attach($alice->id);
+
+        $followers = $alice->followers()->pluck('users.id');
+
+        $this->assertContains($bob->id, $followers);
+        $this->assertContains($carol->id, $followers);
+    }
+
+    public function test_is_following_returns_true_when_following(): void
+    {
+        $alice = User::factory()->create();
+        $bob   = User::factory()->create();
+
+        $alice->following()->attach($bob->id);
+
+        $this->assertTrue($alice->isFollowing($bob));
+    }
+
+    public function test_is_following_returns_false_when_not_following(): void
+    {
+        $alice = User::factory()->create();
+        $bob   = User::factory()->create();
+
+        $this->assertFalse($alice->isFollowing($bob));
+    }
+
+    public function test_deleting_a_user_removes_their_follows(): void
+    {
+        $alice = User::factory()->create();
+        $bob   = User::factory()->create();
+
+        $alice->following()->attach($bob->id);
+
+        $alice->delete();
+
+        $this->assertDatabaseMissing('follows', ['follower_id' => $alice->id]);
+    }
+
+    public function test_deleting_a_followed_user_removes_the_follow_record(): void
+    {
+        $alice = User::factory()->create();
+        $bob   = User::factory()->create();
+
+        $alice->following()->attach($bob->id);
+
+        $bob->delete();
+
+        $this->assertDatabaseMissing('follows', ['following_id' => $bob->id]);
+    }
 }
