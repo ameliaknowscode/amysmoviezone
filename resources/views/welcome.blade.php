@@ -54,42 +54,52 @@
             @endif
 
             {{-- Recently Rated --}}
-            @if($recentRatings->isNotEmpty())
-            <div>
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">Recently Rated</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    @foreach($recentRatings as $rating)
-                    <a href="{{ $rating->movie->publicUrl() }}" class="group">
-                        <div class="aspect-[2/3] bg-gray-200 rounded-md overflow-hidden shadow-sm">
-                            @if($rating->movie->posterUrl())
-                                <img src="{{ $rating->movie->posterUrl() }}" alt="{{ $rating->movie->title }}"
-                                    class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center p-2 text-center">
-                                    <span class="text-xs text-gray-500 leading-snug">{{ $rating->movie->title }}</span>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="mt-1.5">
-                            <div class="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">{{ $rating->movie->title }}</div>
-                            @if($rating->stars)
-                            <div class="text-xs">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <span class="{{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
-                                @endfor
-                            </div>
-                            @endif
-                            <div class="text-xs text-gray-500 truncate">
-                                <a href="{{ route('profile.show', $rating->user->username) }}"
-                                   class="hover:text-indigo-600 hover:underline"
-                                   onclick="event.stopPropagation()">{{ $rating->user->name }}</a>
-                            </div>
-                        </div>
-                    </a>
-                    @endforeach
+            <div x-data="{ tab: '{{ auth()->check() && $followingRatings->isNotEmpty() ? 'following' : 'all' }}' }">
+
+                <div class="flex items-center gap-1 mb-4">
+                    @auth
+                        @if($followingRatings->isNotEmpty())
+                        <button @click="tab = 'following'"
+                                :class="tab === 'following' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'"
+                                class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                            Following
+                        </button>
+                        @endif
+                    @endauth
+                    <button @click="tab = 'all'"
+                            :class="tab === 'all' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'"
+                            class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                        All Activity
+                    </button>
                 </div>
+
+                {{-- Following feed --}}
+                @auth
+                    @if($followingRatings->isNotEmpty())
+                    <div x-show="tab === 'following'">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                            @foreach($followingRatings as $rating)
+                            @include('partials.rating-card', ['rating' => $rating])
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                @endauth
+
+                {{-- All activity feed --}}
+                <div x-show="tab === 'all'">
+                    @if($recentRatings->isNotEmpty())
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        @foreach($recentRatings as $rating)
+                        @include('partials.rating-card', ['rating' => $rating])
+                        @endforeach
+                    </div>
+                    @else
+                        <p class="text-sm text-gray-400">No ratings yet.</p>
+                    @endif
+                </div>
+
             </div>
-            @endif
 
         </div>
     </div>

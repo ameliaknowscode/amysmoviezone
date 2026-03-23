@@ -16,6 +16,9 @@
                     <x-nav-link :href="route('movies.browse')" :active="request()->routeIs('movies.browse')">
                         {{ __('Movies') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                        {{ __('Users') }}
+                    </x-nav-link>
                     @auth
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
@@ -23,6 +26,7 @@
                     <x-nav-link :href="route('watchlist.index')" :active="request()->routeIs('watchlist.*')">
                         {{ __('My Watchlist') }}
                     </x-nav-link>
+                    @if(Auth::user()->is_admin)
                     <div class="flex items-center">
                     <x-dropdown align="left" width="48">
                         <x-slot name="trigger">
@@ -49,6 +53,7 @@
                         </x-slot>
                     </x-dropdown>
                     </div>
+                    @endif
                     @endauth
                 </div>
             </div>
@@ -185,6 +190,9 @@
             <x-responsive-nav-link :href="route('movies.browse')" :active="request()->routeIs('movies.browse')">
                 {{ __('Movies') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                {{ __('Users') }}
+            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('director-connections')" :active="request()->routeIs('director-connections')">
                 {{ __('Director Connections') }}
             </x-responsive-nav-link>
@@ -195,6 +203,7 @@
             <x-responsive-nav-link :href="route('watchlist.index')" :active="request()->routeIs('watchlist.*')">
                 {{ __('My Watchlist') }}
             </x-responsive-nav-link>
+            @if(Auth::user()->is_admin)
             <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                 {{ __('Admin') }}
             </x-responsive-nav-link>
@@ -210,6 +219,7 @@
             <x-responsive-nav-link :href="route('admin.types.index')" :active="request()->routeIs('admin.types.*')" class="pl-8">
                 {{ __('— Types') }}
             </x-responsive-nav-link>
+            @endif
             @endauth
         </div>
 

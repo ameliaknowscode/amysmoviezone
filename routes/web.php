@@ -14,6 +14,8 @@ use App\Http\Controllers\PersonTypeCreditsController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\FollowController;
+use App\Http\Controllers\UsersController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,22 +34,43 @@ Route::get('/', function () {
         ->unique('movie_id')
         ->take(8);
 
-    return view('welcome', compact('movieCount', 'peopleCount', 'creditCount', 'recentMovies', 'recentRatings'));
+    $followingRatings = collect();
+    if (auth()->check()) {
+        $followingIds = auth()->user()->following()->pluck('users.id');
+        if ($followingIds->isNotEmpty()) {
+            $followingRatings = \App\Models\Rating::with('movie', 'user')
+                ->whereIn('user_id', $followingIds)
+                ->whereHas('user', fn ($q) => $q->where('ratings_private', false))
+                ->latest()
+                ->limit(50)
+                ->get()
+                ->unique('movie_id')
+                ->take(8);
+        }
+    }
+
+    return view('welcome', compact('movieCount', 'peopleCount', 'creditCount', 'recentMovies', 'recentRatings', 'followingRatings'));
 })->name('home');
 
 Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/users', [UsersController::class, 'index'])->name('users.index');
 Route::get('/movies', MovieBrowseController::class)->name('movies.browse');
 Route::get('/director-connections', [SearchController::class, 'directorConnections'])->name('director-connections');
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/people/{person}', [PersonController::class, 'show'])->name('people.show');
 Route::get('/u/{username}', [UserProfileController::class, 'show'])->name('profile.show');
 Route::get('/u/{username}/watchlist', [UserProfileController::class, 'watchlist'])->name('profile.watchlist');
+Route::get('/u/{username}/followers', [UserProfileController::class, 'followers'])->name('profile.followers');
+Route::get('/u/{username}/following', [UserProfileController::class, 'following'])->name('profile.following');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::post('/u/{username}/follow', [FollowController::class, 'store'])->name('follow.store');
+    Route::delete('/u/{username}/follow', [FollowController::class, 'destroy'])->name('follow.destroy');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -60,7 +83,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/movies/{movie}/watchlist', [WatchlistController::class, 'destroy'])->name('movies.watchlist.destroy');
     Route::patch('/watchlist/privacy', [WatchlistController::class, 'updatePrivacy'])->name('watchlist.privacy');
 
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/', function () {
             return view('admin.dashboard');
         })->name('dashboard');
