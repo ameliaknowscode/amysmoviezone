@@ -1,4 +1,16 @@
 <section>
+    @if (session('status') === 'profile-updated')
+        <div
+            x-data="{ show: true }"
+            x-show="show"
+            x-transition.opacity
+            x-init="setTimeout(() => show = false, 4000)"
+            class="mb-4 rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700 font-medium"
+        >
+            Profile updated successfully.
+        </div>
+    @endif
+
     <header>
         <h2 class="text-lg font-medium text-gray-900">
             {{ __('Profile Information') }}
@@ -72,16 +84,6 @@
 
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
-            @endif
         </div>
     </form>
 </section>

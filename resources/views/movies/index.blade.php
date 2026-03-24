@@ -21,7 +21,7 @@
                                 placeholder="Filter by title or director…"
                                 class="border-gray-300 rounded-md shadow-sm text-sm w-72">
                             <button type="submit"
-                                class="px-3 py-1.5 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">
+                                class="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
                                 Filter
                             </button>
                             @if($search)
@@ -30,12 +30,13 @@
                             @endif
                         </form>
                         <a href="{{ route('admin.movies.import') }}" class="text-indigo-600 hover:underline text-sm shrink-0">↑ Import CSV</a>
-                        <a href="{{ route('admin.movies.create') }}" class="text-blue-600 hover:underline text-sm shrink-0">+ Add Movie</a>
+                        <a href="{{ route('admin.movies.create') }}" class="text-indigo-600 hover:underline text-sm shrink-0">+ Add Movie</a>
                     </div>
 
                     @if($movies->isEmpty())
                         <p>No movies found.</p>
                     @else
+                        <div class="overflow-x-auto">
                         <table class="w-full border-collapse">
                             <thead>
                                 <tr class="bg-gray-100 text-left">
@@ -93,6 +94,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                         <div class="mt-4">{{ $movies->links() }}</div>
                     @endif
 

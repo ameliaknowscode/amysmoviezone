@@ -36,10 +36,12 @@
                                     </a>
                                     <p class="text-xs text-gray-500">{{ $entry->movie->release_year }}</p>
                                 </div>
-                                <form method="POST" action="{{ route('movies.watchlist.destroy', $entry->movie) }}">
+                                <form method="POST" action="{{ route('movies.watchlist.destroy', $entry->movie) }}"
+                                      onsubmit="return confirm('Remove this film from your watchlist?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition" title="Remove">&#10005;</button>
+                                    <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition"
+                                            title="Remove" aria-label="Remove {{ $entry->movie->title }} from watchlist">&#10005;</button>
                                 </form>
                             </li>
                             @endforeach
@@ -91,10 +93,12 @@
                                     </div>
                                     @endif
                                 </div>
-                                <form method="POST" action="{{ route('movies.watchlist.destroy', $entry->movie) }}">
+                                <form method="POST" action="{{ route('movies.watchlist.destroy', $entry->movie) }}"
+                                      onsubmit="return confirm('Remove this film from your watchlist?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition" title="Remove">&#10005;</button>
+                                    <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition"
+                                            title="Remove" aria-label="Remove {{ $entry->movie->title }} from watchlist">&#10005;</button>
                                 </form>
                             </li>
                             @endforeach
