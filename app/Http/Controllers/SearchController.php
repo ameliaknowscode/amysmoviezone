@@ -22,6 +22,7 @@ class SearchController extends Controller
                     ->with('person')
                     ->where('type_id', $directorTypeId)
                 ])
+                ->withAvg('ratings', 'stars')
                 ->orderBy('release_year', 'desc')
                 ->get()
             : collect();

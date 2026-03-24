@@ -103,14 +103,22 @@
                 @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
+                        @php $unreadCount = Auth::user()->unreadNotifications()->count(); @endphp
                         <button class="inline-flex items-center gap-2 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            @if(Auth::user()->avatar)
-                                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" class="h-7 w-7 rounded-full object-cover">
-                            @else
-                                <div class="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold select-none">
-                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                </div>
-                            @endif
+                            <div class="relative">
+                                @if(Auth::user()->avatar)
+                                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" class="h-7 w-7 rounded-full object-cover">
+                                @else
+                                    <div class="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold select-none">
+                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                    </div>
+                                @endif
+                                @if($unreadCount > 0)
+                                    <span class="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-red-500 border-2 border-white flex items-center justify-center">
+                                        <span class="text-white" style="font-size: 7px; line-height: 1;">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                                    </span>
+                                @endif
+                            </div>
                             <div>{{ Auth::user()->name }}</div>
                             <div>
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -123,6 +131,17 @@
                     <x-slot name="content">
                         <x-dropdown-link :href="Auth::user()->username ? route('profile.show', Auth::user()->username) : route('profile.edit')">
                             {{ __('Profile') }}
+                        </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('notifications.index')">
+                            <span class="flex items-center justify-between gap-2">
+                                Notifications
+                                @if($unreadCount > 0)
+                                    <span class="inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full bg-red-500 text-white text-xs font-medium leading-none">
+                                        {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                                    </span>
+                                @endif
+                            </span>
                         </x-dropdown-link>
 
                         <!-- Authentication -->

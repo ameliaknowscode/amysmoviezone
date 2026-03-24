@@ -162,6 +162,58 @@
                             <a href="#reviews" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-indigo-300 hover:text-white transition">
                                 + Review or Log
                             </a>
+
+                            {{-- Add to List --}}
+                            <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                                <button @click="open = !open"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-indigo-400 text-indigo-200 hover:bg-indigo-800 transition font-medium">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h8"/>
+                                    </svg>
+                                    Lists
+                                </button>
+                                <div x-show="open" x-cloak
+                                     class="absolute left-0 mt-1.5 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-20">
+                                    @forelse($userLists as $list)
+                                        @php $inList = $movieListIds->contains($list->id); @endphp
+                                        <form method="POST"
+                                              action="{{ $inList
+                                                  ? route('lists.movies.destroy', [$list, $movie])
+                                                  : route('lists.movies.store', $list) }}">
+                                            @csrf
+                                            @if($inList) @method('DELETE') @else
+                                                <input type="hidden" name="movie_id" value="{{ $movie->id }}">
+                                            @endif
+                                            <button type="submit"
+                                                    class="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left">
+                                                <span class="w-4 h-4 shrink-0 flex items-center justify-center">
+                                                    @if($inList)
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @else
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                                        </svg>
+                                                    @endif
+                                                </span>
+                                                <span class="truncate">{{ $list->name }}</span>
+                                            </button>
+                                        </form>
+                                    @empty
+                                        <p class="px-4 py-2 text-xs text-gray-400">No lists yet.</p>
+                                    @endforelse
+                                    <div class="border-t border-gray-100 mt-1 pt-1">
+                                        <a href="{{ route('lists.create') }}"
+                                           class="flex items-center gap-2.5 px-4 py-2 text-sm text-indigo-600 hover:bg-gray-50 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                            </svg>
+                                            New list
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     @else
@@ -259,8 +311,67 @@
                 </div>
                 @endif
 
-                {{-- ── Main: Reviews ── --}}
+                {{-- ── Main: Friends' Activity + Reviews ── --}}
                 <div class="{{ ($cast->isNotEmpty() || $crew->isNotEmpty()) ? 'lg:col-span-2' : 'lg:col-span-3' }}" id="reviews">
+
+                {{-- Friends' Activity --}}
+                @if($friendActivity->isNotEmpty())
+                <div class="bg-white rounded-lg shadow-sm mb-5">
+                    <div class="px-5 py-3 border-b border-gray-100">
+                        <h2 class="text-sm font-semibold text-gray-900">Friends</h2>
+                    </div>
+                    <ul class="divide-y divide-gray-100">
+                        @foreach($friendActivity as $friend)
+                        <li class="flex items-center gap-3 px-5 py-3">
+                            {{-- Avatar --}}
+                            <a href="{{ route('profile.show', $friend->user->username) }}" class="shrink-0">
+                                @if($friend->user->avatar)
+                                    <img src="{{ asset('storage/' . $friend->user->avatar) }}"
+                                         class="h-8 w-8 rounded-full object-cover ring-1 ring-gray-200" alt="">
+                                @else
+                                    <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold select-none">
+                                        {{ strtoupper(substr($friend->user->name, 0, 1)) }}
+                                    </div>
+                                @endif
+                            </a>
+
+                            {{-- Name --}}
+                            <a href="{{ route('profile.show', $friend->user->username) }}"
+                               class="flex-1 min-w-0 text-sm font-medium text-gray-800 hover:text-indigo-600 transition-colors truncate">
+                                {{ $friend->user->name }}
+                            </a>
+
+                            {{-- Activity --}}
+                            <div class="shrink-0 flex items-center gap-2 text-sm text-gray-500">
+                                @if($friend->rating?->stars)
+                                    <span class="flex text-xs leading-none">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <span class="{{ $i <= $friend->rating->stars ? 'text-yellow-400' : 'text-gray-200' }}">&#9733;</span>
+                                        @endfor
+                                    </span>
+                                @elseif($friend->rating?->liked)
+                                    <svg class="w-4 h-4 text-red-400" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                @endif
+
+                                @if($friend->review_count > 0)
+                                    <span class="text-xs text-gray-400">
+                                        logged {{ $friend->review_count > 1 ? $friend->review_count . '×' : '' }}
+                                    </span>
+                                @elseif($friend->watchlist?->list_type === 'watched' && !$friend->rating)
+                                    <span class="text-xs text-gray-400">watched</span>
+                                @endif
+
+                                @if($friend->watchlist?->list_type === 'want_to_watch')
+                                    <span class="text-xs text-indigo-400">wants to watch</span>
+                                @endif
+                            </div>
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
                     <div class="bg-white rounded-lg shadow-sm">
                         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                             <h2 class="text-sm font-semibold text-gray-900">Reviews</h2>
@@ -419,6 +530,29 @@
                                     @if($review->body)
                                         <p class="text-sm text-gray-700 mt-1.5 leading-relaxed">{{ $review->body }}</p>
                                     @endif
+
+                                    {{-- Like button --}}
+                                    @auth
+                                    @php $liked = $likedReviewIds->contains($review->id); @endphp
+                                    <div class="mt-2">
+                                        <form method="POST"
+                                              action="{{ $liked
+                                                  ? route('reviews.likes.destroy', $review)
+                                                  : route('reviews.likes.store', $review) }}">
+                                            @csrf
+                                            @if($liked) @method('DELETE') @endif
+                                            <button type="submit"
+                                                    class="inline-flex items-center gap-1 text-xs transition-colors {{ $liked ? 'text-red-400 hover:text-red-500' : 'text-gray-300 hover:text-red-400' }}">
+                                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                </svg>
+                                                @if($review->likes_count > 0)
+                                                    {{ $review->likes_count }}
+                                                @endif
+                                            </button>
+                                        </form>
+                                    </div>
+                                    @endauth
                                 </div>
                             </div>
                             @endforeach

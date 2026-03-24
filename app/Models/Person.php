@@ -19,6 +19,26 @@ class Person extends Model
     }
 
     /**
+     * Name of this person's most-credited type, using already-loaded credits.
+     * Returns null if the person has no credits.
+     */
+    public function dominantTypeName(): ?string
+    {
+        $dominantTypeId = $this->credits
+            ->groupBy('type_id')
+            ->map->count()
+            ->sortDesc()
+            ->keys()
+            ->first();
+
+        if (! $dominantTypeId) {
+            return null;
+        }
+
+        return $this->credits->firstWhere('type_id', $dominantTypeId)?->type?->name;
+    }
+
+    /**
      * URL for this person's most-credited type, using already-loaded credits.
      * Returns null if the person has no credits.
      */

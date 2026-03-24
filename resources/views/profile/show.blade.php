@@ -111,6 +111,10 @@
                                 <span class="bg-gray-100 text-gray-500 text-xs px-1.5 py-0.5 rounded-full font-normal">{{ $totalWatched }}</span>
                                 @endif
                             </a>
+                            <a href="{{ route('profile.lists', $profileUser->username) }}"
+                               class="shrink-0 px-5 py-3 text-sm font-medium text-gray-500 hover:text-indigo-600 hover:bg-gray-50 transition-colors border-b-2 border-transparent hover:border-indigo-300">
+                                Lists
+                            </a>
                         </nav>
                     </div>
                     @endif

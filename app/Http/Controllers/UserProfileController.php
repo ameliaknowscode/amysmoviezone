@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MovieList;
 use App\Models\Rating;
 use App\Models\User;
 use App\Models\WatchlistEntry;
@@ -91,6 +92,23 @@ class UserProfileController extends Controller
                 ->get();
 
         return view('profile.watchlist', compact('profileUser', 'wantToWatch', 'watched'));
+    }
+
+    public function lists(string $username): View
+    {
+        $profileUser = User::where('username', $username)->firstOrFail();
+
+        $isOwner = Auth::id() === $profileUser->id;
+        $private = $profileUser->profile_private && !$isOwner;
+
+        $lists = $private ? collect()
+            : $profileUser->movieLists()
+                ->withCount('items')
+                ->when(!$isOwner, fn($q) => $q->where('is_public', true))
+                ->orderBy('name')
+                ->get();
+
+        return view('profile.lists', compact('profileUser', 'lists', 'isOwner'));
     }
 
     public function followers(string $username): View

@@ -1,101 +1,131 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Search Results for &ldquo;{{ $query }}&rdquo;
+            Results for &ldquo;{{ $query }}&rdquo;
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+    <div class="py-10">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
             {{-- Movies --}}
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold mb-4">Movies</h3>
-
-                    @if($movies->isEmpty())
-                        <p class="text-gray-500">No movies found matching &ldquo;{{ $query }}&rdquo;.</p>
-                    @else
-                        <table class="w-full border-collapse">
-                            <thead>
-                                <tr class="bg-gray-100 text-left">
-                                    <th class="border border-gray-300 px-4 py-2 w-[91px]"></th>
-                                    <th class="border border-gray-300 px-4 py-2">Title</th>
-                                    <th class="border border-gray-300 px-4 py-2">Director</th>
-                                    <th class="border border-gray-300 px-4 py-2">Release Year</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($movies as $movie)
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="border border-gray-300 px-4 py-2">
-                                            @if($movie->posterUrl())
-                                                <img src="{{ $movie->posterUrl() }}" alt="{{ $movie->title }}"
-                                                    class="h-[110px] w-[75px] object-cover rounded shadow-sm">
-                                            @else
-                                                <div class="h-[110px] w-[75px] rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
-                                                    &#127902;
-                                                </div>
-                                            @endif
-                                        </td>
-                                        <td class="border border-gray-300 px-4 py-2">
-                                            <a href="{{ $movie->publicUrl() }}" class="text-indigo-600 hover:underline">{{ $movie->title }}</a>
-                                        </td>
-                                        <td class="border border-gray-300 px-4 py-2">
-                                            @if($movie->credits->isEmpty())
-                                                —
-                                            @else
-                                                @foreach($movie->credits as $i => $credit)
-                                                    @if($i > 0), @endif
-                                                    <a href="{{ $credit->byTypeUrl() }}" class="text-indigo-600 hover:underline">{{ $credit->person->name }}</a>
-                                                @endforeach
-                                            @endif
-                                        </td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $movie->release_year }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h3 class="text-base font-semibold text-gray-800">Movies</h3>
+                    @if($movies->isNotEmpty())
+                        <span class="text-xs font-medium bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full">
+                            {{ $movies->count() }}
+                        </span>
                     @endif
                 </div>
+
+                @if($movies->isEmpty())
+                    <p class="px-6 py-5 text-sm text-gray-400">No movies found for &ldquo;{{ $query }}&rdquo;.</p>
+                @else
+                    <ul class="divide-y divide-gray-100">
+                        @foreach($movies as $movie)
+                            <li class="flex items-start gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+                                {{-- Poster --}}
+                                <a href="{{ $movie->publicUrl() }}" class="shrink-0">
+                                    <div class="w-10 h-[60px] rounded overflow-hidden bg-indigo-50 shadow-sm ring-1 ring-black/5">
+                                        @if($movie->posterUrl())
+                                            <img src="{{ $movie->posterUrl() }}" alt="{{ $movie->title }}"
+                                                 class="w-full h-full object-cover">
+                                        @endif
+                                    </div>
+                                </a>
+
+                                {{-- Info --}}
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline justify-between gap-2">
+                                        <a href="{{ $movie->publicUrl() }}"
+                                           class="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors truncate">
+                                            {{ $movie->title }}
+                                        </a>
+                                        @if($movie->ratings_avg_stars)
+                                            <span class="shrink-0 text-xs text-yellow-500 font-medium">
+                                                ★ {{ number_format($movie->ratings_avg_stars, 1) }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                                        @if($movie->release_year)
+                                            <span>{{ $movie->release_year }}</span>
+                                        @endif
+                                        @if($movie->credits->isNotEmpty())
+                                            <span>·</span>
+                                            <span>
+                                                @foreach($movie->credits as $i => $credit)
+                                                    @if($i > 0), @endif
+                                                    <a href="{{ $credit->byTypeUrl() }}"
+                                                       class="text-indigo-500 hover:text-indigo-700 transition-colors">
+                                                        {{ $credit->person->name }}
+                                                    </a>
+                                                @endforeach
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
             </div>
 
             {{-- People --}}
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold mb-4">People</h3>
-
-                    @if($people->isEmpty())
-                        <p class="text-gray-500">No people found matching &ldquo;{{ $query }}&rdquo;.</p>
-                    @else
-                        <table class="w-full border-collapse">
-                            <thead>
-                                <tr class="bg-gray-100 text-left">
-                                    <th class="border border-gray-300 px-4 py-2">Name</th>
-                                    <th class="border border-gray-300 px-4 py-2">Nationality</th>
-                                    <th class="border border-gray-300 px-4 py-2">Date of Birth</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($people as $person)
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="border border-gray-300 px-4 py-2">
-                                            <a href="{{ $person->dominantTypeUrl() ?? route('people.show', $person) }}" class="text-indigo-600 hover:underline">{{ $person->name }}</a>
-                                        </td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $person->nationality ?? '—' }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">
-                                            {{ $person->date_of_birth ? \Carbon\Carbon::parse($person->date_of_birth)->format('F j, Y') : '—' }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h3 class="text-base font-semibold text-gray-800">People</h3>
+                    @if($people->isNotEmpty())
+                        <span class="text-xs font-medium bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full">
+                            {{ $people->count() }}
+                        </span>
                     @endif
                 </div>
-            </div>
 
-            <div>
-                <a href="{{ route('home') }}" class="text-indigo-600 hover:underline">&larr; Back to home</a>
+                @if($people->isEmpty())
+                    <p class="px-6 py-5 text-sm text-gray-400">No people found for &ldquo;{{ $query }}&rdquo;.</p>
+                @else
+                    <ul class="divide-y divide-gray-100">
+                        @foreach($people as $person)
+                            @php
+                                $typeName  = $person->dominantTypeName();
+                                $typeUrl   = $person->dominantTypeUrl();
+                                $filmCount = $person->credits->count();
+                            @endphp
+                            <li class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+                                {{-- Avatar --}}
+                                <div class="shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm select-none">
+                                    {{ strtoupper(substr($person->name, 0, 1)) }}
+                                </div>
+
+                                {{-- Info --}}
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ $typeUrl ?? route('people.show', $person) }}"
+                                           class="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors">
+                                            {{ $person->name }}
+                                        </a>
+                                        @if($typeName)
+                                            <span class="text-xs font-medium bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded-full">
+                                                {{ $typeName }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-400">
+                                        @if($person->nationality)
+                                            <span>{{ $person->nationality }}</span>
+                                        @endif
+                                        @if($filmCount)
+                                            @if($person->nationality)<span>·</span>@endif
+                                            <span>{{ $filmCount }} {{ Str::plural('film', $filmCount) }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
             </div>
 
         </div>
