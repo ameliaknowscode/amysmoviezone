@@ -47,7 +47,7 @@
                         {{ __('My Watchlist') }}
                     </x-nav-link>
                     <x-nav-link :href="route('feed')" :active="request()->routeIs('feed')">
-                        {{ __('Feed') }}
+                        {{ __('Activity') }}
                     </x-nav-link>
                     @if(Auth::user()->is_admin)
                     <div class="flex items-center">
@@ -231,7 +231,7 @@
                 {{ __('My Watchlist') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('feed')" :active="request()->routeIs('feed')">
-                {{ __('Feed') }}
+                {{ __('Activity') }}
             </x-responsive-nav-link>
             @if(Auth::user()->is_admin)
             <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
