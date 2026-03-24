@@ -24,7 +24,7 @@ class ReviewTest extends TestCase
     {
         $review = new Review();
 
-        $this->assertEquals(['user_id', 'movie_id', 'body'], $review->getFillable());
+        $this->assertEquals(['user_id', 'movie_id', 'body', 'watched_at'], $review->getFillable());
     }
 
     public function test_review_belongs_to_a_user(): void

@@ -17,7 +17,7 @@ class UserProfileController extends Controller
             : $profileUser->ratings()->with('movie')->latest()->limit(4)->get();
 
         $recentReviews = $profileUser->profile_private ? collect()
-            : $profileUser->reviews()->with('movie')->latest()->limit(3)->get();
+            : $profileUser->reviews()->with('movie')->whereNotNull('body')->latest()->limit(3)->get();
 
         $followerCount  = $profileUser->followers()->count();
         $followingCount = $profileUser->following()->count();
@@ -28,6 +28,23 @@ class UserProfileController extends Controller
         return view('profile.show', compact(
             'profileUser', 'recentRatings', 'recentReviews', 'followerCount', 'followingCount', 'isFollowing'
         ));
+    }
+
+    public function diary(string $username): View
+    {
+        $profileUser = User::where('username', $username)->firstOrFail();
+
+        $entries = $profileUser->profile_private && Auth::id() !== $profileUser->id
+            ? null
+            : $profileUser->reviews()
+                ->with('movie')
+                ->whereNotNull('watched_at')
+                ->orderByDesc('watched_at')
+                ->orderByDesc('id')
+                ->get()
+                ->groupBy(fn($r) => $r->watched_at->format('Y-m'));
+
+        return view('profile.diary', compact('profileUser', 'entries'));
     }
 
     public function watchlist(string $username): View

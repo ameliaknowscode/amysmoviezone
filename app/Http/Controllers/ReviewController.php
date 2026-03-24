@@ -12,22 +12,41 @@ class ReviewController extends Controller
     public function store(Request $request, Movie $movie): RedirectResponse
     {
         $validated = $request->validate([
-            'body' => ['required', 'string', 'max:5000'],
+            'body'       => ['nullable', 'string', 'max:5000'],
+            'watched_at' => ['nullable', 'date'],
         ]);
 
-        Review::updateOrCreate(
-            ['user_id' => $request->user()->id, 'movie_id' => $movie->id],
-            ['body' => $validated['body']],
-        );
+        $movie->reviews()->create([
+            'user_id'    => $request->user()->id,
+            'body'       => $validated['body'] ?? null,
+            'watched_at' => $validated['watched_at'] ?? now()->toDateString(),
+        ]);
 
         return back()->with('status', 'review-saved');
     }
 
-    public function destroy(Request $request, Movie $movie): RedirectResponse
+    public function update(Request $request, Review $review): RedirectResponse
     {
-        Review::where('user_id', $request->user()->id)
-            ->where('movie_id', $movie->id)
-            ->delete();
+        abort_if($review->user_id !== $request->user()->id, 403);
+
+        $validated = $request->validate([
+            'body'       => ['nullable', 'string', 'max:5000'],
+            'watched_at' => ['nullable', 'date'],
+        ]);
+
+        $review->update([
+            'body'       => $validated['body'] ?? null,
+            'watched_at' => $validated['watched_at'] ?? null,
+        ]);
+
+        return back()->with('status', 'review-saved');
+    }
+
+    public function destroy(Request $request, Review $review): RedirectResponse
+    {
+        abort_if($review->user_id !== $request->user()->id, 403);
+
+        $review->delete();
 
         return back()->with('status', 'review-deleted');
     }

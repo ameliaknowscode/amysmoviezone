@@ -15,9 +15,10 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'  => User::factory(),
-            'movie_id' => Movie::factory(),
-            'body'     => fake()->paragraph(),
+            'user_id'    => User::factory(),
+            'movie_id'   => Movie::factory(),
+            'body'       => fake()->paragraph(),
+            'watched_at' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
         ];
     }
 }
