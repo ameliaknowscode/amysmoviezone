@@ -26,14 +26,14 @@ class ReviewControllerTest extends TestCase
 
     public function test_unauthenticated_user_cannot_delete_a_review(): void
     {
-        $movie = Movie::factory()->create();
+        $review = Review::factory()->create();
 
-        $this->delete(route('movies.review.destroy', $movie))
+        $this->delete(route('reviews.destroy', $review))
             ->assertRedirect(route('login'));
     }
 
     // -------------------------------------------------------------------------
-    // Store (upsert)
+    // Store
     // -------------------------------------------------------------------------
 
     public function test_authenticated_user_can_submit_a_review(): void
@@ -52,19 +52,30 @@ class ReviewControllerTest extends TestCase
         ]);
     }
 
-    public function test_review_is_upserted_not_duplicated(): void
+    public function test_user_can_log_same_movie_multiple_times(): void
     {
         $user  = User::factory()->create();
         $movie = Movie::factory()->create();
 
         $this->actingAs($user)
-            ->post(route('movies.review.store', $movie), ['body' => 'First review.']);
+            ->post(route('movies.review.store', $movie), ['body' => 'First watch.']);
 
         $this->actingAs($user)
-            ->post(route('movies.review.store', $movie), ['body' => 'Updated review.']);
+            ->post(route('movies.review.store', $movie), ['body' => 'Second watch.']);
 
-        $this->assertDatabaseCount('reviews', 1);
-        $this->assertDatabaseHas('reviews', ['body' => 'Updated review.']);
+        $this->assertDatabaseCount('reviews', 2);
+    }
+
+    public function test_watched_at_defaults_to_today_if_not_provided(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('movies.review.store', $movie), ['body' => 'Good film.']);
+
+        $review = Review::where('user_id', $user->id)->first();
+        $this->assertEquals(now()->toDateString(), $review->watched_at->format('Y-m-d'));
     }
 
     public function test_store_redirects_back_with_review_saved_status(): void
@@ -78,14 +89,21 @@ class ReviewControllerTest extends TestCase
             ->assertSessionHas('status', 'review-saved');
     }
 
-    public function test_body_is_required(): void
+    public function test_body_is_optional(): void
     {
         $user  = User::factory()->create();
         $movie = Movie::factory()->create();
 
         $this->actingAs($user)
             ->post(route('movies.review.store', $movie), ['body' => ''])
-            ->assertSessionHasErrors('body');
+            ->assertRedirect()
+            ->assertSessionMissing('errors');
+
+        $this->assertDatabaseHas('reviews', [
+            'user_id'  => $user->id,
+            'movie_id' => $movie->id,
+            'body'     => null,
+        ]);
     }
 
     public function test_body_cannot_exceed_5000_characters(): void
@@ -111,46 +129,82 @@ class ReviewControllerTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
+    // Update
+    // -------------------------------------------------------------------------
+
+    public function test_user_can_update_their_own_review(): void
+    {
+        $user   = User::factory()->create();
+        $review = Review::factory()->create(['user_id' => $user->id, 'body' => 'Original.']);
+
+        $this->actingAs($user)
+            ->patch(route('reviews.update', $review), ['body' => 'Updated.', 'watched_at' => '2026-01-15'])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('reviews', ['id' => $review->id, 'body' => 'Updated.']);
+        $this->assertEquals('2026-01-15', $review->fresh()->watched_at->format('Y-m-d'));
+    }
+
+    public function test_user_cannot_update_another_users_review(): void
+    {
+        $user1  = User::factory()->create();
+        $user2  = User::factory()->create();
+        $review = Review::factory()->create(['user_id' => $user1->id, 'body' => 'Original.']);
+
+        $this->actingAs($user2)
+            ->patch(route('reviews.update', $review), ['body' => 'Hacked.'])
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('reviews', ['id' => $review->id, 'body' => 'Original.']);
+    }
+
+    public function test_update_redirects_with_review_saved_status(): void
+    {
+        $user   = User::factory()->create();
+        $review = Review::factory()->create(['user_id' => $user->id]);
+
+        $this->actingAs($user)
+            ->patch(route('reviews.update', $review), ['body' => 'Updated.'])
+            ->assertRedirect()
+            ->assertSessionHas('status', 'review-saved');
+    }
+
+    // -------------------------------------------------------------------------
     // Destroy
     // -------------------------------------------------------------------------
 
     public function test_user_can_delete_their_own_review(): void
     {
-        $user  = User::factory()->create();
-        $movie = Movie::factory()->create();
-        Review::factory()->create(['user_id' => $user->id, 'movie_id' => $movie->id]);
+        $user   = User::factory()->create();
+        $review = Review::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user)
-            ->delete(route('movies.review.destroy', $movie))
+            ->delete(route('reviews.destroy', $review))
             ->assertRedirect();
 
-        $this->assertDatabaseMissing('reviews', [
-            'user_id'  => $user->id,
-            'movie_id' => $movie->id,
-        ]);
+        $this->assertDatabaseMissing('reviews', ['id' => $review->id]);
     }
 
     public function test_destroy_redirects_with_review_deleted_status(): void
     {
-        $user  = User::factory()->create();
-        $movie = Movie::factory()->create();
-        Review::factory()->create(['user_id' => $user->id, 'movie_id' => $movie->id]);
+        $user   = User::factory()->create();
+        $review = Review::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user)
-            ->delete(route('movies.review.destroy', $movie))
+            ->delete(route('reviews.destroy', $review))
             ->assertRedirect()
             ->assertSessionHas('status', 'review-deleted');
     }
 
-    public function test_deleting_a_review_only_removes_the_current_users_review(): void
+    public function test_user_cannot_delete_another_users_review(): void
     {
         $user1  = User::factory()->create();
         $user2  = User::factory()->create();
-        $movie  = Movie::factory()->create();
-        $review = Review::factory()->create(['user_id' => $user1->id, 'movie_id' => $movie->id]);
+        $review = Review::factory()->create(['user_id' => $user1->id]);
 
         $this->actingAs($user2)
-            ->delete(route('movies.review.destroy', $movie));
+            ->delete(route('reviews.destroy', $review))
+            ->assertForbidden();
 
         $this->assertDatabaseHas('reviews', ['id' => $review->id]);
     }

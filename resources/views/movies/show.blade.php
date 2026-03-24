@@ -241,11 +241,18 @@
                     <div class="mt-8 pt-6 border-t border-gray-100">
                         <h3 class="text-sm font-semibold text-gray-700 mb-4">Reviews</h3>
 
+                        @if(session('status') === 'review-saved')
+                            <p class="text-xs text-green-600 mb-3">Review saved.</p>
+                        @endif
+                        @if(session('status') === 'review-deleted')
+                            <p class="text-xs text-gray-400 mb-3">Review deleted.</p>
+                        @endif
+
                         <div class="space-y-5">
 
-                            {{-- Current user's own review (shown in list, editable inline) --}}
+                            {{-- Current user's reviews (each editable inline) --}}
                             @auth
-                            @if($userReview)
+                            @foreach($userReviews as $userReview)
                             <div x-data="{ editing: false }" class="flex gap-3">
                                 <div class="flex-shrink-0">
                                     @if(auth()->user()->avatar)
@@ -264,25 +271,35 @@
                                     <div x-show="!editing">
                                         <div class="flex items-baseline gap-2">
                                             <span class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</span>
-                                            <span class="text-xs text-gray-400">{{ $userReview->updated_at->diffForHumans() }}</span>
+                                            @if($userReview->watched_at)
+                                                <span class="text-xs text-gray-400">watched {{ $userReview->watched_at->format('j M Y') }}</span>
+                                            @endif
                                             <button @click="editing = true"
                                                     class="text-xs text-indigo-500 hover:text-indigo-700 transition underline">
                                                 Edit
                                             </button>
                                         </div>
-                                        <p class="text-sm text-gray-700 mt-1 leading-relaxed">{{ $userReview->body }}</p>
-                                        @if(session('status') === 'review-saved')
-                                            <p class="text-xs text-green-600 mt-1">Review saved.</p>
+                                        @if($userReview->body)
+                                            <p class="text-sm text-gray-700 mt-1 leading-relaxed">{{ $userReview->body }}</p>
                                         @endif
                                     </div>
 
                                     {{-- Edit form --}}
                                     <div x-show="editing" x-cloak>
-                                        <form method="POST" action="{{ route('movies.review.store', $movie) }}">
+                                        <form method="POST" action="{{ route('reviews.update', $userReview) }}">
                                             @csrf
+                                            @method('PATCH')
+                                            <div class="mb-2">
+                                                <label class="block text-xs text-gray-500 mb-1">Watch date</label>
+                                                <input type="date"
+                                                       name="watched_at"
+                                                       value="{{ old('watched_at', $userReview->watched_at?->format('Y-m-d')) }}"
+                                                       class="rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            </div>
                                             <textarea
                                                 name="body"
                                                 rows="4"
+                                                placeholder="Write your review… (optional)"
                                                 class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                             >{{ old('body', $userReview->body) }}</textarea>
                                             @error('body')
@@ -291,7 +308,7 @@
                                             <div class="flex items-center gap-3 mt-2">
                                                 <button type="submit"
                                                         class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-                                                    Update Review
+                                                    Update
                                                 </button>
                                                 <button type="button" @click="editing = false"
                                                         class="text-xs text-gray-400 hover:text-gray-600 transition underline">
@@ -299,7 +316,7 @@
                                                 </button>
                                             </div>
                                         </form>
-                                        <form method="POST" action="{{ route('movies.review.destroy', $movie) }}" class="mt-2">
+                                        <form method="POST" action="{{ route('reviews.destroy', $userReview) }}" class="mt-2">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-xs text-red-400 hover:text-red-600 transition underline">
@@ -310,21 +327,28 @@
 
                                 </div>
                             </div>
+                            @endforeach
 
-                            @else
-                            {{-- Write a review form (no review yet) --}}
+                            {{-- Review or Log form (always available to authenticated users) --}}
                             <div x-data="{ open: false }">
                                 <button @click="open = true" x-show="!open"
                                         class="text-sm text-indigo-600 hover:text-indigo-800 transition underline">
-                                    + Write a review
+                                    + Review or Log
                                 </button>
                                 <div x-show="open" x-cloak>
                                     <form method="POST" action="{{ route('movies.review.store', $movie) }}">
                                         @csrf
+                                        <div class="mb-2">
+                                            <label class="block text-xs text-gray-500 mb-1">Watch date</label>
+                                            <input type="date"
+                                                   name="watched_at"
+                                                   value="{{ old('watched_at', now()->format('Y-m-d')) }}"
+                                                   class="rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        </div>
                                         <textarea
                                             name="body"
                                             rows="4"
-                                            placeholder="Write your review…"
+                                            placeholder="Write your review… (optional)"
                                             class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         >{{ old('body') }}</textarea>
                                         @error('body')
@@ -333,7 +357,7 @@
                                         <div class="flex items-center gap-3 mt-2">
                                             <button type="submit"
                                                     class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-                                                Submit Review
+                                                Save
                                             </button>
                                             <button type="button" @click="open = false"
                                                     class="text-xs text-gray-400 hover:text-gray-600 transition underline">
@@ -343,7 +367,6 @@
                                     </form>
                                 </div>
                             </div>
-                            @endif
                             @endauth
 
                             {{-- Public reviews from other users --}}
@@ -366,14 +389,19 @@
                                            class="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors">
                                             {{ $review->user->name }}
                                         </a>
+                                        @if($review->watched_at)
+                                            <span class="text-xs text-gray-400">watched {{ $review->watched_at->format('j M Y') }}</span>
+                                        @endif
                                         <span class="text-xs text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
                                     </div>
-                                    <p class="text-sm text-gray-700 mt-1 leading-relaxed">{{ $review->body }}</p>
+                                    @if($review->body)
+                                        <p class="text-sm text-gray-700 mt-1 leading-relaxed">{{ $review->body }}</p>
+                                    @endif
                                 </div>
                             </div>
                             @endforeach
 
-                            {{-- Empty state (guests only — logged-in users see the write form above) --}}
+                            {{-- Empty state (guests only) --}}
                             @guest
                             @if($reviews->isEmpty())
                             <p class="text-sm text-gray-400">No reviews yet. <a href="{{ route('login') }}" class="text-indigo-600 hover:underline">Sign in</a> to write one.</p>

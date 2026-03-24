@@ -80,11 +80,14 @@
                         </div>
                     </dl>
 
-                    {{-- Watchlist links --}}
+                    {{-- Diary + Watchlist links --}}
                     @if(!$profileUser->profile_private)
                     <div class="mt-6 pt-6 border-t border-gray-100">
-                        <h2 class="text-sm font-semibold text-gray-700 mb-3">Watchlists</h2>
-                        <div class="flex gap-3">
+                        <div class="flex gap-3 flex-wrap">
+                            <a href="{{ route('profile.diary', $profileUser->username) }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                                Diary
+                            </a>
                             <a href="{{ route('profile.watchlist', $profileUser->username) }}#want-to-watch"
                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
                                 Want to Watch
@@ -137,9 +140,14 @@
                         <div class="space-y-4">
                             @foreach($recentReviews as $review)
                             <div>
-                                <a href="{{ $review->movie->publicUrl() }}" class="text-sm font-medium text-indigo-600 hover:underline">
-                                    {{ $review->movie->title }}
-                                </a>
+                                <div class="flex items-baseline gap-2">
+                                    <a href="{{ $review->movie->publicUrl() }}" class="text-sm font-medium text-indigo-600 hover:underline">
+                                        {{ $review->movie->title }}
+                                    </a>
+                                    @if($review->watched_at)
+                                        <span class="text-xs text-gray-400">watched {{ $review->watched_at->format('j M Y') }}</span>
+                                    @endif
+                                </div>
                                 <p class="text-sm text-gray-700 mt-1 leading-relaxed line-clamp-3">{{ $review->body }}</p>
                                 <p class="text-xs text-gray-400 mt-1">{{ $review->created_at->diffForHumans() }}</p>
                             </div>

@@ -93,22 +93,34 @@ class UserSeeder extends Seeder
 
     private function seedReviews(User $user): void
     {
-        // Review roughly 30% of the movies they've rated.
+        // Log roughly 40% of the movies they've rated, spread over the past two years.
         $ratedMovieIds = $user->ratings()->pluck('movie_id')->toArray();
 
         if (empty($ratedMovieIds)) {
             return;
         }
 
-        $count    = max(1, (int) round(count($ratedMovieIds) * 0.3));
+        $count    = max(1, (int) round(count($ratedMovieIds) * 0.4));
         $toReview = fake()->randomElements($ratedMovieIds, min($count, count($ratedMovieIds)));
 
         foreach ($toReview as $movieId) {
             Review::create([
-                'user_id'  => $user->id,
-                'movie_id' => $movieId,
-                'body'     => fake()->paragraphs(fake()->numberBetween(1, 3), true),
+                'user_id'    => $user->id,
+                'movie_id'   => $movieId,
+                // 25% of entries are watch-only (no written review).
+                'body'       => fake()->optional(0.75)->paragraphs(fake()->numberBetween(1, 3), true),
+                'watched_at' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
             ]);
+
+            // 20% chance of a rewatch entry for the same movie.
+            if (fake()->boolean(20)) {
+                Review::create([
+                    'user_id'    => $user->id,
+                    'movie_id'   => $movieId,
+                    'body'       => fake()->optional(0.5)->paragraphs(1, true),
+                    'watched_at' => fake()->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
+                ]);
+            }
         }
     }
 

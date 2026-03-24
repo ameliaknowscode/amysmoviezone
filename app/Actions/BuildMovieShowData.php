@@ -15,12 +15,12 @@ class BuildMovieShowData
 
         $userRating         = null;
         $userWatchlistEntry = null;
-        $userReview         = null;
+        $userReviews        = collect();
 
         if ($userId) {
             $userRating         = Rating::where('user_id', $userId)->where('movie_id', $movie->id)->first();
             $userWatchlistEntry = WatchlistEntry::where('user_id', $userId)->where('movie_id', $movie->id)->first();
-            $userReview         = Review::where('user_id', $userId)->where('movie_id', $movie->id)->first();
+            $userReviews        = Review::where('user_id', $userId)->where('movie_id', $movie->id)->latest()->get();
         }
 
         // Public reviews from other users, most recent first
@@ -48,7 +48,7 @@ class BuildMovieShowData
             'crew'               => $movie->getCrew(),
             'userRating'         => $userRating,
             'userWatchlistEntry' => $userWatchlistEntry,
-            'userReview'         => $userReview,
+            'userReviews'        => $userReviews,
             'reviews'            => $reviews,
             'avgRating'          => $ratingStats->avg_stars,
             'ratingCount'        => (int) $ratingStats->count_stars,

@@ -17,6 +17,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
@@ -43,6 +44,7 @@ Route::get('/', function () {
         ->get();
 
     $recentReviews = \App\Models\Review::with('movie', 'user')
+        ->whereNotNull('body')
         ->whereHas('user', fn ($q) => $q->where('profile_private', false))
         ->latest()
         ->limit(5)
@@ -77,6 +79,7 @@ Route::get('/director-connections', [SearchController::class, 'directorConnectio
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/people/{person}', [PersonController::class, 'show'])->name('people.show');
 Route::get('/u/{username}', [UserProfileController::class, 'show'])->name('profile.show');
+Route::get('/u/{username}/diary', [UserProfileController::class, 'diary'])->name('profile.diary');
 Route::get('/u/{username}/watchlist', [UserProfileController::class, 'watchlist'])->name('profile.watchlist');
 Route::get('/u/{username}/followers', [UserProfileController::class, 'followers'])->name('profile.followers');
 Route::get('/u/{username}/following', [UserProfileController::class, 'following'])->name('profile.following');
@@ -89,6 +92,9 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/feed', [FeedController::class, 'index'])->name('feed');
+    Route::get('/feed/more', [FeedController::class, 'more'])->name('feed.more');
+
     Route::post('/u/{username}/follow', [FollowController::class, 'store'])->name('follow.store');
     Route::delete('/u/{username}/follow', [FollowController::class, 'destroy'])->name('follow.destroy');
 
@@ -100,7 +106,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/movies/{movie}/rating', [RatingController::class, 'destroy'])->name('movies.rating.destroy');
 
     Route::post('/movies/{movie}/review', [ReviewController::class, 'store'])->name('movies.review.store');
-    Route::delete('/movies/{movie}/review', [ReviewController::class, 'destroy'])->name('movies.review.destroy');
+    Route::patch('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     Route::get('/watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
     Route::post('/movies/{movie}/watchlist', [WatchlistController::class, 'store'])->name('movies.watchlist.store');
