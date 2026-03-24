@@ -31,6 +31,13 @@ class BuildMovieShowData
             ->latest()
             ->get();
 
+        // Star ratings keyed by user_id for displaying alongside reviews
+        $reviewerRatings = Rating::whereIn('user_id', $reviews->pluck('user_id'))
+            ->where('movie_id', $movie->id)
+            ->whereNotNull('stars')
+            ->get()
+            ->keyBy('user_id');
+
         // Single query for both rating stats
         $ratingStats  = $movie->ratings()->whereNotNull('stars')
             ->selectRaw('AVG(stars) as avg_stars, COUNT(*) as count_stars')
@@ -54,6 +61,7 @@ class BuildMovieShowData
             'ratingCount'        => (int) $ratingStats->count_stars,
             'wantToWatchCount'   => $watchlistCounts[WatchlistEntry::WANT_TO_WATCH] ?? 0,
             'watchedCount'       => $watchlistCounts[WatchlistEntry::WATCHED] ?? 0,
+            'reviewerRatings'    => $reviewerRatings,
         ];
     }
 }
