@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rating;
 use App\Models\User;
 use App\Models\WatchlistEntry;
 use Illuminate\Support\Facades\Auth;
@@ -13,11 +14,28 @@ class UserProfileController extends Controller
     {
         $profileUser = User::where('username', $username)->firstOrFail();
 
-        $recentRatings = $profileUser->profile_private ? collect()
-            : $profileUser->ratings()->with('movie')->latest()->limit(4)->get();
+        $private = $profileUser->profile_private;
 
-        $recentReviews = $profileUser->profile_private ? collect()
+        $recentRatings = $private ? collect()
+            : $profileUser->ratings()->with('movie')->latest()->limit(6)->get();
+
+        $recentReviews = $private ? collect()
             : $profileUser->reviews()->with('movie')->whereNotNull('body')->latest()->limit(3)->get();
+
+        // Activity stats
+        $totalRated       = $private ? 0 : $profileUser->ratings()->count();
+        $totalLogged      = $private ? 0 : $profileUser->reviews()->count();
+        $totalWatched     = $private ? 0 : $profileUser->watchlistEntries()->where('list_type', WatchlistEntry::WATCHED)->count();
+        $wantToWatchCount = $private ? 0 : $profileUser->watchlistEntries()->where('list_type', WatchlistEntry::WANT_TO_WATCH)->count();
+
+        // User's own ratings keyed by movie_id — for showing stars on recent reviews
+        $reviewRatings = $recentReviews->isNotEmpty()
+            ? Rating::where('user_id', $profileUser->id)
+                ->whereIn('movie_id', $recentReviews->pluck('movie_id'))
+                ->whereNotNull('stars')
+                ->get()
+                ->keyBy('movie_id')
+            : collect();
 
         $followerCount  = $profileUser->followers()->count();
         $followingCount = $profileUser->following()->count();
@@ -26,7 +44,9 @@ class UserProfileController extends Controller
             : false;
 
         return view('profile.show', compact(
-            'profileUser', 'recentRatings', 'recentReviews', 'followerCount', 'followingCount', 'isFollowing'
+            'profileUser', 'recentRatings', 'recentReviews', 'reviewRatings',
+            'followerCount', 'followingCount', 'isFollowing',
+            'totalRated', 'totalLogged', 'totalWatched', 'wantToWatchCount'
         ));
     }
 
