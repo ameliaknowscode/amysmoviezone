@@ -18,6 +18,7 @@ use App\Http\Controllers\FollowController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\RecommendationsController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
@@ -94,6 +95,7 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/feed', [FeedController::class, 'index'])->name('feed');
     Route::get('/feed/more', [FeedController::class, 'more'])->name('feed.more');
+    Route::get('/recommendations', [RecommendationsController::class, 'index'])->name('recommendations');
 
     Route::post('/u/{username}/follow', [FollowController::class, 'store'])->name('follow.store');
     Route::delete('/u/{username}/follow', [FollowController::class, 'destroy'])->name('follow.destroy');
