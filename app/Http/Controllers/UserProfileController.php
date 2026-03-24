@@ -22,11 +22,16 @@ class UserProfileController extends Controller
         $recentReviews = $private ? collect()
             : $profileUser->reviews()->with('movie')->whereNotNull('body')->latest()->limit(3)->get();
 
-        // Activity stats
-        $totalRated       = $private ? 0 : $profileUser->ratings()->count();
-        $totalLogged      = $private ? 0 : $profileUser->reviews()->count();
-        $totalWatched     = $private ? 0 : $profileUser->watchlistEntries()->where('list_type', WatchlistEntry::WATCHED)->count();
-        $wantToWatchCount = $private ? 0 : $profileUser->watchlistEntries()->where('list_type', WatchlistEntry::WANT_TO_WATCH)->count();
+        // Activity stats — watchlist counts in a single GROUP BY query
+        $totalRated  = $private ? 0 : $profileUser->ratings()->count();
+        $totalLogged = $private ? 0 : $profileUser->reviews()->count();
+
+        $watchlistCounts  = $private ? collect() : $profileUser->watchlistEntries()
+            ->selectRaw('list_type, COUNT(*) as total')
+            ->groupBy('list_type')
+            ->pluck('total', 'list_type');
+        $totalWatched     = $watchlistCounts[WatchlistEntry::WATCHED] ?? 0;
+        $wantToWatchCount = $watchlistCounts[WatchlistEntry::WANT_TO_WATCH] ?? 0;
 
         // User's own ratings keyed by movie_id — for showing stars on recent reviews
         $reviewRatings = $recentReviews->isNotEmpty()
