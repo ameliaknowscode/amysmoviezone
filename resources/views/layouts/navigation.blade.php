@@ -29,6 +29,9 @@
                     <x-nav-link :href="route('feed')" :active="request()->routeIs('feed')">
                         {{ __('Feed') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('recommendations')" :active="request()->routeIs('recommendations')">
+                        {{ __('For You') }}
+                    </x-nav-link>
                     @if(Auth::user()->is_admin)
                     <div class="flex items-center">
                     <x-dropdown align="left" width="48">
@@ -211,6 +214,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('feed')" :active="request()->routeIs('feed')">
                 {{ __('Feed') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('recommendations')" :active="request()->routeIs('recommendations')">
+                {{ __('For You') }}
             </x-responsive-nav-link>
             @if(Auth::user()->is_admin)
             <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
