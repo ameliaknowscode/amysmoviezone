@@ -19,6 +19,8 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\MovieListController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReviewLikeController;
 use App\Http\Controllers\MovieListItemController;
 use App\Http\Controllers\RecommendationsController;
 use App\Http\Controllers\ReviewController;
@@ -96,6 +98,12 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    Route::post('/reviews/{review}/likes', [ReviewLikeController::class, 'store'])->name('reviews.likes.store');
+    Route::delete('/reviews/{review}/likes', [ReviewLikeController::class, 'destroy'])->name('reviews.likes.destroy');
+
     Route::get('/feed', [FeedController::class, 'index'])->name('feed');
     Route::get('/feed/more', [FeedController::class, 'more'])->name('feed.more');
     Route::get('/recommendations', [RecommendationsController::class, 'index'])->name('recommendations');

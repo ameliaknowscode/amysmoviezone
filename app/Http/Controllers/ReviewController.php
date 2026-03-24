@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Movie;
 use App\Models\Review;
+use App\Notifications\SharedLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -21,6 +22,12 @@ class ReviewController extends Controller
             'body'       => $validated['body'] ?? null,
             'watched_at' => $validated['watched_at'] ?? now()->toDateString(),
         ]);
+
+        // Notify followers who have also logged this movie
+        $request->user()
+            ->followers()
+            ->whereHas('reviews', fn($q) => $q->where('movie_id', $movie->id))
+            ->each(fn($follower) => $follower->notify(new SharedLog($request->user(), $movie)));
 
         return back()->with('status', 'review-saved');
     }

@@ -6,6 +6,7 @@ use App\Models\Movie;
 use App\Models\MovieList;
 use App\Models\Rating;
 use App\Models\Review;
+use App\Models\ReviewLike;
 use App\Models\User;
 use App\Models\WatchlistEntry;
 
@@ -76,6 +77,7 @@ class BuildMovieShowData
         // Public reviews from other users, most recent first
         $reviews = $movie->reviews()
             ->with('user')
+            ->withCount('likes')
             ->when($userId, fn($q) => $q->where('user_id', '!=', $userId))
             ->whereHas('user', fn($q) => $q->where('profile_private', false))
             ->latest()
@@ -115,6 +117,11 @@ class BuildMovieShowData
             'userLists'          => $userLists,
             'movieListIds'       => $movieListIds,
             'friendActivity'     => $friendActivity,
+            'likedReviewIds'     => $userId
+                ? ReviewLike::where('user_id', $userId)
+                    ->whereIn('review_id', $reviews->pluck('id'))
+                    ->pluck('review_id')
+                : collect(),
         ];
     }
 }
