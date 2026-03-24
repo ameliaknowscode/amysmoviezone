@@ -13,30 +13,47 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('movies.browse')" :active="request()->routeIs('movies.browse')">
-                        {{ __('Movies') }}
-                    </x-nav-link>
+                    {{-- Explore dropdown --}}
+                    <div class="flex items-center">
+                        <x-dropdown align="left" width="48">
+                            <x-slot name="trigger">
+                                <button class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('movies.browse', 'recommendations', 'director-connections') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out">
+                                    {{ __('Explore') }}
+                                    <svg class="ms-1 fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </x-slot>
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('movies.browse')">
+                                    {{ __('Movies') }}
+                                </x-dropdown-link>
+                                @auth
+                                <x-dropdown-link :href="route('recommendations')">
+                                    {{ __('For You') }}
+                                </x-dropdown-link>
+                                @endauth
+                                <x-dropdown-link :href="route('director-connections')">
+                                    {{ __('Director Connections') }}
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                         {{ __('Users') }}
                     </x-nav-link>
                     @auth
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
                     <x-nav-link :href="route('watchlist.index')" :active="request()->routeIs('watchlist.*')">
                         {{ __('My Watchlist') }}
                     </x-nav-link>
                     <x-nav-link :href="route('feed')" :active="request()->routeIs('feed')">
                         {{ __('Feed') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('recommendations')" :active="request()->routeIs('recommendations')">
-                        {{ __('For You') }}
-                    </x-nav-link>
                     @if(Auth::user()->is_admin)
                     <div class="flex items-center">
                     <x-dropdown align="left" width="48">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.*') ? 'border-indigo-400 text-gray-900 focus:border-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out">
+                            <button class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.*', 'dashboard') ? 'border-indigo-400 text-gray-900 focus:border-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out">
                                 {{ __('Admin') }}
                                 <svg class="ms-1 fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -44,6 +61,9 @@
                             </button>
                         </x-slot>
                         <x-slot name="content">
+                            <x-dropdown-link :href="route('dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.users.index')">
                                 {{ __('Users') }}
                             </x-dropdown-link>
@@ -64,14 +84,8 @@
                 </div>
             </div>
 
-            <!-- Search Buttons (desktop) -->
+            <!-- Search Button (desktop) -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 gap-2">
-                <a
-                    href="{{ route('director-connections') }}"
-                    class="inline-flex items-center gap-1 px-3 py-2 text-sm {{ request()->routeIs('director-connections') ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700' }} focus:outline-none transition"
-                >
-                    Director Connections
-                </a>
                 <button
                     @click="searchOpen = true"
                     class="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 focus:outline-none transition"
@@ -196,31 +210,35 @@
             >
                 Search
             </button>
+            <div class="px-4 pt-2 pb-1 text-xs font-semibold uppercase tracking-widest text-gray-400">Explore</div>
             <x-responsive-nav-link :href="route('movies.browse')" :active="request()->routeIs('movies.browse')">
                 {{ __('Movies') }}
+            </x-responsive-nav-link>
+            @auth
+            <x-responsive-nav-link :href="route('recommendations')" :active="request()->routeIs('recommendations')">
+                {{ __('For You') }}
+            </x-responsive-nav-link>
+            @endauth
+            <x-responsive-nav-link :href="route('director-connections')" :active="request()->routeIs('director-connections')">
+                {{ __('Director Connections') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                 {{ __('Users') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('director-connections')" :active="request()->routeIs('director-connections')">
-                {{ __('Director Connections') }}
-            </x-responsive-nav-link>
             @auth
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            <div class="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-widest text-gray-400">My Zone</div>
             <x-responsive-nav-link :href="route('watchlist.index')" :active="request()->routeIs('watchlist.*')">
                 {{ __('My Watchlist') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('feed')" :active="request()->routeIs('feed')">
                 {{ __('Feed') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('recommendations')" :active="request()->routeIs('recommendations')">
-                {{ __('For You') }}
-            </x-responsive-nav-link>
             @if(Auth::user()->is_admin)
             <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                 {{ __('Admin') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="pl-8">
+                {{ __('— Dashboard') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" class="pl-8">
                 {{ __('— Users') }}
