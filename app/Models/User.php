@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\MovieList;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -83,5 +84,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isFollowing(User $user): bool
     {
         return $this->following()->where('following_id', $user->id)->exists();
+    }
+
+    public function movieLists(): HasMany
+    {
+        return $this->hasMany(MovieList::class);
     }
 }

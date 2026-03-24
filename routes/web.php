@@ -18,6 +18,8 @@ use App\Http\Controllers\FollowController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\MovieListController;
+use App\Http\Controllers\MovieListItemController;
 use App\Http\Controllers\RecommendationsController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
@@ -80,6 +82,7 @@ Route::get('/director-connections', [SearchController::class, 'directorConnectio
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/people/{person}', [PersonController::class, 'show'])->name('people.show');
 Route::get('/u/{username}', [UserProfileController::class, 'show'])->name('profile.show');
+Route::get('/u/{username}/lists', [UserProfileController::class, 'lists'])->name('profile.lists');
 Route::get('/u/{username}/diary', [UserProfileController::class, 'diary'])->name('profile.diary');
 Route::get('/u/{username}/watchlist', [UserProfileController::class, 'watchlist'])->name('profile.watchlist');
 Route::get('/u/{username}/followers', [UserProfileController::class, 'followers'])->name('profile.followers');
@@ -96,6 +99,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/feed', [FeedController::class, 'index'])->name('feed');
     Route::get('/feed/more', [FeedController::class, 'more'])->name('feed.more');
     Route::get('/recommendations', [RecommendationsController::class, 'index'])->name('recommendations');
+
+    Route::get('/lists', [MovieListController::class, 'index'])->name('lists.index');
+    Route::get('/lists/create', [MovieListController::class, 'create'])->name('lists.create');
+    Route::post('/lists', [MovieListController::class, 'store'])->name('lists.store');
+    Route::get('/lists/{movieList}', [MovieListController::class, 'show'])->name('lists.show');
+    Route::get('/lists/{movieList}/edit', [MovieListController::class, 'edit'])->name('lists.edit');
+    Route::put('/lists/{movieList}', [MovieListController::class, 'update'])->name('lists.update');
+    Route::delete('/lists/{movieList}', [MovieListController::class, 'destroy'])->name('lists.destroy');
+    Route::post('/lists/{movieList}/movies', [MovieListItemController::class, 'store'])->name('lists.movies.store');
+    Route::delete('/lists/{movieList}/movies/{movie}', [MovieListItemController::class, 'destroy'])->name('lists.movies.destroy');
+    Route::post('/lists/{movieList}/reorder', [MovieListItemController::class, 'reorder'])->name('lists.movies.reorder');
 
     Route::post('/u/{username}/follow', [FollowController::class, 'store'])->name('follow.store');
     Route::delete('/u/{username}/follow', [FollowController::class, 'destroy'])->name('follow.destroy');
