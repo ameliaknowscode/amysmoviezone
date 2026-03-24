@@ -1,338 +1,362 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ $movie->title }}
-        </h2>
-    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+    {{-- ═══════════════════════════════════════════════════════════
+         HERO
+    ═══════════════════════════════════════════════════════════ --}}
+    <div class="bg-indigo-950 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div class="flex flex-col sm:flex-row gap-6 sm:gap-10 items-start">
 
-                    <div class="flex gap-8 mb-6">
-
-                        @if($movie->posterUrl())
-                        <div class="flex-shrink-0">
-                            <img src="{{ $movie->posterUrl() }}" alt="{{ $movie->title }} poster"
-                                class="w-[230px] h-[345px] object-cover rounded-md shadow-sm">
+                {{-- Poster --}}
+                <div class="shrink-0 mx-auto sm:mx-0">
+                    @if($movie->posterUrl())
+                        <img src="{{ $movie->posterUrl() }}" alt="{{ $movie->title }}"
+                             class="w-40 sm:w-52 rounded-lg shadow-2xl ring-1 ring-white/10">
+                    @else
+                        <div class="w-40 sm:w-52 aspect-[2/3] bg-indigo-900 rounded-lg flex items-center justify-center ring-1 ring-white/10">
+                            <span class="text-indigo-300 text-sm text-center px-4 leading-relaxed">{{ $movie->title }}</span>
                         </div>
+                    @endif
+                </div>
+
+                {{-- Info --}}
+                <div class="flex-1 min-w-0">
+
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">{{ $movie->title }}</h1>
+
+                    <p class="mt-1.5 text-indigo-300 text-sm">
+                        {{ $movie->release_year }}
+                        @if(isset($crew['Director']))
+                            &nbsp;·&nbsp;
+                            {{ $crew['Director']->map(fn($c) => $c->person->name)->join(', ') }}
+                        @endif
+                    </p>
+
+                    {{-- Rating + Stats --}}
+                    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4">
+                        @if($ratingCount === 0)
+                            <span class="text-indigo-300 text-sm">No ratings yet</span>
+                        @endif
+                        @if($ratingCount > 0)
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-yellow-400 text-xl font-bold">{{ number_format($avgRating, 1) }}</span>
+                                <div class="flex text-sm leading-none">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <span class="{{ $i <= round($avgRating) ? 'text-yellow-400' : 'text-indigo-800' }}">&#9733;</span>
+                                    @endfor
+                                </div>
+                                <span class="text-indigo-300 text-xs">{{ $ratingCount }} {{ Str::plural('rating', $ratingCount) }}</span>
+                            </div>
+                            <span class="text-indigo-800 hidden sm:inline">·</span>
                         @endif
 
-                        <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-4 text-indigo-300 text-sm">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                {{ $watchedCount }} watched
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                </svg>
+                                {{ $wantToWatchCount }} want to watch
+                            </span>
+                        </div>
+                    </div>
 
-                            <dl class="divide-y divide-gray-100">
-                                <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Title</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ $movie->title }}</dd>
-                                </div>
-                                @if(isset($crew['Director']))
-                                <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">{{ $crew['Director']->count() === 1 ? 'Director' : 'Directors' }}</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                                        @foreach($crew['Director'] as $i => $c)
-                                            @if($i > 0), @endif
-                                            <a href="{{ $c->byTypeUrl() }}" class="text-indigo-600 hover:underline">{{ $c->person->name }}</a>
-                                        @endforeach
-                                    </dd>
-                                </div>
-                                @endif
-                                <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Release Year</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ $movie->release_year }}</dd>
-                                </div>
-                                <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Average Rating</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                                        @if($ratingCount > 0)
-                                            <span class="text-yellow-400">★</span> {{ number_format($avgRating, 1) }} <span class="text-gray-500">({{ $ratingCount }} {{ Str::plural('rating', $ratingCount) }})</span>
-                                        @else
-                                            <span class="text-gray-400">No ratings yet</span>
-                                        @endif
-                                    </dd>
-                                </div>
-                                <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Want to Watch</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ $wantToWatchCount }}</dd>
-                                </div>
-                                <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Watched</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ $watchedCount }}</dd>
-                                </div>
-                            </dl>
+                    {{-- User actions --}}
+                    @auth
+                    <div
+                        x-data="{
+                            stars: {{ $userRating?->stars ?? 0 }},
+                            hovered: 0,
+                        }"
+                        class="mt-6 space-y-3"
+                    >
+                        {{-- Stars + Remove + Heart --}}
+                        <div class="flex items-center gap-4">
+                            <form method="POST" action="{{ route('movies.rate', $movie) }}" class="flex items-center gap-0.5">
+                                @csrf
+                                <input type="hidden" name="stars" x-bind:value="stars">
+                                @foreach([1,2,3,4,5] as $star)
+                                <button
+                                    type="submit"
+                                    @mouseenter="hovered = {{ $star }}"
+                                    @mouseleave="hovered = 0"
+                                    @click="stars = {{ $star }}"
+                                    class="text-2xl sm:text-3xl leading-none focus:outline-none transition-colors"
+                                    :class="(hovered ? hovered >= {{ $star }} : stars >= {{ $star }}) ? 'text-yellow-400' : 'text-indigo-700 hover:text-indigo-400'"
+                                    title="{{ $star }} {{ $star === 1 ? 'star' : 'stars' }}"
+                                >&#9733;</button>
+                                @endforeach
+                            </form>
 
-                            @auth
-                            <div class="mt-6 pt-6 border-t border-gray-100">
-                                <h3 class="text-sm font-semibold text-gray-700 mb-4">Your Rating &amp; Watchlist</h3>
-
-                                {{-- Star rating + heart --}}
-                                <div
-                                    x-data="{
-                                        stars: {{ $userRating?->stars ?? 0 }},
-                                        hovered: 0,
-                                    }"
-                                    class="flex items-center gap-4 mb-4"
-                                >
-                                    {{-- Stars --}}
-                                    <form method="POST" action="{{ route('movies.rate', $movie) }}" class="flex items-center gap-1" id="star-form-{{ $movie->id }}">
-                                        @csrf
-                                        <input type="hidden" name="stars" x-bind:value="stars">
-                                        @foreach([1,2,3,4,5] as $star)
-                                        <button
-                                            type="submit"
-                                            @mouseenter="hovered = {{ $star }}"
-                                            @mouseleave="hovered = 0"
-                                            @click="stars = {{ $star }}"
-                                            class="text-2xl leading-none focus:outline-none transition-colors"
-                                            :class="(hovered ? hovered >= {{ $star }} : stars >= {{ $star }}) ? 'text-yellow-400' : 'text-gray-300'"
-                                            title="{{ $star }} star{{ $star !== 1 ? 's' : '' }}"
-                                            aria-label="{{ $star }} star{{ $star !== 1 ? 's' : '' }}"
-                                        >&#9733;</button>
-                                        @endforeach
-                                    </form>
-
-                                    {{-- Remove rating --}}
-                                    @if($userRating?->stars)
-                                    <form method="POST" action="{{ route('movies.rating.destroy', $movie) }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-xs text-gray-400 hover:text-gray-600 underline">Remove rating</button>
-                                    </form>
-                                    @endif
-
-                                    {{-- Heart / liked toggle --}}
-                                    <form method="POST" action="{{ route('movies.rate', $movie) }}">
-                                        @csrf
-                                        <input type="hidden" name="liked" value="{{ $userRating?->liked ? '0' : '1' }}">
-                                        <button
-                                            type="submit"
-                                            class="focus:outline-none transition-colors {{ $userRating?->liked ? 'text-red-500' : 'text-gray-300 hover:text-red-400' }}"
-                                            title="{{ $userRating?->liked ? 'Unlike' : 'Like' }}"
-                                            aria-label="{{ $userRating?->liked ? 'Unlike' : 'Like' }}"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-
-                                {{-- Watchlist buttons --}}
-                                <div class="flex items-center gap-3">
-                                    @php $listType = $userWatchlistEntry?->list_type; @endphp
-
-                                    {{-- Want to Watch --}}
-                                    @if($listType === 'want_to_watch')
-                                        <form method="POST" action="{{ route('movies.watchlist.destroy', $movie) }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition">
-                                                &#10003; Want to Watch
-                                            </button>
-                                        </form>
-                                    @else
-                                        <form method="POST" action="{{ route('movies.watchlist.store', $movie) }}">
-                                            @csrf
-                                            <input type="hidden" name="list_type" value="want_to_watch">
-                                            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
-                                                + Want to Watch
-                                            </button>
-                                        </form>
-                                    @endif
-
-                                    {{-- Watched --}}
-                                    @if($listType === 'watched')
-                                        <form method="POST" action="{{ route('movies.watchlist.destroy', $movie) }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-md bg-green-600 text-white hover:bg-green-700 transition">
-                                                &#10003; Watched
-                                            </button>
-                                        </form>
-                                    @else
-                                        <form method="POST" action="{{ route('movies.watchlist.store', $movie) }}">
-                                            @csrf
-                                            <input type="hidden" name="list_type" value="watched">
-                                            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
-                                                + Watched
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </div>
-                            @endauth
-
-                            @if($cast->isNotEmpty() || $crew->isNotEmpty())
-                            <div x-data="{ tab: 'cast' }" class="mt-6">
-
-                                {{-- Tab bar --}}
-                                <div class="border-b border-gray-200">
-                                    <nav class="-mb-px flex gap-6">
-                                        <button
-                                            type="button"
-                                            @click="tab = 'cast'"
-                                            :class="tab === 'cast'
-                                                ? 'border-indigo-500 text-indigo-600'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                            class="whitespace-nowrap border-b-2 py-3 text-sm font-medium transition-colors">
-                                            Cast
-                                        </button>
-                                        <button
-                                            type="button"
-                                            @click="tab = 'crew'"
-                                            :class="tab === 'crew'
-                                                ? 'border-indigo-500 text-indigo-600'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                            class="whitespace-nowrap border-b-2 py-3 text-sm font-medium transition-colors">
-                                            Crew
-                                        </button>
-                                    </nav>
-                                </div>
-
-                                {{-- Cast panel --}}
-                                <div x-show="tab === 'cast'" class="pt-4">
-                                    @if($cast->isNotEmpty())
-                                        <ul class="space-y-1 text-sm">
-                                            @foreach($cast as $credit)
-                                                <li>
-                                                    <a href="{{ $credit->byTypeUrl() }}" class="text-indigo-600 hover:underline">{{ $credit->person->name }}</a>
-                                                    @if($credit->character)
-                                                        <span class="text-gray-500">as {{ $credit->character }}</span>
-                                                    @endif
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    @else
-                                        <p class="text-sm text-gray-400">No cast listed.</p>
-                                    @endif
-                                </div>
-
-                                {{-- Crew panel --}}
-                                <div x-show="tab === 'crew'" class="pt-4">
-                                    @if($crew->isNotEmpty())
-                                        <dl class="space-y-4">
-                                            @foreach($crew as $typeName => $credits)
-                                                <div class="sm:grid sm:grid-cols-3 sm:gap-4">
-                                                    <dt class="text-sm font-medium text-gray-500">{{ $typeName }}</dt>
-                                                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                                                        <ul class="space-y-1">
-                                                            @foreach($credits as $credit)
-                                                                <li>
-                                                                    <a href="{{ $credit->byTypeUrl() }}" class="text-indigo-600 hover:underline">{{ $credit->person->name }}</a>
-                                                                </li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </dd>
-                                                </div>
-                                            @endforeach
-                                        </dl>
-                                    @else
-                                        <p class="text-sm text-gray-400">No crew listed.</p>
-                                    @endif
-                                </div>
-
-                            </div>
+                            @if($userRating?->stars)
+                            <form method="POST" action="{{ route('movies.rating.destroy', $movie) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs text-indigo-400 hover:text-indigo-200 transition underline">
+                                    Remove
+                                </button>
+                            </form>
                             @endif
 
-                        </div>{{-- end flex-1 --}}
-                    </div>{{-- end flex wrapper --}}
+                            {{-- Heart --}}
+                            <form method="POST" action="{{ route('movies.rate', $movie) }}">
+                                @csrf
+                                <input type="hidden" name="liked" value="{{ $userRating?->liked ? '0' : '1' }}">
+                                <button
+                                    type="submit"
+                                    class="focus:outline-none transition-colors {{ $userRating?->liked ? 'text-red-400' : 'text-indigo-700 hover:text-red-400' }}"
+                                    title="{{ $userRating?->liked ? 'Unlike' : 'Like' }}"
+                                >
+                                    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
 
-                    {{-- Reviews --}}
-                    <div class="mt-8 pt-6 border-t border-gray-100">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-4">Reviews</h3>
+                        {{-- Watchlist buttons --}}
+                        @php $listType = $userWatchlistEntry?->list_type; @endphp
+                        <div class="flex flex-wrap items-center gap-2">
+                            @if($listType === 'want_to_watch')
+                                <form method="POST" action="{{ route('movies.watchlist.destroy', $movie) }}">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-500 transition font-medium">
+                                        <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        Want to Watch
+                                    </button>
+                                </form>
+                            @else
+                                <form method="POST" action="{{ route('movies.watchlist.store', $movie) }}">
+                                    @csrf
+                                    <input type="hidden" name="list_type" value="want_to_watch">
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-indigo-700 text-indigo-200 hover:border-indigo-400 hover:text-white transition font-medium">
+                                        + Want to Watch
+                                    </button>
+                                </form>
+                            @endif
+
+                            @if($listType === 'watched')
+                                <form method="POST" action="{{ route('movies.watchlist.destroy', $movie) }}">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-500 transition font-medium">
+                                        <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                        Watched
+                                    </button>
+                                </form>
+                            @else
+                                <form method="POST" action="{{ route('movies.watchlist.store', $movie) }}">
+                                    @csrf
+                                    <input type="hidden" name="list_type" value="watched">
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-indigo-700 text-indigo-200 hover:border-indigo-400 hover:text-white transition font-medium">
+                                        + Watched
+                                    </button>
+                                </form>
+                            @endif
+
+                            <a href="#reviews" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-indigo-300 hover:text-white transition">
+                                + Review or Log
+                            </a>
+                        </div>
+                    </div>
+                    @else
+                    <p class="mt-4 text-sm text-indigo-300">
+                        <a href="{{ route('login') }}" class="text-indigo-400 hover:text-indigo-300 transition">Sign in</a> to rate and log this film.
+                    </p>
+                    @endauth
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ═══════════════════════════════════════════════════════════
+         CONTENT
+    ═══════════════════════════════════════════════════════════ --}}
+    <div class="py-8 sm:py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:grid lg:grid-cols-3 lg:gap-10 items-start">
+
+                {{-- ── Sidebar: Cast / Crew ── --}}
+                @if($cast->isNotEmpty() || $crew->isNotEmpty())
+                <div class="mb-8 lg:mb-0" x-data="{ tab: 'cast' }">
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        {{-- Tab bar --}}
+                        <div class="border-b border-gray-100 px-4">
+                            <nav class="-mb-px flex gap-5">
+                                <button type="button" @click="tab = 'cast'"
+                                    :class="tab === 'cast' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                                    class="whitespace-nowrap border-b-2 py-3 text-sm font-medium transition-colors">
+                                    Cast
+                                </button>
+                                <button type="button" @click="tab = 'crew'"
+                                    :class="tab === 'crew' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                                    class="whitespace-nowrap border-b-2 py-3 text-sm font-medium transition-colors">
+                                    Crew
+                                </button>
+                            </nav>
+                        </div>
+
+                        {{-- Cast --}}
+                        <div x-show="tab === 'cast'" class="p-4">
+                            @if($cast->isNotEmpty())
+                                <ul class="space-y-3">
+                                    @foreach($cast as $credit)
+                                    <li class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold shrink-0 select-none">
+                                            {{ strtoupper(substr($credit->person->name, 0, 1)) }}
+                                        </div>
+                                        <div class="min-w-0">
+                                            <a href="{{ $credit->byTypeUrl() }}"
+                                               class="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors block truncate">
+                                                {{ $credit->person->name }}
+                                            </a>
+                                            @if($credit->character)
+                                                <span class="text-xs text-gray-400 block truncate">{{ $credit->character }}</span>
+                                            @endif
+                                        </div>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-sm text-gray-400">No cast listed.</p>
+                            @endif
+                        </div>
+
+                        {{-- Crew --}}
+                        <div x-show="tab === 'crew'" class="p-4">
+                            @if($crew->isNotEmpty())
+                                <dl class="space-y-4">
+                                    @foreach($crew as $typeName => $credits)
+                                    <div>
+                                        <dt class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">{{ $typeName }}</dt>
+                                        <dd class="space-y-1">
+                                            @foreach($credits as $credit)
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 text-xs font-bold shrink-0 select-none">
+                                                    {{ strtoupper(substr($credit->person->name, 0, 1)) }}
+                                                </div>
+                                                <a href="{{ $credit->byTypeUrl() }}"
+                                                   class="text-sm text-gray-900 hover:text-indigo-600 transition-colors truncate">
+                                                    {{ $credit->person->name }}
+                                                </a>
+                                            </div>
+                                            @endforeach
+                                        </dd>
+                                    </div>
+                                    @endforeach
+                                </dl>
+                            @else
+                                <p class="text-sm text-gray-400">No crew listed.</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                {{-- ── Main: Reviews ── --}}
+                <div class="{{ ($cast->isNotEmpty() || $crew->isNotEmpty()) ? 'lg:col-span-2' : 'lg:col-span-3' }}" id="reviews">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                            <h2 class="text-sm font-semibold text-gray-900">Reviews</h2>
+                            @auth
+                            <a href="#review-form" class="text-xs text-indigo-600 hover:text-indigo-800 transition font-medium">+ Review or Log</a>
+                            @endauth
+                        </div>
 
                         @if(session('status') === 'review-saved')
-                            <p class="text-xs text-green-600 mb-3">Review saved.</p>
+                            <p class="text-xs text-emerald-600 px-5 pt-3">Review saved.</p>
                         @endif
                         @if(session('status') === 'review-deleted')
-                            <p class="text-xs text-gray-400 mb-3">Review deleted.</p>
+                            <p class="text-xs text-gray-400 px-5 pt-3">Review deleted.</p>
                         @endif
 
-                        <div class="space-y-5">
+                        <div class="divide-y divide-gray-50">
 
-                            {{-- Current user's reviews (each editable inline) --}}
+                            {{-- Current user's reviews --}}
                             @auth
                             @foreach($userReviews as $userReview)
-                            <div x-data="{ editing: false }" class="flex gap-3">
-                                <div class="flex-shrink-0">
-                                    @if(auth()->user()->avatar)
-                                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
-                                             alt="{{ auth()->user()->name }}"
-                                             class="h-8 w-8 rounded-full object-cover ring-1 ring-gray-200">
-                                    @else
-                                        <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm select-none">
-                                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="flex-1 min-w-0">
-
-                                    {{-- Read view --}}
-                                    <div x-show="!editing">
-                                        <div class="flex items-baseline gap-2">
-                                            <span class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</span>
-                                            @if($userReview->watched_at)
-                                                <span class="text-xs text-gray-400">watched {{ $userReview->watched_at->format('j M Y') }}</span>
-                                            @endif
-                                            <button @click="editing = true"
-                                                    class="text-xs text-indigo-500 hover:text-indigo-700 transition underline">
-                                                Edit
-                                            </button>
-                                        </div>
-                                        @if($userReview->body)
-                                            <p class="text-sm text-gray-700 mt-1 leading-relaxed">{{ $userReview->body }}</p>
+                            <div x-data="{ editing: false }" class="px-5 py-4">
+                                <div class="flex gap-3">
+                                    <div class="shrink-0">
+                                        @if(auth()->user()->avatar)
+                                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
+                                                 alt="{{ auth()->user()->name }}"
+                                                 class="h-8 w-8 rounded-full object-cover ring-1 ring-gray-200">
+                                        @else
+                                            <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm select-none">
+                                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                            </div>
                                         @endif
                                     </div>
+                                    <div class="flex-1 min-w-0">
 
-                                    {{-- Edit form --}}
-                                    <div x-show="editing" x-cloak>
-                                        <form method="POST" action="{{ route('reviews.update', $userReview) }}">
-                                            @csrf
-                                            @method('PATCH')
-                                            <div class="mb-2">
-                                                <label class="block text-xs text-gray-500 mb-1">Watch date</label>
-                                                <input type="date"
-                                                       name="watched_at"
-                                                       value="{{ old('watched_at', $userReview->watched_at?->format('Y-m-d')) }}"
-                                                       class="rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            </div>
-                                            <textarea
-                                                name="body"
-                                                rows="4"
-                                                placeholder="Write your review… (optional)"
-                                                class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            >{{ old('body', $userReview->body) }}</textarea>
-                                            @error('body')
-                                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                                            @enderror
-                                            <div class="flex items-center gap-3 mt-2">
-                                                <button type="submit"
-                                                        class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-                                                    Update
-                                                </button>
-                                                <button type="button" @click="editing = false"
-                                                        class="text-xs text-gray-400 hover:text-gray-600 transition underline">
-                                                    Cancel
+                                        {{-- Read view --}}
+                                        <div x-show="!editing">
+                                            <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                                                <span class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</span>
+                                                @if($userRating?->stars)
+                                                    <span class="text-xs leading-none">
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            <span class="{{ $i <= $userRating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
+                                                        @endfor
+                                                    </span>
+                                                @endif
+                                                @if($userReview->watched_at)
+                                                    <span class="text-xs text-gray-400">watched {{ $userReview->watched_at->format('j M Y') }}</span>
+                                                @endif
+                                                <button @click="editing = true"
+                                                        class="text-xs text-indigo-500 hover:text-indigo-700 transition underline">
+                                                    Edit
                                                 </button>
                                             </div>
-                                        </form>
-                                        <form method="POST" action="{{ route('reviews.destroy', $userReview) }}" class="mt-2">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-xs text-red-400 hover:text-red-600 transition underline">
-                                                Delete review
-                                            </button>
-                                        </form>
+                                            @if($userReview->body)
+                                                <p class="text-sm text-gray-700 mt-1.5 leading-relaxed">{{ $userReview->body }}</p>
+                                            @endif
+                                        </div>
+
+                                        {{-- Edit form --}}
+                                        <div x-show="editing" x-cloak>
+                                            <form method="POST" action="{{ route('reviews.update', $userReview) }}">
+                                                @csrf @method('PATCH')
+                                                <div class="mb-2">
+                                                    <label class="block text-xs text-gray-500 mb-1">Watch date</label>
+                                                    <input type="date" name="watched_at"
+                                                           value="{{ old('watched_at', $userReview->watched_at?->format('Y-m-d')) }}"
+                                                           class="rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                                </div>
+                                                <textarea name="body" rows="4"
+                                                    placeholder="Write your review… (optional)"
+                                                    class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                >{{ old('body', $userReview->body) }}</textarea>
+                                                @error('body')
+                                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                                @enderror
+                                                <div class="flex items-center gap-3 mt-2">
+                                                    <button type="submit" class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Update</button>
+                                                    <button type="button" @click="editing = false" class="text-xs text-gray-400 hover:text-gray-600 transition underline">Cancel</button>
+                                                </div>
+                                            </form>
+                                            <form method="POST" action="{{ route('reviews.destroy', $userReview) }}" class="mt-2">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="text-xs text-red-400 hover:text-red-600 transition underline">Delete review</button>
+                                            </form>
+                                        </div>
+
                                     </div>
-
                                 </div>
                             </div>
                             @endforeach
 
-                            {{-- Review or Log form (always available to authenticated users) --}}
-                            <div x-data="{ open: false }">
+                            {{-- Review or Log form --}}
+                            <div id="review-form" x-data="{ open: false }" class="px-5 py-4">
                                 <button @click="open = true" x-show="!open"
-                                        class="text-sm text-indigo-600 hover:text-indigo-800 transition underline">
+                                        class="text-sm text-indigo-600 hover:text-indigo-800 transition font-medium">
                                     + Review or Log
                                 </button>
                                 <div x-show="open" x-cloak>
@@ -340,14 +364,11 @@
                                         @csrf
                                         <div class="mb-2">
                                             <label class="block text-xs text-gray-500 mb-1">Watch date</label>
-                                            <input type="date"
-                                                   name="watched_at"
+                                            <input type="date" name="watched_at"
                                                    value="{{ old('watched_at', now()->format('Y-m-d')) }}"
                                                    class="rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         </div>
-                                        <textarea
-                                            name="body"
-                                            rows="4"
+                                        <textarea name="body" rows="4"
                                             placeholder="Write your review… (optional)"
                                             class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         >{{ old('body') }}</textarea>
@@ -355,14 +376,8 @@
                                             <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                                         @enderror
                                         <div class="flex items-center gap-3 mt-2">
-                                            <button type="submit"
-                                                    class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-                                                Save
-                                            </button>
-                                            <button type="button" @click="open = false"
-                                                    class="text-xs text-gray-400 hover:text-gray-600 transition underline">
-                                                Cancel
-                                            </button>
+                                            <button type="submit" class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Save</button>
+                                            <button type="button" @click="open = false" class="text-xs text-gray-400 hover:text-gray-600 transition underline">Cancel</button>
                                         </div>
                                     </form>
                                 </div>
@@ -371,8 +386,8 @@
 
                             {{-- Public reviews from other users --}}
                             @foreach($reviews as $review)
-                            <div class="flex gap-3">
-                                <div class="flex-shrink-0">
+                            <div class="px-5 py-4 flex gap-3">
+                                <div class="shrink-0">
                                     @if($review->user->avatar)
                                         <img src="{{ asset('storage/' . $review->user->avatar) }}"
                                              alt="{{ $review->user->name }}"
@@ -384,39 +399,46 @@
                                     @endif
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <div class="flex items-baseline gap-2">
+                                    <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                                         <a href="{{ route('profile.show', $review->user->username) }}"
                                            class="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors">
                                             {{ $review->user->name }}
                                         </a>
+                                        @if($rating = $reviewerRatings->get($review->user_id))
+                                            <span class="text-xs leading-none">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <span class="{{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
+                                                @endfor
+                                            </span>
+                                        @endif
                                         @if($review->watched_at)
                                             <span class="text-xs text-gray-400">watched {{ $review->watched_at->format('j M Y') }}</span>
                                         @endif
                                         <span class="text-xs text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
                                     </div>
                                     @if($review->body)
-                                        <p class="text-sm text-gray-700 mt-1 leading-relaxed">{{ $review->body }}</p>
+                                        <p class="text-sm text-gray-700 mt-1.5 leading-relaxed">{{ $review->body }}</p>
                                     @endif
                                 </div>
                             </div>
                             @endforeach
 
-                            {{-- Empty state (guests only) --}}
-                            @guest
-                            @if($reviews->isEmpty())
-                            <p class="text-sm text-gray-400">No reviews yet. <a href="{{ route('login') }}" class="text-indigo-600 hover:underline">Sign in</a> to write one.</p>
+                            {{-- Empty state --}}
+                            @if($reviews->isEmpty() && $userReviews->isEmpty())
+                            <div class="px-5 py-6 text-sm text-gray-400">
+                                No reviews yet.
+                                @guest
+                                    <a href="{{ route('login') }}" class="text-indigo-600 hover:underline">Sign in</a> to write one.
+                                @endguest
+                            </div>
                             @endif
-                            @endguest
 
                         </div>
                     </div>
-
-                    <div class="mt-6">
-                        <a href="{{ url()->previous() }}" class="text-indigo-600 hover:underline text-sm">&larr; Back</a>
-                    </div>
-
                 </div>
+
             </div>
         </div>
     </div>
+
 </x-app-layout>
