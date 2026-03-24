@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Credit;
 use App\Models\Person;
+use App\Models\Rating;
 use App\Models\Type;
 
 class PersonTypeCreditsController extends Controller
@@ -30,6 +31,17 @@ class PersonTypeCreditsController extends Controller
             Credit::where('person_id', $person->id)->select('type_id')->distinct()
         )->get();
 
-        return view('credits.by-type', compact('person', 'type', 'credits', 'personTypes'));
+        $avgRatings = Rating::whereIn('movie_id', $credits->pluck('movie_id'))
+            ->whereNotNull('stars')
+            ->groupBy('movie_id')
+            ->selectRaw('movie_id, ROUND(AVG(stars), 1) as avg_stars, COUNT(*) as rating_count')
+            ->get()
+            ->keyBy('movie_id');
+
+        $overallAvg = $avgRatings->isNotEmpty()
+            ? round($avgRatings->avg('avg_stars'), 1)
+            : null;
+
+        return view('credits.by-type', compact('person', 'type', 'credits', 'personTypes', 'avgRatings', 'overallAvg'));
     }
 }

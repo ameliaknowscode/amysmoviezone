@@ -1,72 +1,102 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ $person->name }}
-            <span class="text-gray-400 font-normal">— {{ $type->name }}</span>
-        </h2>
-    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-
-                    <dl class="divide-y divide-gray-100 mb-6">
-                        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                            <dt class="text-sm font-medium text-gray-500">Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ $person->name }}</dd>
-                        </div>
-                        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                            <dt class="text-sm font-medium text-gray-500">Nationality</dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ $person->nationality ?? '—' }}</dd>
-                        </div>
-                        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                            <dt class="text-sm font-medium text-gray-500">Date of Birth</dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                                {{ $person->date_of_birth ? \Carbon\Carbon::parse($person->date_of_birth)->format('F j, Y') : '—' }}
-                            </dd>
-                        </div>
-                        @if($person->date_of_death)
-                        <div class="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                            <dt class="text-sm font-medium text-gray-500">Date of Death</dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                                {{ \Carbon\Carbon::parse($person->date_of_death)->format('F j, Y') }}
-                            </dd>
-                        </div>
+    {{-- Hero Header --}}
+    <div class="bg-gradient-to-br from-indigo-950 to-indigo-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                    <span class="inline-block text-xs font-semibold uppercase tracking-widest text-indigo-300 mb-2">
+                        {{ $type->name }}
+                    </span>
+                    <h1 class="text-3xl sm:text-4xl font-bold">{{ $person->name }}</h1>
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-indigo-200">
+                        @if($person->nationality)
+                            <span>{{ $person->nationality }}</span>
                         @endif
-                    </dl>
+                        @if($person->date_of_birth)
+                            <span>b. {{ \Carbon\Carbon::parse($person->date_of_birth)->format('Y') }}</span>
+                        @endif
+                        @if($person->date_of_death)
+                            <span>d. {{ \Carbon\Carbon::parse($person->date_of_death)->format('Y') }}</span>
+                        @endif
+                    </div>
+                </div>
 
-                    <h3 class="text-base font-semibold text-gray-800 mb-3">{{ $type->name }} Credits</h3>
-
-                    @if($personTypes->count() > 1)
-                        <select onchange="window.location.href = this.value"
-                                class="mb-4 rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            @foreach($personTypes as $t)
-                                <option value="{{ route('credits.by-type', [\Illuminate\Support\Str::slug($t->name), $person->slug]) }}"
-                                        {{ $t->id === $type->id ? 'selected' : '' }}>
-                                    {{ $t->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                {{-- Stats --}}
+                <div class="flex gap-6 text-center sm:text-right shrink-0">
+                    <div>
+                        <p class="text-2xl font-bold">{{ $credits->count() }}</p>
+                        <p class="text-xs text-indigo-300 uppercase tracking-wide">{{ Str::plural('Film', $credits->count()) }}</p>
+                    </div>
+                    @if($overallAvg)
+                        <div>
+                            <p class="text-2xl font-bold">{{ number_format($overallAvg, 1) }}</p>
+                            <p class="text-xs text-indigo-300 uppercase tracking-wide">Avg Rating</p>
+                        </div>
                     @endif
-
-                    <ul class="divide-y divide-gray-100">
-                        @foreach($credits as $credit)
-                            <li class="py-3 flex items-baseline gap-3">
-                                <a href="{{ $credit->movie->publicUrl() }}"
-                                   class="text-sm font-medium text-indigo-600 hover:underline">
-                                    {{ $credit->movie->title }}
-                                </a>
-                                <span class="text-sm text-gray-400">({{ $credit->movie->release_year }})</span>
-                                @if($credit->character)
-                                    <span class="text-sm text-gray-500">as {{ $credit->character }}</span>
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
-
                 </div>
             </div>
         </div>
+
+        {{-- Type tabs --}}
+        @if($personTypes->count() > 1)
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav class="flex gap-1">
+                    @foreach($personTypes as $t)
+                        @php $isActive = $t->id === $type->id; @endphp
+                        <a href="{{ route('credits.by-type', [\Illuminate\Support\Str::slug($t->name), $person->slug]) }}"
+                           class="px-4 py-2.5 text-sm font-medium rounded-t-md transition-colors
+                               {{ $isActive
+                                   ? 'bg-white text-indigo-700'
+                                   : 'text-indigo-200 hover:text-white hover:bg-white/10' }}">
+                            {{ $t->name }}
+                        </a>
+                    @endforeach
+                </nav>
+            </div>
+        @endif
     </div>
+
+    {{-- Filmography Grid --}}
+    <div class="py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 sm:gap-5">
+                @foreach($credits as $credit)
+                    <a href="{{ $credit->movie->publicUrl() }}" class="group block">
+                        {{-- Poster --}}
+                        <div class="aspect-[2/3] rounded-lg overflow-hidden bg-indigo-50 shadow-sm ring-1 ring-black/5">
+                            @if($credit->movie->posterUrl())
+                                <img src="{{ $credit->movie->posterUrl() }}"
+                                     alt="{{ $credit->movie->title }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-indigo-100">
+                                    <span class="text-indigo-300 text-3xl">🎬</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Info --}}
+                        <div class="mt-2 space-y-0.5">
+                            <p class="text-xs font-medium text-gray-800 group-hover:text-indigo-600 transition-colors line-clamp-2 leading-snug">
+                                {{ $credit->movie->title }}
+                            </p>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xs text-gray-400">{{ $credit->movie->release_year }}</span>
+                                @if(isset($avgRatings[$credit->movie_id]))
+                                    <span class="text-xs text-yellow-500 font-medium">
+                                        ★ {{ number_format($avgRatings[$credit->movie_id]->avg_stars, 1) }}
+                                    </span>
+                                @endif
+                            </div>
+                            @if($credit->character)
+                                <p class="text-xs text-gray-400 italic line-clamp-1">{{ $credit->character }}</p>
+                            @endif
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
 </x-app-layout>
