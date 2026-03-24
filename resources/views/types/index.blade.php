@@ -15,12 +15,13 @@
                     @endif
 
                     <div class="mb-4">
-                        <a href="{{ route('admin.types.create') }}" class="text-blue-600 hover:underline">+ Add Type</a>
+                        <a href="{{ route('admin.types.create') }}" class="text-indigo-600 hover:underline">+ Add Type</a>
                     </div>
 
                     @if($types->isEmpty())
                         <p>No types found.</p>
                     @else
+                        <div class="overflow-x-auto">
                         <table class="w-full border-collapse">
                             <thead>
                                 <tr class="bg-gray-100 text-left">
@@ -70,6 +71,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                         <div class="mt-4">{{ $types->links() }}</div>
                     @endif
 

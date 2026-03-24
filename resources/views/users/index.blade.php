@@ -15,12 +15,13 @@
                     @endif
 
                     <div class="mb-4">
-                        <a href="{{ route('admin.users.create') }}" class="text-blue-600 hover:underline">+ Create User</a>
+                        <a href="{{ route('admin.users.create') }}" class="text-indigo-600 hover:underline">+ Create User</a>
                     </div>
 
                     @if($users->isEmpty())
                         <p>No users found.</p>
                     @else
+                        <div class="overflow-x-auto">
                         <table class="w-full border-collapse">
                             <thead>
                                 <tr class="bg-gray-100 text-left">
@@ -60,6 +61,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                         <div class="mt-4">{{ $users->links() }}</div>
                     @endif
 

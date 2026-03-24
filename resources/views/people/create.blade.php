@@ -47,7 +47,7 @@
 
                         <div class="flex items-center gap-4">
                             <button type="submit"
-                                class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700">
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                                 Add Person
                             </button>
                             <a href="{{ route('admin.people.index') }}" class="text-gray-600 hover:underline">Cancel</a>

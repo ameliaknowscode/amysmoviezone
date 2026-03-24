@@ -89,12 +89,12 @@
                                 </div>
                             </template>
                             <button type="button" @click="credits.push({ person_id: '', type_id: '', character: '' })"
-                                class="mt-1 text-sm text-blue-600 hover:underline">+ Add credit</button>
+                                class="mt-1 text-sm text-indigo-600 hover:underline">+ Add credit</button>
                         </div>
 
                         <div class="flex items-center gap-4">
                             <button type="submit"
-                                class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700">
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                                 Add Movie
                             </button>
                             <a href="{{ route('admin.movies.index') }}" class="text-gray-600 hover:underline">Cancel</a>
