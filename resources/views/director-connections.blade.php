@@ -37,7 +37,7 @@
                                     <select
                                         :name="'directors[' + idx + ']'"
                                         x-model="directors[idx]"
-                                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:min-w-48"
+                                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-72"
                                     >
                                         <option value="">— Select a director —</option>
                                         @foreach($directors as $director)
