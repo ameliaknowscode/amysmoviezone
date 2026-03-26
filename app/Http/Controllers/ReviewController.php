@@ -7,6 +7,7 @@ use App\Models\Review;
 use App\Notifications\SharedLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ReviewController extends Controller
 {
@@ -22,6 +23,8 @@ class ReviewController extends Controller
             'body'       => $validated['body'] ?? null,
             'watched_at' => $validated['watched_at'] ?? now()->toDateString(),
         ]);
+
+        Cache::forget("user.{$request->user()->id}.profile_stats");
 
         // Notify followers who have also logged this movie (lazy chunks to avoid memory spike)
         $request->user()
@@ -54,6 +57,7 @@ class ReviewController extends Controller
     {
         abort_if($review->user_id !== $request->user()->id, 403);
 
+        Cache::forget("user.{$request->user()->id}.profile_stats");
         $review->delete();
 
         return back()->with('status', 'review-deleted');

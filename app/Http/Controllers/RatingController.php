@@ -6,6 +6,7 @@ use App\Models\Movie;
 use App\Models\Rating;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class RatingController extends Controller
 {
@@ -31,6 +32,8 @@ class RatingController extends Controller
             $data,
         );
 
+        Cache::forget("user.{$request->user()->id}.profile_stats");
+
         return back()->with('status', 'rating-saved');
     }
 
@@ -39,6 +42,8 @@ class RatingController extends Controller
         Rating::where('user_id', $request->user()->id)
             ->where('movie_id', $movie->id)
             ->update(['stars' => null]);
+
+        Cache::forget("user.{$request->user()->id}.profile_stats");
 
         return back()->with('status', 'rating-removed');
     }

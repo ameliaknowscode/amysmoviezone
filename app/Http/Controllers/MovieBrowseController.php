@@ -6,6 +6,7 @@ use App\Models\Movie;
 use App\Models\Type;
 use App\Models\WatchlistEntry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class MovieBrowseController extends Controller
@@ -57,7 +58,9 @@ class MovieBrowseController extends Controller
             default        => $query->orderByDesc('ratings_avg_stars')->orderBy('title'),
         };
 
-        $years      = Movie::whereNotNull('release_year')->distinct()->orderByDesc('release_year')->pluck('release_year');
+        $years      = Cache::remember('movies.release_years', now()->addDay(), fn() =>
+            Movie::whereNotNull('release_year')->distinct()->orderByDesc('release_year')->pluck('release_year')
+        );
         $movies     = $query->paginate(72)->withQueryString();
         $hasFilters = $search || $director || $yearFrom || $yearTo || $sort !== 'rating';
 

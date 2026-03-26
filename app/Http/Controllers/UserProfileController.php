@@ -24,16 +24,30 @@ class UserProfileController extends Controller
         $recentReviews = $private ? collect()
             : $profileUser->reviews()->with('movie')->whereNotNull('body')->latest()->limit(3)->get();
 
-        // Activity stats — watchlist counts in a single GROUP BY query
-        $totalRated  = $private ? 0 : $profileUser->ratings()->count();
-        $totalLogged = $private ? 0 : $profileUser->reviews()->count();
+        // Activity stats — cached for 10 minutes, same TTL as follower counts
+        if ($private) {
+            $totalRated = $totalLogged = $totalWatched = $wantToWatchCount = 0;
+        } else {
+            $profileStats = Cache::remember(
+                "user.{$profileUser->id}.profile_stats",
+                now()->addMinutes(10),
+                function () use ($profileUser) {
+                    $watchlistCounts = $profileUser->watchlistEntries()
+                        ->selectRaw('list_type, COUNT(*) as total')
+                        ->groupBy('list_type')
+                        ->pluck('total', 'list_type');
 
-        $watchlistCounts  = $private ? collect() : $profileUser->watchlistEntries()
-            ->selectRaw('list_type, COUNT(*) as total')
-            ->groupBy('list_type')
-            ->pluck('total', 'list_type');
-        $totalWatched     = $watchlistCounts[WatchlistEntry::WATCHED] ?? 0;
-        $wantToWatchCount = $watchlistCounts[WatchlistEntry::WANT_TO_WATCH] ?? 0;
+                    return [
+                        'totalRated'      => $profileUser->ratings()->count(),
+                        'totalLogged'     => $profileUser->reviews()->count(),
+                        'totalWatched'    => $watchlistCounts[WatchlistEntry::WATCHED] ?? 0,
+                        'wantToWatchCount'=> $watchlistCounts[WatchlistEntry::WANT_TO_WATCH] ?? 0,
+                    ];
+                }
+            );
+            ['totalRated' => $totalRated, 'totalLogged' => $totalLogged,
+             'totalWatched' => $totalWatched, 'wantToWatchCount' => $wantToWatchCount] = $profileStats;
+        }
 
         // User's own ratings keyed by movie_id — for showing stars on recent reviews
         $reviewRatings = $recentReviews->isNotEmpty()
