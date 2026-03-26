@@ -7,8 +7,10 @@ use App\Models\Review;
 use App\Models\WatchlistEntry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class FeedController extends Controller
@@ -55,33 +57,51 @@ class FeedController extends Controller
 
         $limit = self::PER_PAGE;
 
-        $ratings = Rating::with('movie', 'user')
+        // Single UNION ALL query to get the globally-sorted top N IDs across all
+        // three activity types, then hydrate each type with a targeted whereIn.
+        $rows = DB::table('ratings')
+            ->select(DB::raw("'rating' as type"), 'id', 'created_at')
             ->whereIn('user_id', $followingIds)
             ->when($before, fn($q) => $q->where('created_at', '<', $before))
-            ->latest()
+            ->unionAll(
+                DB::table('reviews')
+                    ->select(DB::raw("'review' as type"), 'id', 'created_at')
+                    ->whereIn('user_id', $followingIds)
+                    ->when($before, fn($q) => $q->where('created_at', '<', $before))
+            )
+            ->unionAll(
+                DB::table('watchlist_entries')
+                    ->select(DB::raw("'watchlist' as type"), 'id', 'created_at')
+                    ->whereIn('user_id', $followingIds)
+                    ->when($before, fn($q) => $q->where('created_at', '<', $before))
+            )
+            ->orderByDesc('created_at')
             ->limit($limit)
-            ->get()
-            ->map(fn($r) => (object) ['type' => 'rating', 'item' => $r, 'created_at' => $r->created_at]);
+            ->get();
 
-        $reviews = Review::with('movie', 'user')
-            ->whereIn('user_id', $followingIds)
-            ->when($before, fn($q) => $q->where('created_at', '<', $before))
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn($r) => (object) ['type' => 'review', 'item' => $r, 'created_at' => $r->created_at]);
+        // Eager-load only the rows that actually appear in the top N
+        $ratings   = Rating::with('movie', 'user')
+            ->whereIn('id', $rows->where('type', 'rating')->pluck('id'))
+            ->get()->keyBy('id');
+
+        $reviews   = Review::with('movie', 'user')
+            ->whereIn('id', $rows->where('type', 'review')->pluck('id'))
+            ->get()->keyBy('id');
 
         $watchlist = WatchlistEntry::with('movie', 'user')
-            ->whereIn('user_id', $followingIds)
-            ->when($before, fn($q) => $q->where('created_at', '<', $before))
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn($r) => (object) ['type' => 'watchlist', 'item' => $r, 'created_at' => $r->created_at]);
+            ->whereIn('id', $rows->where('type', 'watchlist')->pluck('id'))
+            ->get()->keyBy('id');
 
-        return $ratings->concat($reviews)->concat($watchlist)
-            ->sortByDesc(fn($a) => $a->created_at->timestamp)
-            ->take($limit)
-            ->values();
+        return $rows->map(function ($row) use ($ratings, $reviews, $watchlist) {
+            $item = match ($row->type) {
+                'rating'    => $ratings->get($row->id),
+                'review'    => $reviews->get($row->id),
+                'watchlist' => $watchlist->get($row->id),
+            };
+
+            return $item
+                ? (object) ['type' => $row->type, 'item' => $item, 'created_at' => Carbon::parse($row->created_at)]
+                : null;
+        })->filter()->values();
     }
 }

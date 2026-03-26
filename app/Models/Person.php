@@ -19,10 +19,10 @@ class Person extends Model
     }
 
     /**
-     * Name of this person's most-credited type, using already-loaded credits.
+     * The credit whose type appears most frequently in the already-loaded credits.
      * Returns null if the person has no credits.
      */
-    public function dominantTypeName(): ?string
+    private function dominantCredit(): ?Credit
     {
         $dominantTypeId = $this->credits
             ->groupBy('type_id')
@@ -31,11 +31,18 @@ class Person extends Model
             ->keys()
             ->first();
 
-        if (! $dominantTypeId) {
-            return null;
-        }
+        return $dominantTypeId
+            ? $this->credits->firstWhere('type_id', $dominantTypeId)
+            : null;
+    }
 
-        return $this->credits->firstWhere('type_id', $dominantTypeId)?->type?->name;
+    /**
+     * Name of this person's most-credited type, using already-loaded credits.
+     * Returns null if the person has no credits.
+     */
+    public function dominantTypeName(): ?string
+    {
+        return $this->dominantCredit()?->type?->name;
     }
 
     /**
@@ -44,18 +51,7 @@ class Person extends Model
      */
     public function dominantTypeUrl(): ?string
     {
-        $dominantTypeId = $this->credits
-            ->groupBy('type_id')
-            ->map->count()
-            ->sortDesc()
-            ->keys()
-            ->first();
-
-        if (! $dominantTypeId) {
-            return null;
-        }
-
-        $type = $this->credits->firstWhere('type_id', $dominantTypeId)?->type;
+        $type = $this->dominantCredit()?->type;
 
         if (! $type) {
             return null;

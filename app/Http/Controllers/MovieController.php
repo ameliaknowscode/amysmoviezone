@@ -64,6 +64,7 @@ class MovieController extends Controller
         }
 
         SyncCredits::for($movie, $request->input('credits', []));
+        Cache::forget('movies.release_years');
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie added successfully.');
     }
@@ -109,6 +110,7 @@ class MovieController extends Controller
         }
 
         SyncCredits::for($movie, $request->input('credits', []));
+        Cache::forget('movies.release_years');
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie updated successfully.');
     }
@@ -120,6 +122,7 @@ class MovieController extends Controller
         }
 
         $movie->delete();
+        Cache::forget('movies.release_years');
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie deleted successfully.');
     }

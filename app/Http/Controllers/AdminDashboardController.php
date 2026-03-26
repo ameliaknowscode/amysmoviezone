@@ -12,13 +12,26 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
+        // Consolidate per-table counts into single aggregation queries
+        $userCounts = User::selectRaw(
+            'COUNT(*) as total_users,
+             SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as new_users_7_days',
+            [now()->subDays(7)]
+        )->first();
+
+        $ratingStats = Rating::selectRaw(
+            'COUNT(CASE WHEN stars IS NOT NULL THEN 1 END) as total_ratings,
+             AVG(CASE WHEN stars IS NOT NULL THEN stars END) as average_stars,
+             COUNT(CASE WHEN liked = 1 THEN 1 END) as total_likes'
+        )->first();
+
         $stats = [
-            'total_users'      => User::count(),
-            'new_users_7_days' => User::where('created_at', '>=', now()->subDays(7))->count(),
+            'total_users'      => $userCounts->total_users,
+            'new_users_7_days' => $userCounts->new_users_7_days,
             'total_movies'     => Movie::count(),
-            'total_ratings'    => Rating::whereNotNull('stars')->count(),
-            'average_stars'    => Rating::whereNotNull('stars')->avg('stars'),
-            'total_likes'      => Rating::where('liked', true)->count(),
+            'total_ratings'    => $ratingStats->total_ratings,
+            'average_stars'    => $ratingStats->average_stars,
+            'total_likes'      => $ratingStats->total_likes,
             'total_watchlist'  => WatchlistEntry::count(),
             'total_follows'    => DB::table('follows')->count(),
         ];

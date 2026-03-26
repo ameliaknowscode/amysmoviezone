@@ -13,7 +13,7 @@
                     <div class="p-6 text-sm text-gray-500">This user's diary is private.</div>
                 </div>
 
-            @elseif($entries->isEmpty())
+            @elseif($entries->isEmpty() && $paginator->total() === 0)
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-sm text-gray-400">No diary entries yet.</div>
                 </div>
@@ -68,6 +68,12 @@
                     </div>
                     @endforeach
                 </div>
+
+                @if($paginator->hasPages())
+                    <div class="mt-6">
+                        {{ $paginator->links() }}
+                    </div>
+                @endif
             @endif
 
         </div>

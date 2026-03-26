@@ -6,6 +6,7 @@ use App\Models\Movie;
 use App\Models\WatchlistEntry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class WatchlistController extends Controller
@@ -46,6 +47,9 @@ class WatchlistController extends Controller
             ['list_type' => $validated['list_type']],
         );
 
+        Cache::forget("user.{$request->user()->id}.profile_stats");
+        Cache::forget("movie.{$movie->id}.stats");
+
         return back()->with('status', 'watchlist-updated');
     }
 
@@ -54,6 +58,9 @@ class WatchlistController extends Controller
         WatchlistEntry::where('user_id', $request->user()->id)
             ->where('movie_id', $movie->id)
             ->delete();
+
+        Cache::forget("user.{$request->user()->id}.profile_stats");
+        Cache::forget("movie.{$movie->id}.stats");
 
         return back()->with('status', 'watchlist-removed');
     }
