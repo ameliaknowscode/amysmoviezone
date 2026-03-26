@@ -48,6 +48,7 @@ class WatchlistController extends Controller
         );
 
         Cache::forget("user.{$request->user()->id}.profile_stats");
+        Cache::forget("movie.{$movie->id}.stats");
 
         return back()->with('status', 'watchlist-updated');
     }
@@ -59,6 +60,7 @@ class WatchlistController extends Controller
             ->delete();
 
         Cache::forget("user.{$request->user()->id}.profile_stats");
+        Cache::forget("movie.{$movie->id}.stats");
 
         return back()->with('status', 'watchlist-removed');
     }

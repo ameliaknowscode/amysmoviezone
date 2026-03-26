@@ -33,6 +33,7 @@ class RatingController extends Controller
         );
 
         Cache::forget("user.{$request->user()->id}.profile_stats");
+        Cache::forget("movie.{$movie->id}.stats");
 
         return back()->with('status', 'rating-saved');
     }
@@ -44,6 +45,7 @@ class RatingController extends Controller
             ->update(['stars' => null]);
 
         Cache::forget("user.{$request->user()->id}.profile_stats");
+        Cache::forget("movie.{$movie->id}.stats");
 
         return back()->with('status', 'rating-removed');
     }
