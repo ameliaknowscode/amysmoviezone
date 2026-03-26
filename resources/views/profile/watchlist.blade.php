@@ -37,6 +37,9 @@
                             </li>
                             @endforeach
                         </ul>
+                        @if($wantToWatch->hasPages())
+                            <div class="mt-4">{{ $wantToWatch->links() }}</div>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -71,6 +74,9 @@
                             </li>
                             @endforeach
                         </ul>
+                        @if($watched->hasPages())
+                            <div class="mt-4">{{ $watched->links() }}</div>
+                        @endif
                     @endif
                 </div>
             </div>

@@ -23,10 +23,11 @@ class ReviewController extends Controller
             'watched_at' => $validated['watched_at'] ?? now()->toDateString(),
         ]);
 
-        // Notify followers who have also logged this movie
+        // Notify followers who have also logged this movie (lazy chunks to avoid memory spike)
         $request->user()
             ->followers()
             ->whereHas('reviews', fn($q) => $q->where('movie_id', $movie->id))
+            ->lazyById()
             ->each(fn($follower) => $follower->notify(new SharedLog($request->user(), $movie)));
 
         return back()->with('status', 'review-saved');

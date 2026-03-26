@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\Movie;
 use App\Models\MovieList;
+use App\Models\MovieListItem;
 use App\Models\Rating;
 use App\Models\Review;
 use App\Models\ReviewLike;
@@ -27,10 +28,11 @@ class BuildMovieShowData
             $userRating         = Rating::where('user_id', $userId)->where('movie_id', $movie->id)->first();
             $userWatchlistEntry = WatchlistEntry::where('user_id', $userId)->where('movie_id', $movie->id)->first();
             $userReviews        = Review::where('user_id', $userId)->where('movie_id', $movie->id)->latest()->get();
-            $userLists      = MovieList::where('user_id', $userId)->orderBy('name')->get();
-            $movieListIds   = $userLists->filter(
-                fn($list) => $list->items()->where('movie_id', $movie->id)->exists()
-            )->pluck('id');
+            $userLists    = MovieList::where('user_id', $userId)->orderBy('name')->get();
+            // Single query instead of one exists() per list
+            $movieListIds = MovieListItem::whereIn('movie_list_id', $userLists->pluck('id'))
+                ->where('movie_id', $movie->id)
+                ->pluck('movie_list_id');
 
             // Friend activity on this movie
             $followingIds = User::find($userId)->following()->pluck('users.id');

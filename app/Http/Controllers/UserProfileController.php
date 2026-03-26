@@ -69,17 +69,22 @@ class UserProfileController extends Controller
     {
         $profileUser = User::where('username', $username)->firstOrFail();
 
-        $entries = $profileUser->profile_private && Auth::id() !== $profileUser->id
-            ? null
-            : $profileUser->reviews()
+        $paginator = null;
+        $entries   = null;
+
+        if (! ($profileUser->profile_private && Auth::id() !== $profileUser->id)) {
+            $paginator = $profileUser->reviews()
                 ->with('movie')
                 ->whereNotNull('watched_at')
                 ->orderByDesc('watched_at')
                 ->orderByDesc('id')
-                ->get()
-                ->groupBy(fn($r) => $r->watched_at->format('Y-m'));
+                ->paginate(50);
 
-        return view('profile.diary', compact('profileUser', 'entries'));
+            $entries = $paginator->getCollection()
+                ->groupBy(fn($r) => $r->watched_at->format('Y-m'));
+        }
+
+        return view('profile.diary', compact('profileUser', 'entries', 'paginator'));
     }
 
     public function watchlist(string $username): View
@@ -91,14 +96,14 @@ class UserProfileController extends Controller
                 ->where('list_type', WatchlistEntry::WANT_TO_WATCH)
                 ->with('movie')
                 ->latest()
-                ->get();
+                ->paginate(48, ['*'], 'want_page');
 
         $watched = $profileUser->profile_private ? null
             : $profileUser->watchlistEntries()
                 ->where('list_type', WatchlistEntry::WATCHED)
                 ->with('movie')
                 ->latest()
-                ->get();
+                ->paginate(48, ['*'], 'watched_page');
 
         return view('profile.watchlist', compact('profileUser', 'wantToWatch', 'watched'));
     }
