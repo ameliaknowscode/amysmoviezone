@@ -188,7 +188,7 @@ class SearchControllerTest extends TestCase
 
         // Director has no actor credit — results should be empty.
         $this->get(route('director-connections', ['directors' => [$director->id]]))
-            ->assertSee('No actors found for the selected director(s).');
+            ->assertSee('No actors in common.');
     }
 
     public function test_director_search_actor_in_both_directors_films_appears_once(): void
@@ -224,6 +224,49 @@ class SearchControllerTest extends TestCase
 
         $this->get(route('director-connections'))
             ->assertDontSee('Jack Nicholson');
+    }
+
+    public function test_director_search_shows_connecting_film_titles_in_results(): void
+    {
+        $directorType = Type::firstOrCreate(['name' => 'Director'], ['is_crew' => true]);
+        $actorType    = Type::firstOrCreate(['name' => 'Actor'],    ['is_crew' => false]);
+
+        $director = Person::factory()->create(['name' => 'Stanley Kubrick']);
+        $actor    = Person::factory()->create(['name' => 'Jack Nicholson']);
+        $movie    = Movie::factory()->create(['title' => 'The Shining']);
+
+        Credit::factory()->create(['person_id' => $director->id, 'type_id' => $directorType->id, 'movie_id' => $movie->id]);
+        Credit::factory()->create(['person_id' => $actor->id,    'type_id' => $actorType->id,    'movie_id' => $movie->id]);
+
+        $this->get(route('director-connections', ['directors' => [$director->id]]))
+            ->assertSee('Jack Nicholson')
+            ->assertSee('The Shining');
+    }
+
+    public function test_director_search_shows_director_columns_in_results_header(): void
+    {
+        $directorType = Type::firstOrCreate(['name' => 'Director'], ['is_crew' => true]);
+        $actorType    = Type::firstOrCreate(['name' => 'Actor'],    ['is_crew' => false]);
+
+        $director1 = Person::factory()->create(['name' => 'Stanley Kubrick']);
+        $director2 = Person::factory()->create(['name' => 'Francis Coppola']);
+        $actor     = Person::factory()->create(['name' => 'Robert Duvall']);
+        $movie1    = Movie::factory()->create(['title' => 'The Shining']);
+        $movie2    = Movie::factory()->create(['title' => 'The Godfather']);
+
+        Credit::factory()->create(['person_id' => $director1->id, 'type_id' => $directorType->id, 'movie_id' => $movie1->id]);
+        Credit::factory()->create(['person_id' => $director2->id, 'type_id' => $directorType->id, 'movie_id' => $movie2->id]);
+        Credit::factory()->create(['person_id' => $actor->id,     'type_id' => $actorType->id,    'movie_id' => $movie1->id]);
+        Credit::factory()->create(['person_id' => $actor->id,     'type_id' => $actorType->id,    'movie_id' => $movie2->id]);
+
+        $response = $this->get(route('director-connections', [
+            'directors' => [$director1->id, $director2->id],
+        ]));
+
+        $response->assertSee('Stanley Kubrick')
+                 ->assertSee('Francis Coppola')
+                 ->assertSee('The Shining')
+                 ->assertSee('The Godfather');
     }
 
     public function test_director_search_returns_actors_common_to_three_directors(): void

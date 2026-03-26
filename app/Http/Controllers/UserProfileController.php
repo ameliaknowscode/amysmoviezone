@@ -7,6 +7,7 @@ use App\Models\Rating;
 use App\Models\User;
 use App\Models\WatchlistEntry;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class UserProfileController extends Controller
@@ -43,8 +44,16 @@ class UserProfileController extends Controller
                 ->keyBy('movie_id')
             : collect();
 
-        $followerCount  = $profileUser->followers()->count();
-        $followingCount = $profileUser->following()->count();
+        $followerCount  = Cache::remember(
+            "user.{$profileUser->id}.follower_count",
+            now()->addMinutes(10),
+            fn() => $profileUser->followers()->count()
+        );
+        $followingCount = Cache::remember(
+            "user.{$profileUser->id}.following_count",
+            now()->addMinutes(10),
+            fn() => $profileUser->following()->count()
+        );
         $isFollowing    = Auth::check() && Auth::id() !== $profileUser->id
             ? Auth::user()->isFollowing($profileUser)
             : false;

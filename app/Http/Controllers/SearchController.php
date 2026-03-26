@@ -62,7 +62,8 @@ class SearchController extends Controller
 
         $ids = array_filter($request->query('directors', []));
 
-        $actors           = collect();
+        $actors            = collect();
+        $filmsByActor      = [];
         $selectedDirectors = collect();
 
         if (!empty($ids)) {
@@ -74,36 +75,65 @@ class SearchController extends Controller
                 return $allDirectors->firstWhere('id', (int) $id);
             })->filter()->values();
 
-            // For each slot, collect the actor IDs who appeared in that director's films.
-            $actorSets = collect($ids)->map(function ($directorId) use ($coenIds, $directorTypeId, $actorTypeId) {
-                if ($directorId === 'coen-brothers') {
-                    // Union every film where Joel OR Ethan is credited as Director.
-                    $movieIds = Credit::whereIn('person_id', $coenIds)
-                        ->where('type_id', $directorTypeId)
-                        ->pluck('movie_id')
-                        ->unique();
-                } else {
-                    $movieIds = Credit::where('person_id', (int) $directorId)
-                        ->where('type_id', $directorTypeId)
-                        ->pluck('movie_id');
+            // Cache actor intersection + connecting films per unique director combo (order-independent).
+            $sortedIds = collect($ids)->sort()->values()->implode('_');
+            ['actors' => $actors, 'filmsByActor' => $filmsByActor] = Cache::remember(
+                "director_connections.{$sortedIds}",
+                now()->addHour(),
+                function () use ($ids, $coenIds, $directorTypeId, $actorTypeId) {
+                    // For each slot, collect the movie IDs and actor IDs for that director.
+                    $movieIdsByDirector = [];
+                    $actorSets = collect($ids)->map(function ($directorId) use ($coenIds, $directorTypeId, $actorTypeId, &$movieIdsByDirector) {
+                        if ($directorId === 'coen-brothers') {
+                            $movieIds = Credit::whereIn('person_id', $coenIds)
+                                ->where('type_id', $directorTypeId)
+                                ->pluck('movie_id')
+                                ->unique();
+                        } else {
+                            $movieIds = Credit::where('person_id', (int) $directorId)
+                                ->where('type_id', $directorTypeId)
+                                ->pluck('movie_id');
+                        }
+
+                        $movieIdsByDirector[$directorId] = $movieIds;
+
+                        return Credit::whereIn('movie_id', $movieIds)
+                            ->where('type_id', $actorTypeId)
+                            ->pluck('person_id')
+                            ->unique()
+                            ->values();
+                    });
+
+                    $sharedActorIds = $actorSets->reduce(
+                        fn($carry, $set) => $carry === null ? $set : $carry->intersect($set)->values()
+                    );
+
+                    if (!$sharedActorIds || $sharedActorIds->isEmpty()) {
+                        return ['actors' => collect(), 'filmsByActor' => []];
+                    }
+
+                    $actors = Person::whereIn('id', $sharedActorIds)->with('credits.type')->orderBy('name')->get();
+
+                    // Build a map: actor_id => [director_id => [movie titles]]
+                    $filmsByActor = [];
+                    foreach ($ids as $directorId) {
+                        $movieIds = $movieIdsByDirector[$directorId];
+                        $credits  = Credit::whereIn('movie_id', $movieIds)
+                            ->where('type_id', $actorTypeId)
+                            ->whereIn('person_id', $sharedActorIds)
+                            ->with('movie')
+                            ->get();
+
+                        foreach ($credits as $credit) {
+                            $filmsByActor[$credit->person_id][$directorId][] = $credit->movie->title;
+                        }
+                    }
+
+                    return ['actors' => $actors, 'filmsByActor' => $filmsByActor];
                 }
-
-                return Credit::whereIn('movie_id', $movieIds)
-                    ->where('type_id', $actorTypeId)
-                    ->pluck('person_id')
-                    ->unique()
-                    ->values();
-            });
-
-            $sharedActorIds = $actorSets->reduce(
-                fn($carry, $set) => $carry === null ? $set : $carry->intersect($set)->values()
             );
-
-            $actors = $sharedActorIds && $sharedActorIds->isNotEmpty()
-                ? Person::whereIn('id', $sharedActorIds)->with('credits.type')->orderBy('name')->get()
-                : collect();
         }
 
-        return view('director-connections', compact('directors', 'selectedDirectors', 'actors'));
+        return view('director-connections', compact('directors', 'selectedDirectors', 'actors', 'filmsByActor'));
     }
 }

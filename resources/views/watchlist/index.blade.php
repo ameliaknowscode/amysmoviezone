@@ -16,7 +16,13 @@
                     </div>
 
                     @if($wantToWatch->isEmpty())
-                        <p class="text-sm text-gray-400">Nothing here yet. Add movies from their pages.</p>
+                        <div class="py-6 text-center">
+                            <p class="text-sm text-gray-400 mb-3">Nothing here yet. Browse movies and add them to your watchlist.</p>
+                            <a href="{{ route('movies.browse') }}"
+                               class="inline-block text-sm font-semibold text-indigo-600 hover:text-indigo-700 underline underline-offset-2">
+                                Browse movies
+                            </a>
+                        </div>
                     @else
                         <ul class="divide-y divide-gray-100">
                             @foreach($wantToWatch as $entry)
@@ -58,7 +64,13 @@
                     </div>
 
                     @if($watched->isEmpty())
-                        <p class="text-sm text-gray-400">Nothing here yet. Mark movies as watched from their pages.</p>
+                        <div class="py-6 text-center">
+                            <p class="text-sm text-gray-400 mb-3">Nothing here yet. Mark movies as watched from their pages.</p>
+                            <a href="{{ route('movies.browse') }}"
+                               class="inline-block text-sm font-semibold text-indigo-600 hover:text-indigo-700 underline underline-offset-2">
+                                Browse movies
+                            </a>
+                        </div>
                     @else
                         <ul class="divide-y divide-gray-100">
                             @foreach($watched as $entry)

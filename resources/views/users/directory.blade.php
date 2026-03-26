@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow sm:rounded-lg overflow-hidden">
-
+                <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -119,6 +119,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
 
                 @if ($users->hasPages())
                 <div class="px-6 py-4 border-t border-gray-100">{{ $users->links() }}</div>

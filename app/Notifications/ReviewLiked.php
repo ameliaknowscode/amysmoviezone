@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class ReviewLiked extends Notification
@@ -18,7 +19,21 @@ class ReviewLiked extends Notification
 
     public function via($notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+        if ($notifiable->email_notifications) {
+            $channels[] = 'mail';
+        }
+        return $channels;
+    }
+
+    public function toMail($notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject("@{$this->liker->username} liked your review of {$this->review->movie->title}")
+            ->greeting("Hi {$notifiable->name}!")
+            ->line("**@{$this->liker->username}** liked your review of *{$this->review->movie->title}*.")
+            ->action('View the review', $this->review->movie->publicUrl())
+            ->line('You can manage your email notification preferences in your profile settings.');
     }
 
     public function toDatabase($notifiable): array

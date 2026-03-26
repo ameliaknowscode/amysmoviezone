@@ -8,6 +8,7 @@ use App\Models\WatchlistEntry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class FeedController extends Controller
@@ -16,7 +17,11 @@ class FeedController extends Controller
 
     public function index(Request $request): View
     {
-        $followingIds = $request->user()->following()->pluck('users.id')->toArray();
+        $followingIds = Cache::remember(
+            "user.{$request->user()->id}.following_ids",
+            now()->addMinutes(5),
+            fn() => $request->user()->following()->pluck('users.id')->toArray()
+        );
         $activities   = $this->getActivities($followingIds, null);
         $nextCursor   = $activities->last()?->created_at->toISOString();
         $hasMore      = $activities->count() === self::PER_PAGE;
@@ -26,7 +31,11 @@ class FeedController extends Controller
 
     public function more(Request $request): JsonResponse
     {
-        $followingIds = $request->user()->following()->pluck('users.id')->toArray();
+        $followingIds = Cache::remember(
+            "user.{$request->user()->id}.following_ids",
+            now()->addMinutes(5),
+            fn() => $request->user()->following()->pluck('users.id')->toArray()
+        );
         $activities   = $this->getActivities($followingIds, $request->query('before'));
         $nextCursor   = $activities->last()?->created_at->toISOString();
         $hasMore      = $activities->count() === self::PER_PAGE;
