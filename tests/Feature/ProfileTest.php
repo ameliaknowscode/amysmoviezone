@@ -186,6 +186,47 @@ class ProfileTest extends TestCase
         $this->assertNull($user->fresh()->avatar);
     }
 
+    // -------------------------------------------------------------------------
+    // Email notification preferences
+    // -------------------------------------------------------------------------
+
+    public function test_email_notifications_default_to_true_for_new_users(): void
+    {
+        $user = User::factory()->create();
+
+        $this->assertTrue($user->fresh()->email_notifications);
+    }
+
+    public function test_unauthenticated_user_cannot_update_notification_preferences(): void
+    {
+        $this->patch(route('profile.notifications'), ['email_notifications' => '1'])
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_email_notifications_can_be_disabled(): void
+    {
+        $user = User::factory()->create(['email_notifications' => true]);
+
+        $this->actingAs($user)
+            ->patch(route('profile.notifications'), ['email_notifications' => '0'])
+            ->assertRedirect(route('profile.edit'))
+            ->assertSessionHas('status', 'notifications-updated');
+
+        $this->assertFalse($user->fresh()->email_notifications);
+    }
+
+    public function test_email_notifications_can_be_re_enabled(): void
+    {
+        $user = User::factory()->create(['email_notifications' => false]);
+
+        $this->actingAs($user)
+            ->patch(route('profile.notifications'), ['email_notifications' => '1'])
+            ->assertRedirect(route('profile.edit'))
+            ->assertSessionHas('status', 'notifications-updated');
+
+        $this->assertTrue($user->fresh()->email_notifications);
+    }
+
     public function test_avatar_upload_rejects_files_over_2mb(): void
     {
         Storage::fake('public');

@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Movie;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class SharedLog extends Notification
@@ -18,7 +19,21 @@ class SharedLog extends Notification
 
     public function via($notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+        if ($notifiable->email_notifications) {
+            $channels[] = 'mail';
+        }
+        return $channels;
+    }
+
+    public function toMail($notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject("@{$this->logger->username} watched {$this->movie->title}")
+            ->greeting("Hi {$notifiable->name}!")
+            ->line("**@{$this->logger->username}** just logged *{$this->movie->title}*.")
+            ->action('See their log', $this->movie->publicUrl())
+            ->line('You can manage your email notification preferences in your profile settings.');
     }
 
     public function toDatabase($notifiable): array

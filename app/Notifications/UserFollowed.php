@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class UserFollowed extends Notification
@@ -14,7 +15,21 @@ class UserFollowed extends Notification
 
     public function via($notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+        if ($notifiable->email_notifications) {
+            $channels[] = 'mail';
+        }
+        return $channels;
+    }
+
+    public function toMail($notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject("@{$this->follower->username} started following you on " . config('app.name'))
+            ->greeting("Hi {$notifiable->name}!")
+            ->line("**@{$this->follower->username}** ({$this->follower->name}) started following you.")
+            ->action('View their profile', route('profile.show', $this->follower->username))
+            ->line('You can manage your email notification preferences in your profile settings.');
     }
 
     public function toDatabase($notifiable): array

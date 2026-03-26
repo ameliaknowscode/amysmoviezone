@@ -23,6 +23,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReviewLikeController;
 use App\Http\Controllers\MovieListItemController;
 use App\Http\Controllers\RecommendationsController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
@@ -90,6 +91,9 @@ Route::get('/u/{username}/watchlist', [UserProfileController::class, 'watchlist'
 Route::get('/u/{username}/followers', [UserProfileController::class, 'followers'])->name('profile.followers');
 Route::get('/u/{username}/following', [UserProfileController::class, 'following'])->name('profile.following');
 
+Route::get('/onboarding', [OnboardingController::class, 'show'])->middleware(['auth', 'verified'])->name('onboarding');
+Route::post('/onboarding', [OnboardingController::class, 'complete'])->middleware(['auth', 'verified'])->name('onboarding.complete');
+
 Route::get('/dashboard', function () {
     if (auth()->user()->is_admin) {
         return redirect()->route('admin.dashboard');
@@ -124,6 +128,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/notifications', [ProfileController::class, 'updateNotifications'])->name('profile.notifications');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/movies/{movie}/rate', [RatingController::class, 'store'])->name('movies.rate');

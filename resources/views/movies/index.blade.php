@@ -14,12 +14,12 @@
                         <p class="mb-4 text-green-600">{{ session('success') }}</p>
                     @endif
 
-                    <div class="flex items-center justify-between mb-4 gap-4">
-                        <form method="GET" action="{{ route('admin.movies.index') }}" class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center justify-between mb-4 gap-3">
+                        <form method="GET" action="{{ route('admin.movies.index') }}" class="flex items-center gap-2 w-full sm:w-auto">
                             <input type="hidden" name="sort" value="{{ $direction }}">
                             <input type="text" name="search" value="{{ $search }}"
                                 placeholder="Filter by title or director…"
-                                class="border-gray-300 rounded-md shadow-sm text-sm w-72">
+                                class="border-gray-300 rounded-md shadow-sm text-sm w-full sm:w-72">
                             <button type="submit"
                                 class="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
                                 Filter

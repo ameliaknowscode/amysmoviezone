@@ -30,9 +30,14 @@
             >
                 <div class="bg-white shadow-sm sm:rounded-lg divide-y divide-gray-100" x-ref="items">
                     @if($activities->isEmpty())
-                        <div class="p-6 text-sm text-gray-400">
-                            Nothing here yet.
-                            <a href="{{ route('users.index') }}" class="text-indigo-600 hover:underline">Find people to follow.</a>
+                        <div class="p-10 text-center">
+                            <div class="text-3xl mb-3">&#128101;</div>
+                            <h3 class="font-semibold text-gray-700 mb-1">Nothing here yet</h3>
+                            <p class="text-sm text-gray-400 mb-5">Follow other members to see their ratings, reviews, and watchlist activity here.</p>
+                            <a href="{{ route('users.index') }}"
+                               class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                                Find people to follow
+                            </a>
                         </div>
                     @else
                         @include('feed._items', ['activities' => $activities])

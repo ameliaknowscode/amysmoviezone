@@ -11,7 +11,10 @@
             {{-- Search Form --}}
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <p class="text-sm text-gray-600 mb-4">Pick directors to see every actor who has appeared in at least one film by <em>each</em> of the selected directors.</p>
+                    <p class="text-sm text-gray-600 mb-5">
+                        Pick two or more directors to discover every actor who has appeared in at least one film by <em>each</em> of them.
+                        A great way to find unexpected connections.
+                    </p>
 
                     @php
                         $initialDirectors = array_values(array_map('strval', request()->query('directors', [])));
@@ -27,14 +30,14 @@
                             remove(i) { this.directors.splice(i, 1) }
                         }"
                     >
-                        <div class="space-y-2 mb-4">
+                        <div class="space-y-2 mb-5">
                             <template x-for="(val, idx) in directors" :key="idx">
                                 <div class="flex items-center gap-2">
-                                    <label class="text-sm font-medium text-gray-700 w-20 shrink-0" x-text="'Director ' + (idx + 1)"></label>
+                                    <label class="text-sm font-medium text-gray-500 w-20 shrink-0" x-text="'Director ' + (idx + 1)"></label>
                                     <select
                                         :name="'directors[' + idx + ']'"
                                         x-model="directors[idx]"
-                                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-48"
+                                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-72"
                                     >
                                         <option value="">— Select a director —</option>
                                         @foreach($directors as $director)
@@ -48,8 +51,13 @@
                                         type="button"
                                         @click="remove(idx)"
                                         x-show="directors.length > 1"
-                                        class="text-sm text-red-500 hover:text-red-700"
-                                    >Remove</button>
+                                        class="text-gray-400 hover:text-red-500 transition shrink-0"
+                                        title="Remove"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
                                 </div>
                             </template>
                         </div>
@@ -59,10 +67,10 @@
                                 type="button"
                                 @click="add()"
                                 x-show="directors.length < {{ $directors->count() }}"
-                                class="text-sm text-indigo-600 hover:text-indigo-800"
+                                class="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
                             >+ Add director</button>
                             <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition">
-                                Search
+                                Find connections
                             </button>
                         </div>
                     </form>
@@ -72,40 +80,68 @@
             {{-- Results --}}
             @if($selectedDirectors->isNotEmpty())
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">
-                        <h3 class="text-lg font-semibold mb-4">
+                    <div class="px-6 py-5 border-b border-gray-100">
+                        <h3 class="text-base font-semibold text-gray-900">
                             Actors in films by {{ $selectedDirectors->pluck('name')->join(', ', ' & ') }}
                         </h3>
+                        @if($actors->isNotEmpty())
+                            <p class="mt-1 text-sm text-gray-500">
+                                {{ $actors->count() }} {{ Str::plural('actor', $actors->count()) }} appeared in at least one film by each director.
+                            </p>
+                        @endif
+                    </div>
 
+                    <div class="p-6">
                         @if($actors->isEmpty())
-                            <p class="text-gray-500">No actors found for the selected director(s).</p>
+                            <div class="text-center py-8">
+                                <p class="text-gray-500 font-medium">No actors in common.</p>
+                                <p class="text-sm text-gray-400 mt-1">These directors haven't shared any cast members. Try a different combination.</p>
+                            </div>
                         @else
-                            <p class="text-sm text-gray-500 mb-3">{{ $actors->count() }} {{ Str::plural('actor', $actors->count()) }} found.</p>
-                            <table class="w-full border-collapse">
-                                <thead>
-                                    <tr class="bg-gray-100 text-left">
-                                        <th class="border border-gray-300 px-4 py-2">Name</th>
-                                        <th class="border border-gray-300 px-4 py-2">Nationality</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($actors as $actor)
-                                        <tr class="hover:bg-gray-50">
-                                            <td class="border border-gray-300 px-4 py-2">
-                                                <a href="{{ $actor->dominantTypeUrl() ?? route('people.show', $actor) }}" class="text-indigo-600 hover:underline">{{ $actor->name }}</a>
-                                            </td>
-                                            <td class="border border-gray-300 px-4 py-2">{{ $actor->nationality ?? '—' }}</td>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th class="pb-3 pr-6">Actor</th>
+                                            @foreach($selectedDirectors as $dir)
+                                                <th class="pb-3 pr-6">{{ $dir->name }}</th>
+                                            @endforeach
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        @foreach($actors as $actor)
+                                            <tr class="hover:bg-gray-50 transition">
+                                                <td class="py-3 pr-6">
+                                                    <a href="{{ $actor->dominantTypeUrl() ?? route('people.show', $actor) }}"
+                                                       class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline">
+                                                        {{ $actor->name }}
+                                                    </a>
+                                                    @if($actor->nationality)
+                                                        <span class="text-xs text-gray-400 ml-1">{{ $actor->nationality }}</span>
+                                                    @endif
+                                                </td>
+                                                @foreach($selectedDirectors as $dir)
+                                                    <td class="py-3 pr-6 text-sm text-gray-600">
+                                                        @php $films = $filmsByActor[$actor->id][$dir->id] ?? []; @endphp
+                                                        @if($films)
+                                                            {{ implode(', ', array_unique($films)) }}
+                                                        @else
+                                                            <span class="text-gray-300">—</span>
+                                                        @endif
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         @endif
                     </div>
                 </div>
             @endif
 
             <div>
-                <a href="{{ route('home') }}" class="text-indigo-600 hover:underline">&larr; Back to home</a>
+                <a href="{{ route('home') }}" class="text-sm text-indigo-600 hover:underline">&larr; Back to home</a>
             </div>
 
         </div>

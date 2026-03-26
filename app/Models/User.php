@@ -29,6 +29,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar',
         'profile_private',
         'is_admin',
+        'welcomed_at',
+        'email_notifications',
     ];
 
     /**
@@ -51,8 +53,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
-            'profile_private'   => 'boolean',
-            'is_admin'          => 'boolean',
+            'profile_private'      => 'boolean',
+            'is_admin'             => 'boolean',
+            'welcomed_at'          => 'datetime',
+            'email_notifications'  => 'boolean',
         ];
     }
 
