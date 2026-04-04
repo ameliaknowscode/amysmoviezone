@@ -68,4 +68,58 @@ class PersonTest extends TestCase
         $this->assertCount(2, $person->credits);
         $this->assertInstanceOf(Credit::class, $person->credits->first());
     }
+
+    // -------------------------------------------------------------------------
+    // Helper methods
+    // -------------------------------------------------------------------------
+
+    public function test_dominant_type_name_returns_most_frequent_credit_type(): void
+    {
+        $person       = Person::factory()->create();
+        $movie1       = \App\Models\Movie::factory()->create();
+        $movie2       = \App\Models\Movie::factory()->create();
+        $movie3       = \App\Models\Movie::factory()->create();
+        $actorType    = \App\Models\Type::factory()->create(['is_crew' => false]);
+        $directorType = \App\Models\Type::factory()->create(['is_crew' => true]);
+
+        // credits unique on (movie_id, person_id, type_id) — use different movies
+        Credit::create(['person_id' => $person->id, 'movie_id' => $movie1->id, 'type_id' => $actorType->id]);
+        Credit::create(['person_id' => $person->id, 'movie_id' => $movie2->id, 'type_id' => $actorType->id]);
+        Credit::create(['person_id' => $person->id, 'movie_id' => $movie3->id, 'type_id' => $directorType->id]);
+
+        $person->load(['credits.type']);
+
+        $this->assertSame($actorType->name, $person->dominantTypeName());
+    }
+
+    public function test_dominant_type_name_returns_null_when_no_credits(): void
+    {
+        $person = Person::factory()->create();
+        $person->load(['credits.type']);
+
+        $this->assertNull($person->dominantTypeName());
+    }
+
+    public function test_dominant_type_url_returns_null_when_no_credits(): void
+    {
+        $person = Person::factory()->create();
+        $person->load(['credits.type']);
+
+        $this->assertNull($person->dominantTypeUrl());
+    }
+
+    public function test_dominant_type_url_returns_route_string_when_credits_exist(): void
+    {
+        $person = Person::factory()->create(['name' => 'Jane Doe']);
+        $movie  = \App\Models\Movie::factory()->create();
+        $type   = \App\Models\Type::factory()->create(['is_crew' => false]);
+
+        Credit::create(['person_id' => $person->id, 'movie_id' => $movie->id, 'type_id' => $type->id]);
+
+        $person->load(['credits.type']);
+
+        $url = $person->dominantTypeUrl();
+        $this->assertStringContainsString($person->slug, $url);
+        $this->assertStringContainsString($type->slug, $url);
+    }
 }

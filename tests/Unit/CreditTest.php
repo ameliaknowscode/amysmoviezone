@@ -48,4 +48,28 @@ class CreditTest extends TestCase
 
         $this->assertInstanceOf(Type::class, $credit->type);
     }
+
+    // -------------------------------------------------------------------------
+    // Helper methods
+    // -------------------------------------------------------------------------
+
+    public function test_by_type_url_returns_route_containing_type_and_person_slug(): void
+    {
+        $person = Person::factory()->create(['name' => 'Jane Doe']);
+        $movie  = Movie::factory()->create();
+        $type   = Type::factory()->create(['name' => 'Director', 'slug' => 'director']);
+
+        // Use Credit::create() to avoid CreditFactory spawning an additional Type
+        $credit = Credit::create([
+            'movie_id'  => $movie->id,
+            'person_id' => $person->id,
+            'type_id'   => $type->id,
+        ]);
+
+        $credit->load(['type', 'person']);
+        $url = $credit->byTypeUrl();
+
+        $this->assertStringContainsString($type->slug, $url);
+        $this->assertStringContainsString($person->slug, $url);
+    }
 }
