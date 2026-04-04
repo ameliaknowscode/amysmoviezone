@@ -11,11 +11,8 @@ class PersonTypeCreditsController extends Controller
 {
     public function __invoke(string $typeSlug, string $personSlug)
     {
-        $type = Type::where('slug', $typeSlug)->first();
-        abort_unless($type, 404);
-
-        $person = Person::where('slug', $personSlug)->first();
-        abort_unless($person, 404);
+        $type   = Type::where('slug', $typeSlug)->firstOrFail();
+        $person = Person::where('slug', $personSlug)->firstOrFail();
 
         $credits = Credit::with('movie')
             ->where('person_id', $person->id)

@@ -16,11 +16,9 @@ class FollowController extends Controller
 
         abort_if(Auth::id() === $target->id, 403);
 
-        $alreadyFollowing = Auth::user()->following()->where('following_id', $target->id)->exists();
+        $changes = Auth::user()->following()->syncWithoutDetaching([$target->id]);
 
-        Auth::user()->following()->syncWithoutDetaching([$target->id]);
-
-        if (! $alreadyFollowing) {
+        if (! empty($changes['attached'])) {
             $target->notify(new UserFollowed(Auth::user()));
         }
 

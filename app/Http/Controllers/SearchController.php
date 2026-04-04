@@ -48,17 +48,22 @@ class SearchController extends Controller
                 ->get()
         );
 
-        // Build the Coen Brothers virtual entry: any film directed by Joel or Ethan counts.
-        $coenNames   = ['Joel Coen', 'Ethan Coen'];
-        $coens       = $allDirectors->whereIn('name', $coenNames);
-        $coenIds     = $coens->pluck('id')->all();
+        // Build virtual group entries (e.g. The Coen Brothers) from config/director_groups.php.
+        // Each group collapses multiple individual directors into one dropdown option.
+        // $groupMemberIds maps group ID => [person IDs] for use in queries.
+        $groupMemberIds = [];
+        $directors      = $allDirectors;
 
-        // Replace individual Coen entries with one virtual entry in the dropdown list.
-        $directors = $allDirectors->reject(fn($d) => in_array($d->name, $coenNames))->values();
-        if ($coens->isNotEmpty()) {
-            $coenEntry = (object) ['id' => 'coen-brothers', 'name' => 'The Coen Brothers'];
-            $directors = $directors->push($coenEntry)->sortBy('name')->values();
+        foreach (config('director_groups') as $group) {
+            $members = $allDirectors->whereIn('name', $group['members']);
+            $groupMemberIds[$group['id']] = $members->pluck('id')->all();
+            $directors = $directors->reject(fn($d) => in_array($d->name, $group['members']));
+            if ($members->isNotEmpty()) {
+                $directors = $directors->push((object) ['id' => $group['id'], 'name' => $group['name']]);
+            }
         }
+
+        $directors = $directors->sortBy('name')->values();
 
         $ids = array_filter($request->query('directors', []));
 
@@ -68,32 +73,27 @@ class SearchController extends Controller
 
         if (!empty($ids)) {
             // Build display labels for selected slots.
-            $selectedDirectors = collect($ids)->map(function ($id) use ($allDirectors, $coens) {
-                if ($id === 'coen-brothers') {
-                    return (object) ['id' => 'coen-brothers', 'name' => 'The Coen Brothers'];
-                }
-                return $allDirectors->firstWhere('id', (int) $id);
-            })->filter()->values();
+            $selectedDirectors = collect($ids)->map(
+                fn($id) => $directors->firstWhere('id', isset($groupMemberIds[$id]) ? $id : (int) $id)
+            )->filter()->values();
 
             // Cache actor intersection + connecting films per unique director combo (order-independent).
             $sortedIds = collect($ids)->sort()->values()->implode('_');
             ['actors' => $actors, 'filmsByActor' => $filmsByActor] = Cache::remember(
                 "director_connections.{$sortedIds}",
                 now()->addHour(),
-                function () use ($ids, $coenIds, $directorTypeId, $actorTypeId) {
-                    // For each slot, collect the movie IDs and actor IDs for that director.
+                function () use ($ids, $groupMemberIds, $directorTypeId, $actorTypeId) {
+                    // For each slot, collect the movie IDs directed by that person (or group).
                     $movieIdsByDirector = [];
-                    $actorSets = collect($ids)->map(function ($directorId) use ($coenIds, $directorTypeId, $actorTypeId, &$movieIdsByDirector) {
-                        if ($directorId === 'coen-brothers') {
-                            $movieIds = Credit::whereIn('person_id', $coenIds)
+                    $actorSets = collect($ids)->map(function ($directorId) use ($groupMemberIds, $directorTypeId, $actorTypeId, &$movieIdsByDirector) {
+                        $movieIds = isset($groupMemberIds[$directorId])
+                            ? Credit::whereIn('person_id', $groupMemberIds[$directorId])
                                 ->where('type_id', $directorTypeId)
                                 ->pluck('movie_id')
-                                ->unique();
-                        } else {
-                            $movieIds = Credit::where('person_id', (int) $directorId)
+                                ->unique()
+                            : Credit::where('person_id', (int) $directorId)
                                 ->where('type_id', $directorTypeId)
                                 ->pluck('movie_id');
-                        }
 
                         $movieIdsByDirector[$directorId] = $movieIds;
 

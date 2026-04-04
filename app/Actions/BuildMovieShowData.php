@@ -8,9 +8,9 @@ use App\Models\MovieListItem;
 use App\Models\Rating;
 use App\Models\Review;
 use App\Models\ReviewLike;
-use App\Models\User;
 use App\Models\WatchlistEntry;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class BuildMovieShowData
 {
@@ -36,7 +36,7 @@ class BuildMovieShowData
                 ->pluck('movie_list_id');
 
             // Friend activity on this movie
-            $followingIds = User::find($userId)->following()->pluck('users.id');
+            $followingIds = DB::table('follows')->where('follower_id', $userId)->pluck('following_id');
 
             if ($followingIds->isNotEmpty()) {
                 $friendRatings = Rating::with('user')
