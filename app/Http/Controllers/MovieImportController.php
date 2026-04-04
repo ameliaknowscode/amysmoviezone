@@ -43,7 +43,7 @@ class MovieImportController extends Controller
         $errors   = [];
         $row      = 1;
 
-        $maxYear = (int) date('Y') + 5;
+        $maxYear = now()->addYears(5)->year;
 
         while (($line = fgetcsv($handle)) !== false) {
             $row++;

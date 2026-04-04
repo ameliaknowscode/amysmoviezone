@@ -19,13 +19,12 @@ class ReviewLikeController extends Controller
             return back();
         }
 
-        $alreadyLiked = ReviewLike::where('user_id', $user->id)
-            ->where('review_id', $review->id)
-            ->exists();
+        $like = ReviewLike::firstOrCreate([
+            'user_id'   => $user->id,
+            'review_id' => $review->id,
+        ]);
 
-        if (! $alreadyLiked) {
-            ReviewLike::create(['user_id' => $user->id, 'review_id' => $review->id]);
-
+        if ($like->wasRecentlyCreated) {
             // Notify the review author (load movie for the notification payload)
             $review->load('movie');
             $review->user->notify(new ReviewLiked($user, $review));
