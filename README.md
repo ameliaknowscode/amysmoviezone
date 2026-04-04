@@ -12,6 +12,7 @@ Built as a hands-on learning project for both Laravel and [Claude Code](https://
 - Watchlist (want to watch / watched)
 - Social feed — follow other users and see their activity
 - Custom movie lists (ranked or unranked)
+- Director Connections — explore shared cast members for multiple directors
 - Admin panel for managing movies, people, and credits
 
 ## Tech Stack
