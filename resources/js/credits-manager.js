@@ -1,3 +1,5 @@
+import Alpine from 'alpinejs';
+
 Alpine.data('creditsManager', (initialCredits, searchUrl) => ({
     credits: initialCredits,
     searchUrl,
