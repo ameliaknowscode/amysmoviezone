@@ -4,6 +4,8 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
+import './credits-manager';
+
 Alpine.start();
 
 import TomSelect from 'tom-select';

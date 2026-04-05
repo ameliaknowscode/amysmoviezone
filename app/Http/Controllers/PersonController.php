@@ -7,6 +7,8 @@ use App\Http\Requests\PersonRequest;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Type;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class PersonController extends Controller
@@ -83,6 +85,22 @@ class PersonController extends Controller
         $person->delete();
 
         return redirect()->route('admin.people.index')->with('success', 'Person deleted successfully.');
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+        $q = trim($request->query('q', ''));
+
+        if (mb_strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        return response()->json(
+            Person::where('name', 'like', '%' . $q . '%')
+                ->orderBy('name')
+                ->limit(15)
+                ->get(['id', 'name'])
+        );
     }
 
 }
