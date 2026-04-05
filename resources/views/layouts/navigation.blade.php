@@ -76,6 +76,9 @@
                             <x-dropdown-link :href="route('admin.types.index')">
                                 {{ __('Types') }}
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.credits.import')">
+                                {{ __('Import Credits') }}
+                            </x-dropdown-link>
                         </x-slot>
                     </x-dropdown>
                     </div>
@@ -270,6 +273,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.types.index')" :active="request()->routeIs('admin.types.*')" class="pl-8">
                 {{ __('— Types') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.credits.import')" :active="request()->routeIs('admin.credits.import')" class="pl-8">
+                {{ __('— Import Credits') }}
             </x-responsive-nav-link>
             @endif
             @endauth

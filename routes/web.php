@@ -16,6 +16,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\AdminCreditImportController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\MovieListController;
@@ -145,6 +146,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/credits/import', [AdminCreditImportController::class, 'create'])->name('credits.import');
 
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
