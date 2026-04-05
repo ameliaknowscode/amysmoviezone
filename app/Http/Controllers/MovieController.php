@@ -42,10 +42,9 @@ class MovieController extends Controller
 
     public function create()
     {
-        $people         = Person::orderBy('name')->get();
         $types          = Type::orderBy('name')->get();
-        $initialCredits = [['person_id' => '', 'type_id' => '', 'character' => '']];
-        return view('movies.create', compact('people', 'types', 'initialCredits'));
+        $initialCredits = [['person_id' => '', 'query' => '', 'type_id' => '', 'character' => '']];
+        return view('movies.create', compact('types', 'initialCredits'));
     }
 
     public function store(MovieRequest $request)
@@ -76,15 +75,15 @@ class MovieController extends Controller
 
     public function edit(Movie $movie)
     {
-        $people         = Person::orderBy('name')->get();
         $types          = Type::orderBy('name')->get();
-        $movie->load('credits');
+        $movie->load('credits.person');
         $initialCredits = $movie->credits->map(fn($c) => [
             'person_id' => (string) $c->person_id,
+            'query'     => $c->person->name,
             'type_id'   => (string) $c->type_id,
             'character' => $c->character ?? '',
         ])->values()->toArray();
-        return view('movies.edit', compact('movie', 'people', 'types', 'initialCredits'));
+        return view('movies.edit', compact('movie', 'types', 'initialCredits'));
     }
 
     public function update(MovieRequest $request, Movie $movie)

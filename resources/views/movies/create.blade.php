@@ -62,17 +62,38 @@
                             </div>
                         </div>
 
-                        <div x-data="{ credits: {{ Js::from(old('credits', $initialCredits)) }} }" class="mb-4">
+                        <div x-data="creditsManager({{ Js::from(old('credits', $initialCredits)) }}, '{{ route('admin.people.search') }}')" class="mb-4">
                             <label class="block font-medium text-sm text-gray-700 mb-2">Credits</label>
                             <template x-for="(row, i) in credits" :key="i">
                                 <div class="flex gap-2 mb-2 max-w-3xl items-center">
-                                    <select :name="`credits[${i}][person_id]`" x-model="row.person_id"
-                                        class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
-                                        <option value="">Select person…</option>
-                                        @foreach($people as $person)
-                                            <option value="{{ $person->id }}">{{ $person->name }}</option>
-                                        @endforeach
-                                    </select>
+                                    <div class="relative flex-1">
+                                        <input
+                                            type="text"
+                                            :value="row.query"
+                                            @input="searchPeople(row, $event.target.value)"
+                                            @keydown.escape="row.open = false"
+                                            @blur="setTimeout(() => row.open = false, 150)"
+                                            placeholder="Search person…"
+                                            autocomplete="off"
+                                            class="w-full border-gray-300 rounded-md shadow-sm text-sm"
+                                        >
+                                        <input type="hidden" :name="`credits[${i}][person_id]`" :value="row.person_id">
+                                        <input type="hidden" :name="`credits[${i}][query]`"     :value="row.query">
+                                        <div
+                                            x-show="row.open"
+                                            class="absolute z-10 left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto"
+                                            style="display: none;"
+                                        >
+                                            <template x-for="person in row.results" :key="person.id">
+                                                <button
+                                                    type="button"
+                                                    @click="selectPerson(row, person)"
+                                                    class="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50"
+                                                    x-text="person.name"
+                                                ></button>
+                                            </template>
+                                        </div>
+                                    </div>
                                     <select :name="`credits[${i}][type_id]`" x-model="row.type_id"
                                         class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
                                         <option value="">Select type…</option>
@@ -83,12 +104,12 @@
                                     <input type="text" :name="`credits[${i}][character]`" x-model="row.character"
                                         placeholder="Character (optional)"
                                         class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
-                                    <button type="button" @click="credits.splice(i, 1)"
+                                    <button type="button" @click="removeCredit(i)"
                                         class="text-red-500 hover:text-red-700 text-xl leading-none px-1"
                                         title="Remove">&times;</button>
                                 </div>
                             </template>
-                            <button type="button" @click="credits.push({ person_id: '', type_id: '', character: '' })"
+                            <button type="button" @click="addCredit()"
                                 class="mt-1 text-sm text-indigo-600 hover:underline">+ Add credit</button>
                         </div>
 
