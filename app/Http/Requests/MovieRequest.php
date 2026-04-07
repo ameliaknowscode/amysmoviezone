@@ -11,6 +11,13 @@ class MovieRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->filled('credits_json')) {
+            $this->merge(['credits' => json_decode($this->input('credits_json'), true) ?? []]);
+        }
+    }
+
     public function rules(): array
     {
         return [

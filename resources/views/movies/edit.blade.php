@@ -80,6 +80,7 @@
                         </div>
 
                         <div x-data="creditsManager({{ Js::from(old('credits', $initialCredits)) }}, '{{ route('admin.people.search') }}')" class="mb-4">
+                            <input type="hidden" name="credits_json" :value="JSON.stringify(credits)">
                             <label class="block font-medium text-sm text-gray-700 mb-2">Credits</label>
                             <template x-for="(row, i) in credits" :key="i">
                                 <div class="flex gap-2 mb-2 max-w-3xl items-center">
@@ -94,8 +95,6 @@
                                             autocomplete="off"
                                             class="w-full border-gray-300 rounded-md shadow-sm text-sm"
                                         >
-                                        <input type="hidden" :name="`credits[${i}][person_id]`" :value="row.person_id">
-                                        <input type="hidden" :name="`credits[${i}][query]`"     :value="row.query">
                                         <div
                                             x-show="row.open"
                                             class="absolute z-10 left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto"
@@ -111,14 +110,14 @@
                                             </template>
                                         </div>
                                     </div>
-                                    <select :name="`credits[${i}][type_id]`" x-model="row.type_id"
+                                    <select x-model="row.type_id"
                                         class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
                                         <option value="">Select type…</option>
                                         @foreach($types as $type)
                                             <option value="{{ $type->id }}">{{ $type->name }}</option>
                                         @endforeach
                                     </select>
-                                    <input type="text" :name="`credits[${i}][character]`" x-model="row.character"
+                                    <input type="text" x-model="row.character"
                                         placeholder="Character (optional)"
                                         class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
                                     <button type="button" @click="removeCredit(i)"
