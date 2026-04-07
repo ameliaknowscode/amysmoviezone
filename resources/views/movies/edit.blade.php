@@ -79,7 +79,7 @@
                             </div>
                         </div>
 
-                        <div x-data="creditsManager({{ Js::from(old('credits', $initialCredits)) }}, '{{ route('admin.people.search') }}')" class="mb-4">
+                        <div x-data="creditsManager({{ Js::from(old('credits_json') ? json_decode(old('credits_json'), true) : $initialCredits) }}, '{{ route('admin.people.search') }}')" class="mb-4">
                             <input type="hidden" name="credits_json" :value="JSON.stringify(credits)">
                             <label class="block font-medium text-sm text-gray-700 mb-2">Credits</label>
                             <template x-for="(row, i) in credits" :key="i">
