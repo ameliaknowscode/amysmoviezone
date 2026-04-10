@@ -32,6 +32,17 @@
                         @endif
                     </p>
 
+                    @if($genres->isNotEmpty())
+                        <div class="flex flex-wrap gap-1.5 mt-2">
+                            @foreach($genres as $genre)
+                                <a href="{{ route('movies.browse', ['genre' => $genre->slug]) }}"
+                                   class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-800 text-indigo-200 hover:bg-indigo-700 transition">
+                                    {{ $genre->name }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+
                     {{-- Rating + Stats --}}
                     <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4">
                         @if($ratingCount === 0)

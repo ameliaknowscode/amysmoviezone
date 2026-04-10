@@ -22,6 +22,17 @@
                            class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                 </div>
 
+                <div class="flex-1 min-w-[150px]">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Genre</label>
+                    <select name="genre"
+                            class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">Any</option>
+                        @foreach($genres as $g)
+                            <option value="{{ $g->slug }}" {{ $genre === $g->slug ? 'selected' : '' }}>{{ $g->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1">From year</label>
                     <select name="year_from"
