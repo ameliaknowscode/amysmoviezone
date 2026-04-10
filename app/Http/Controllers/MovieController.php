@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\BuildMovieShowData;
 use App\Actions\SyncCredits;
 use App\Http\Requests\MovieRequest;
+use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Type;
@@ -43,8 +44,9 @@ class MovieController extends Controller
     public function create()
     {
         $types          = Type::orderBy('name')->get();
+        $genres         = Genre::orderBy('name')->get();
         $initialCredits = [['person_id' => '', 'query' => '', 'type_id' => '', 'character' => '']];
-        return view('movies.create', compact('types', 'initialCredits'));
+        return view('movies.create', compact('types', 'genres', 'initialCredits'));
     }
 
     public function store(MovieRequest $request)
@@ -63,6 +65,7 @@ class MovieController extends Controller
         }
 
         SyncCredits::for($movie, $request->input('credits', []));
+        $movie->genres()->sync($validated['genres'] ?? []);
         Cache::forget('movies.release_years');
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie added successfully.');
@@ -76,14 +79,16 @@ class MovieController extends Controller
     public function edit(Movie $movie)
     {
         $types          = Type::orderBy('name')->get();
-        $movie->load('credits.person');
+        $genres         = Genre::orderBy('name')->get();
+        $movie->load('credits.person', 'genres');
         $initialCredits = $movie->credits->map(fn($c) => [
             'person_id' => (string) $c->person_id,
             'query'     => $c->person->name,
             'type_id'   => (string) $c->type_id,
             'character' => $c->character ?? '',
         ])->values()->toArray();
-        return view('movies.edit', compact('movie', 'types', 'initialCredits'));
+        $selectedGenres = $movie->genres->pluck('id')->toArray();
+        return view('movies.edit', compact('movie', 'types', 'genres', 'selectedGenres', 'initialCredits'));
     }
 
     public function update(MovieRequest $request, Movie $movie)
@@ -109,6 +114,7 @@ class MovieController extends Controller
         }
 
         SyncCredits::for($movie, $request->input('credits', []));
+        $movie->genres()->sync($validated['genres'] ?? []);
         Cache::forget('movies.release_years');
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie updated successfully.');

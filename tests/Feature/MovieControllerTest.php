@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Actor;
 use App\Models\Credit;
+use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Person;
 use App\Models\Type;
@@ -215,6 +216,53 @@ class MovieControllerTest extends TestCase
         ]);
     }
 
+    public function test_store_syncs_genres(): void
+    {
+        $user   = User::factory()->admin()->create();
+        $horror = Genre::factory()->create(['name' => 'Horror', 'slug' => 'horror']);
+        $drama  = Genre::factory()->create(['name' => 'Drama',  'slug' => 'drama']);
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'        => 'Scary Drama',
+                'release_year' => 2010,
+                'genres'       => [$horror->id, $drama->id],
+            ]);
+
+        $movie = Movie::where('title', 'Scary Drama')->firstOrFail();
+        $this->assertCount(2, $movie->genres);
+        $this->assertTrue($movie->genres->contains($horror));
+        $this->assertTrue($movie->genres->contains($drama));
+    }
+
+    public function test_store_with_no_genres_attaches_none(): void
+    {
+        $user = User::factory()->admin()->create();
+        Genre::factory()->create(['name' => 'Horror', 'slug' => 'horror']);
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'        => 'Genre-less Film',
+                'release_year' => 2010,
+            ]);
+
+        $movie = Movie::where('title', 'Genre-less Film')->firstOrFail();
+        $this->assertCount(0, $movie->genres);
+    }
+
+    public function test_store_rejects_invalid_genre_id(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'        => 'Bad Genre Film',
+                'release_year' => 2010,
+                'genres'       => [99999],
+            ])
+            ->assertSessionHasErrors('genres.0');
+    }
+
     // -------------------------------------------------------------------------
     // Update
     // -------------------------------------------------------------------------
@@ -295,6 +343,50 @@ class MovieControllerTest extends TestCase
             'movie_id'  => $movie->id,
             'person_id' => $person1->id,
         ]);
+    }
+
+    public function test_update_syncs_genres(): void
+    {
+        $user   = User::factory()->admin()->create();
+        $movie  = Movie::factory()->create();
+        $horror = Genre::factory()->create(['name' => 'Horror', 'slug' => 'horror']);
+        $drama  = Genre::factory()->create(['name' => 'Drama',  'slug' => 'drama']);
+        $sci_fi = Genre::factory()->create(['name' => 'Sci-Fi', 'slug' => 'sci-fi']);
+
+        // Start with Horror attached
+        $movie->genres()->sync([$horror->id]);
+
+        // Update to Drama + Sci-Fi, removing Horror
+        $this->actingAs($user)
+            ->patch(route('admin.movies.update', $movie), [
+                'title'        => $movie->title,
+                'release_year' => $movie->release_year,
+                'genres'       => [$drama->id, $sci_fi->id],
+            ]);
+
+        $movie->refresh();
+        $this->assertCount(2, $movie->genres);
+        $this->assertTrue($movie->genres->contains($drama));
+        $this->assertTrue($movie->genres->contains($sci_fi));
+        $this->assertFalse($movie->genres->contains($horror));
+    }
+
+    public function test_update_with_no_genres_detaches_all(): void
+    {
+        $user   = User::factory()->admin()->create();
+        $movie  = Movie::factory()->create();
+        $horror = Genre::factory()->create(['name' => 'Horror', 'slug' => 'horror']);
+
+        $movie->genres()->sync([$horror->id]);
+
+        $this->actingAs($user)
+            ->patch(route('admin.movies.update', $movie), [
+                'title'        => $movie->title,
+                'release_year' => $movie->release_year,
+            ]);
+
+        $movie->refresh();
+        $this->assertCount(0, $movie->genres);
     }
 
     // -------------------------------------------------------------------------

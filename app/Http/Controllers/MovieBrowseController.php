@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Type;
 use App\Models\WatchlistEntry;
@@ -19,6 +20,7 @@ class MovieBrowseController extends Controller
         $director = trim($request->query('director', ''));
         $yearFrom = $request->query('year_from');
         $yearTo   = $request->query('year_to');
+        $genre    = trim($request->query('genre', ''));
         $sort     = in_array($request->query('sort'), self::VALID_SORTS)
                         ? $request->query('sort') : 'rating';
 
@@ -34,6 +36,10 @@ class MovieBrowseController extends Controller
 
         if ($yearTo) {
             $query->where('release_year', '<=', $yearTo);
+        }
+
+        if ($genre) {
+            $query->whereHas('genres', fn($q) => $q->where('slug', $genre));
         }
 
         if ($director) {
@@ -58,14 +64,17 @@ class MovieBrowseController extends Controller
             default        => $query->orderByDesc('ratings_avg_stars')->orderBy('title'),
         };
 
-        $years      = Cache::remember('movies.release_years', now()->addDay(), fn() =>
+        $years  = Cache::remember('movies.release_years', now()->addDay(), fn() =>
             Movie::whereNotNull('release_year')->distinct()->orderByDesc('release_year')->pluck('release_year')
         );
+        $genres = Cache::remember('genres.all', now()->addDay(), fn() =>
+            Genre::orderBy('name')->get()
+        );
         $movies     = $query->paginate(72)->withQueryString();
-        $hasFilters = $search || $director || $yearFrom || $yearTo || $sort !== 'rating';
+        $hasFilters = $search || $director || $yearFrom || $yearTo || $genre || $sort !== 'rating';
 
         return view('movies.browse', compact(
-            'movies', 'search', 'director', 'yearFrom', 'yearTo', 'sort', 'years', 'hasFilters'
+            'movies', 'search', 'director', 'yearFrom', 'yearTo', 'genre', 'sort', 'years', 'genres', 'hasFilters'
         ));
     }
 }

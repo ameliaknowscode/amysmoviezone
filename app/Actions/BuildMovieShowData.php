@@ -16,7 +16,10 @@ class BuildMovieShowData
 {
     public static function for(Movie $movie, ?int $userId): array
     {
-        $movie->load(['credits' => fn($q) => $q->with(['person', 'type'])->orderBy('id')]);
+        $movie->load([
+            'credits' => fn($q) => $q->with(['person', 'type'])->orderBy('id'),
+            'genres',
+        ]);
 
         $userRating         = null;
         $userWatchlistEntry = null;
@@ -115,6 +118,7 @@ class BuildMovieShowData
 
         return [
             'movie'              => $movie,
+            'genres'             => $movie->genres,
             'cast'               => $movie->getCast(),
             'crew'               => $movie->getCrew(),
             'userRating'         => $userRating,

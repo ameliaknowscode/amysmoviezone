@@ -11,6 +11,7 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\PersonCreditImportController;
 use App\Http\Controllers\PersonTypeCreditsController;
+use App\Http\Controllers\GenreController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
@@ -180,6 +181,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/types/{type}/edit', [TypeController::class, 'edit'])->name('types.edit');
         Route::patch('/types/{type}', [TypeController::class, 'update'])->name('types.update');
         Route::delete('/types/{type}', [TypeController::class, 'destroy'])->name('types.destroy');
+
+        Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
+        Route::get('/genres/create', [GenreController::class, 'create'])->name('genres.create');
+        Route::post('/genres', [GenreController::class, 'store'])->name('genres.store');
+        Route::get('/genres/{genre}/edit', [GenreController::class, 'edit'])->name('genres.edit');
+        Route::patch('/genres/{genre}', [GenreController::class, 'update'])->name('genres.update');
+        Route::delete('/genres/{genre}', [GenreController::class, 'destroy'])->name('genres.destroy');
     });
 });
 
