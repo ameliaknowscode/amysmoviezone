@@ -73,6 +73,9 @@
                             <x-dropdown-link :href="route('admin.people.index')">
                                 {{ __('People') }}
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.genres.index')">
+                                {{ __('Genres') }}
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.types.index')">
                                 {{ __('Types') }}
                             </x-dropdown-link>
@@ -270,6 +273,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.people.index')" :active="request()->routeIs('admin.people.*')" class="pl-8">
                 {{ __('— People') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.genres.index')" :active="request()->routeIs('admin.genres.*')" class="pl-8">
+                {{ __('— Genres') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.types.index')" :active="request()->routeIs('admin.types.*')" class="pl-8">
                 {{ __('— Types') }}
