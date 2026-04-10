@@ -10,21 +10,22 @@ Built as a hands-on learning project for both Laravel and [Claude Code](https://
 - Personal diary — log watches with dates and written reviews
 - Star ratings and liked/disliked tracking
 - Watchlist (want to watch / watched)
+- Movies can be attached to Genres and filtered as such
 - Social feed — follow other users and see their activity
 - Custom movie lists (ranked or unranked)
 - Director Connections — explore shared cast members for multiple directors
-- Admin panel for managing movies, people, and credits
+- Admin panel for managing movies, people, genres, and credits
 
 ## Tech Stack
 
-- **PHP 8.2** / **Laravel 12**
+- **PHP 8.3** / **Laravel 13**
 - **MySQL**
 - **Tailwind CSS** / **Alpine.js** / **Vite**
 - **Laravel Queues** for background notifications
 
 ## Local Setup
 
-**Requirements:** PHP 8.2+, Composer, Node.js, MySQL
+**Requirements:** PHP 8.3+, Composer, Node.js, MySQL
 
 ```bash
 git clone https://github.com/ameliaknowscode/amysmoviezone.git
