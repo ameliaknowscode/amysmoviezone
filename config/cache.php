@@ -114,4 +114,17 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Serialization
+    |--------------------------------------------------------------------------
+    |
+    | By default, arbitrary PHP object deserialization from the cache is
+    | blocked as a security measure. If your application stores PHP objects
+    | in the cache, list the allowed classes here.
+    |
+    */
+
+    'serializable_classes' => [],
+
 ];

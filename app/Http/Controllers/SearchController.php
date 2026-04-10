@@ -14,7 +14,7 @@ class SearchController extends Controller
     public function search(Request $request)
     {
         $query          = $request->query('q', '');
-        $directorTypeId = Cache::rememberForever('director_type_id', fn() => Type::where('name', 'Director')->value('id'));
+        $directorTypeId = Cache::rememberForever('director_type_id.v2', fn() => Type::where('name', 'Director')->value('id'));
 
         $movies = $query
             ? Movie::where('title', 'like', '%' . $query . '%')
@@ -39,21 +39,28 @@ class SearchController extends Controller
 
     public function directorConnections(Request $request)
     {
-        $directorTypeId = Cache::rememberForever('director_type_id', fn() => Type::where('name', 'Director')->value('id'));
-        $actorTypeId    = Cache::rememberForever('actor_type_id',    fn() => Type::where('name', 'Actor')->value('id'));
+        // Keys versioned at .v2 — L12 cached Eloquent objects under the unversioned keys,
+        // which L13's deserialization security rejects. Versioned keys guarantee a clean start.
+        $directorTypeId = Cache::rememberForever('director_type_id.v2', fn() => Type::where('name', 'Director')->value('id'));
+        $actorTypeId    = Cache::rememberForever('actor_type_id.v2',    fn() => Type::where('name', 'Actor')->value('id'));
 
-        $allDirectors = Cache::remember('all_directors', now()->addHour(), fn() =>
-            Person::whereHas('credits', fn($q) => $q->where('type_id', $directorTypeId))
-                ->orderBy('name')
-                ->get()
-        );
+        // Cache as plain arrays (not Eloquent objects) to satisfy L13's cache deserialization policy.
+        $allDirectors = collect(
+            Cache::remember('all_directors.v2', now()->addHour(), fn() =>
+                Person::whereHas('credits', fn($q) => $q->where('type_id', $directorTypeId))
+                    ->orderBy('name')
+                    ->get(['id', 'name'])
+                    ->map(fn($p) => ['id' => $p->id, 'name' => $p->name])
+                    ->all()
+            )
+        )->map(fn($d) => (object) $d);
 
         // Build virtual group entries (e.g. The Coen Brothers) from config/director_groups.php.
         // Each group collapses multiple individual directors into one dropdown option.
         // $groupMemberIds maps group ID => [person IDs] for use in queries.
         $groupMemberIds = [];
         $directors      = $allDirectors;
-
+        
         foreach (config('director_groups') as $group) {
             $members = $allDirectors->whereIn('name', $group['members']);
             $groupMemberIds[$group['id']] = $members->pluck('id')->all();
@@ -78,9 +85,11 @@ class SearchController extends Controller
             )->filter()->values();
 
             // Cache actor intersection + connecting films per unique director combo (order-independent).
+            // Store only plain scalar arrays (not Eloquent objects) to satisfy L13's cache
+            // deserialization policy. Person models are re-queried cheaply by ID after cache hit.
             $sortedIds = collect($ids)->sort()->values()->implode('_');
-            ['actors' => $actors, 'filmsByActor' => $filmsByActor] = Cache::remember(
-                "director_connections.{$sortedIds}",
+            ['actorIds' => $actorIds, 'filmsByActor' => $filmsByActor] = Cache::remember(
+                "director_connections.v2.{$sortedIds}",
                 now()->addHour(),
                 function () use ($ids, $groupMemberIds, $directorTypeId, $actorTypeId) {
                     // For each slot, collect the movie IDs directed by that person (or group).
@@ -109,10 +118,8 @@ class SearchController extends Controller
                     );
 
                     if (!$sharedActorIds || $sharedActorIds->isEmpty()) {
-                        return ['actors' => collect(), 'filmsByActor' => []];
+                        return ['actorIds' => [], 'filmsByActor' => []];
                     }
-
-                    $actors = Person::whereIn('id', $sharedActorIds)->with('credits.type')->orderBy('name')->get();
 
                     // Build a map: actor_id => [director_id => [movie titles]]
                     $filmsByActor = [];
@@ -129,9 +136,14 @@ class SearchController extends Controller
                         }
                     }
 
-                    return ['actors' => $actors, 'filmsByActor' => $filmsByActor];
+                    return ['actorIds' => $sharedActorIds->all(), 'filmsByActor' => $filmsByActor];
                 }
             );
+
+            // Re-query Person models by the cached IDs (cheap PK lookup, not worth caching as objects).
+            $actors = !empty($actorIds)
+                ? Person::whereIn('id', $actorIds)->with('credits.type')->orderBy('name')->get()
+                : collect();
         }
 
         return view('director-connections', compact('directors', 'selectedDirectors', 'actors', 'filmsByActor'));
