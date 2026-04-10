@@ -62,6 +62,51 @@
                             </div>
                         </div>
 
+                        {{-- Additional Details --}}
+                        <div class="mb-6">
+                            <h3 class="font-medium text-sm text-gray-700 mb-3 border-b border-gray-200 pb-1">Additional Details</h3>
+
+                            <div class="mb-4">
+                                <label for="synopsis" class="block font-medium text-sm text-gray-700 mb-1">Synopsis</label>
+                                <textarea id="synopsis" name="synopsis" rows="4"
+                                    class="w-full max-w-2xl border-gray-300 rounded-md shadow-sm">{{ old('synopsis') }}</textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="runtime" class="block font-medium text-sm text-gray-700 mb-1">Runtime</label>
+                                <input type="number" id="runtime" name="runtime" value="{{ old('runtime') }}"
+                                    min="1" max="1440"
+                                    class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                                <p class="text-xs text-gray-400 mt-1">Enter in minutes (e.g. 102 for 1h 42m)</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="country" class="block font-medium text-sm text-gray-700 mb-1">Country</label>
+                                <input type="text" id="country" name="country" value="{{ old('country') }}"
+                                    class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="language" class="block font-medium text-sm text-gray-700 mb-1">Language</label>
+                                <input type="text" id="language" name="language" value="{{ old('language') }}"
+                                    class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="imdb_url" class="block font-medium text-sm text-gray-700 mb-1">IMDb URL</label>
+                                <input type="url" id="imdb_url" name="imdb_url" value="{{ old('imdb_url') }}"
+                                    placeholder="https://www.imdb.com/title/tt0000000/"
+                                    class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="letterboxd_url" class="block font-medium text-sm text-gray-700 mb-1">Letterboxd URL</label>
+                                <input type="url" id="letterboxd_url" name="letterboxd_url" value="{{ old('letterboxd_url') }}"
+                                    placeholder="https://letterboxd.com/film/movie-slug/"
+                                    class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                            </div>
+                        </div>
+
                         <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700 mb-2">Genres</label>
                             <div class="flex flex-wrap gap-x-6 gap-y-2 max-w-3xl">

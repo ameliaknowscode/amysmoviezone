@@ -14,8 +14,14 @@ class MovieFactory extends Factory
     public function definition(): array
     {
         return [
-            'title'        => fake()->sentence(3, false),
-            'release_year' => fake()->numberBetween(1950, 2024),
+            'title'          => fake()->sentence(3, false),
+            'release_year'   => fake()->numberBetween(1950, 2024),
+            'synopsis'       => null,
+            'runtime'        => null,
+            'country'        => null,
+            'language'       => null,
+            'imdb_url'       => null,
+            'letterboxd_url' => null,
         ];
     }
 

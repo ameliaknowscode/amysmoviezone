@@ -54,9 +54,15 @@ class MovieController extends Controller
         $validated = $request->validated();
 
         $movie = Movie::create([
-            'title'        => $validated['title'],
-            'slug'         => Str::slug($validated['title']),
-            'release_year' => $validated['release_year'],
+            'title'          => $validated['title'],
+            'slug'           => Str::slug($validated['title']),
+            'release_year'   => $validated['release_year'],
+            'synopsis'       => $validated['synopsis'] ?? null,
+            'runtime'        => $validated['runtime'] ?? null,
+            'country'        => $validated['country'] ?? null,
+            'language'       => $validated['language'] ?? null,
+            'imdb_url'       => $validated['imdb_url'] ?? null,
+            'letterboxd_url' => $validated['letterboxd_url'] ?? null,
         ]);
 
         if ($request->hasFile('poster')) {
@@ -96,9 +102,15 @@ class MovieController extends Controller
         $validated = $request->validated();
 
         $movie->update([
-            'title'        => $validated['title'],
-            'slug'         => Str::slug($validated['title']),
-            'release_year' => $validated['release_year'],
+            'title'          => $validated['title'],
+            'slug'           => Str::slug($validated['title']),
+            'release_year'   => $validated['release_year'],
+            'synopsis'       => $validated['synopsis'] ?? null,
+            'runtime'        => $validated['runtime'] ?? null,
+            'country'        => $validated['country'] ?? null,
+            'language'       => $validated['language'] ?? null,
+            'imdb_url'       => $validated['imdb_url'] ?? null,
+            'letterboxd_url' => $validated['letterboxd_url'] ?? null,
         ]);
 
         if ($request->boolean('remove_poster') && $movie->poster) {

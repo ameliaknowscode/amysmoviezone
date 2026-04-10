@@ -14,7 +14,10 @@ class Movie extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'slug', 'release_year', 'poster'];
+    protected $fillable = [
+        'title', 'slug', 'release_year', 'poster',
+        'synopsis', 'runtime', 'country', 'language', 'imdb_url', 'letterboxd_url',
+    ];
 
     public function genres(): BelongsToMany
     {
