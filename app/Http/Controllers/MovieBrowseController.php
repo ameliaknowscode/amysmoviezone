@@ -67,9 +67,9 @@ class MovieBrowseController extends Controller
         $years  = Cache::remember('movies.release_years', now()->addDay(), fn() =>
             Movie::whereNotNull('release_year')->distinct()->orderByDesc('release_year')->pluck('release_year')
         );
-        $genres = Cache::remember('genres.all', now()->addDay(), fn() =>
-            Genre::orderBy('name')->get()
-        );
+        $genres = collect(Cache::remember('genres.all', now()->addDay(), fn() =>
+            Genre::orderBy('name')->get()->map(fn($g) => ['id' => $g->id, 'name' => $g->name, 'slug' => $g->slug])->all()
+        ))->map(fn($g) => (object) $g);
         $movies     = $query->paginate(72)->withQueryString();
         $hasFilters = $search || $director || $yearFrom || $yearTo || $genre || $sort !== 'rating';
 
