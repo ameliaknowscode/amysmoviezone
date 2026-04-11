@@ -160,21 +160,55 @@
                             @endif
 
                             @if($listType === 'watched')
-                                <form method="POST" action="{{ route('movies.watchlist.destroy', $movie) }}">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-500 transition font-medium">
-                                        <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                        Watched
-                                    </button>
-                                </form>
+                                <div x-data="{ editing: false }">
+                                    <div class="flex items-center gap-2">
+                                        <form method="POST" action="{{ route('movies.watchlist.destroy', $movie) }}">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-500 transition font-medium">
+                                                <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                Watched
+                                            </button>
+                                        </form>
+                                        <button @click="editing = !editing"
+                                                class="text-xs text-indigo-300 hover:text-white transition">
+                                            @if($userWatchlistEntry->watched_at)
+                                                {{ $userWatchlistEntry->watched_at->format('j M Y') }}
+                                            @else
+                                                + add date
+                                            @endif
+                                        </button>
+                                    </div>
+                                    <form x-show="editing" x-cloak method="POST"
+                                          action="{{ route('movies.watchlist.watched-at', $movie) }}"
+                                          class="flex items-center gap-2 mt-2">
+                                        @csrf @method('PATCH')
+                                        <input type="date" name="watched_at"
+                                               value="{{ $userWatchlistEntry->watched_at?->format('Y-m-d') }}"
+                                               max="{{ now()->format('Y-m-d') }}"
+                                               class="text-xs rounded border border-indigo-700 bg-indigo-950 text-indigo-100 px-2 py-1 focus:outline-none focus:border-indigo-400">
+                                        <button type="submit" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium transition">Save</button>
+                                        <button type="button" @click="editing = false" class="text-xs text-indigo-400 hover:text-indigo-200 transition">Cancel</button>
+                                    </form>
+                                </div>
                             @else
-                                <form method="POST" action="{{ route('movies.watchlist.store', $movie) }}">
-                                    @csrf
-                                    <input type="hidden" name="list_type" value="watched">
-                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-indigo-700 text-indigo-200 hover:border-indigo-400 hover:text-white transition font-medium">
+                                <div x-data="{ open: false }">
+                                    <button @click="open = true"
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-indigo-700 text-indigo-200 hover:border-indigo-400 hover:text-white transition font-medium">
                                         + Watched
                                     </button>
-                                </form>
+                                    <form x-show="open" x-cloak method="POST"
+                                          action="{{ route('movies.watchlist.store', $movie) }}"
+                                          class="flex items-center gap-2 mt-2">
+                                        @csrf
+                                        <input type="hidden" name="list_type" value="watched">
+                                        <input type="date" name="watched_at"
+                                               value="{{ now()->format('Y-m-d') }}"
+                                               max="{{ now()->format('Y-m-d') }}"
+                                               class="text-xs rounded border border-indigo-700 bg-indigo-950 text-indigo-100 px-2 py-1 focus:outline-none focus:border-indigo-400">
+                                        <button type="submit" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium transition">Mark Watched</button>
+                                        <button type="button" @click="open = false" class="text-xs text-indigo-400 hover:text-indigo-200 transition">Cancel</button>
+                                    </form>
+                                </div>
                             @endif
 
                             <a href="#reviews" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-indigo-300 hover:text-white transition">
@@ -452,6 +486,11 @@
 
                             {{-- Current user's reviews --}}
                             @auth
+                            @if($userReviews->isNotEmpty())
+                                <div class="px-5 py-2 bg-gray-50 text-xs text-gray-400">
+                                    You've watched this {{ $userReviews->count() }} {{ Str::plural('time', $userReviews->count()) }}
+                                </div>
+                            @endif
                             @foreach($userReviews as $userReview)
                             <div x-data="{ editing: false }" class="px-5 py-4">
                                 <div class="flex gap-3">
@@ -481,6 +520,9 @@
                                                 @endif
                                                 @if($userReview->watched_at)
                                                     <span class="text-xs text-gray-400">watched {{ $userReview->watched_at->format('j M Y') }}</span>
+                                                @endif
+                                                @if($userReview->is_rewatch)
+                                                    <span class="text-xs text-indigo-500 border border-indigo-200 rounded px-1.5 py-0.5 leading-none">Rewatch</span>
                                                 @endif
                                                 <button @click="editing = true"
                                                         class="text-xs text-indigo-500 hover:text-indigo-700 transition underline">

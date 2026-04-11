@@ -46,6 +46,9 @@
                     <x-nav-link :href="route('watchlist.index')" :active="request()->routeIs('watchlist.*')">
                         {{ __('My Watchlist') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('stats.show')" :active="request()->routeIs('stats.*')">
+                        {{ __('Stats') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('feed')" :active="request()->routeIs('feed')">
                         {{ __('Activity') }}
                     </x-nav-link>
@@ -254,6 +257,9 @@
             <div class="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-widest text-gray-400">My Zone</div>
             <x-responsive-nav-link :href="route('watchlist.index')" :active="request()->routeIs('watchlist.*')">
                 {{ __('My Watchlist') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('stats.show')" :active="request()->routeIs('stats.*')">
+                {{ __('Stats') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('feed')" :active="request()->routeIs('feed')">
                 {{ __('Activity') }}

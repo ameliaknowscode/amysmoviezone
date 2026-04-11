@@ -38,19 +38,43 @@ class WatchlistController extends Controller
     public function store(Request $request, Movie $movie): RedirectResponse
     {
         $validated = $request->validate([
-            'list_type' => ['required', 'in:want_to_watch,watched'],
+            'list_type'  => ['required', 'in:want_to_watch,watched'],
+            'watched_at' => ['nullable', 'date', 'before_or_equal:today'],
         ]);
 
-        // If already in the other list, update; otherwise create
+        $attributes = ['list_type' => $validated['list_type']];
+
+        if ($validated['list_type'] === WatchlistEntry::WATCHED) {
+            $attributes['watched_at'] = $validated['watched_at'] ?? null;
+        } else {
+            $attributes['watched_at'] = null;
+        }
+
         WatchlistEntry::updateOrCreate(
             ['user_id' => $request->user()->id, 'movie_id' => $movie->id],
-            ['list_type' => $validated['list_type']],
+            $attributes,
         );
 
         Cache::forget("user.{$request->user()->id}.profile_stats");
         Cache::forget("movie.{$movie->id}.stats");
 
         return back()->with('status', 'watchlist-updated');
+    }
+
+    public function updateWatchedAt(Request $request, Movie $movie): RedirectResponse
+    {
+        $validated = $request->validate([
+            'watched_at' => ['nullable', 'date', 'before_or_equal:today'],
+        ]);
+
+        WatchlistEntry::where('user_id', $request->user()->id)
+            ->where('movie_id', $movie->id)
+            ->where('list_type', WatchlistEntry::WATCHED)
+            ->update(['watched_at' => $validated['watched_at']]);
+
+        Cache::forget("user.{$request->user()->id}.profile_stats");
+
+        return back()->with('status', 'watched-at-updated');
     }
 
     public function destroy(Request $request, Movie $movie): RedirectResponse

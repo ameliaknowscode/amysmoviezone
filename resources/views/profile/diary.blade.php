@@ -48,13 +48,24 @@
 
                                 {{-- Details --}}
                                 <div class="flex-1 min-w-0">
-                                    <div class="flex items-baseline gap-2">
+                                    <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                                         <a href="{{ $entry->movie->publicUrl() }}"
                                            class="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors">
                                             {{ $entry->movie->title }}
                                         </a>
                                         @if($entry->movie->release_year)
                                             <span class="text-xs text-gray-400">{{ $entry->movie->release_year }}</span>
+                                        @endif
+                                        @if($entry->is_rewatch)
+                                            <span class="text-xs text-indigo-500 border border-indigo-200 rounded px-1.5 py-0.5 leading-none">Rewatch</span>
+                                        @endif
+                                        @php $rating = $diaryRatings->get($entry->movie_id); @endphp
+                                        @if($rating)
+                                            <span class="text-xs leading-none">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <span class="{{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
+                                                @endfor
+                                            </span>
                                         @endif
                                     </div>
                                     @if($entry->body)

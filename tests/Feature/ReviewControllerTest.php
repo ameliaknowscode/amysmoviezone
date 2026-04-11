@@ -66,6 +66,63 @@ class ReviewControllerTest extends TestCase
         $this->assertDatabaseCount('reviews', 2);
     }
 
+    // -------------------------------------------------------------------------
+    // Rewatch detection
+    // -------------------------------------------------------------------------
+
+    public function test_first_log_is_not_marked_as_rewatch(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('movies.review.store', $movie), ['body' => 'First watch.']);
+
+        $this->assertDatabaseHas('reviews', [
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'is_rewatch' => false,
+        ]);
+    }
+
+    public function test_second_log_is_marked_as_rewatch(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        Review::factory()->create(['user_id' => $user->id, 'movie_id' => $movie->id]);
+
+        $this->actingAs($user)
+            ->post(route('movies.review.store', $movie), ['body' => 'Rewatch.']);
+
+        $this->assertDatabaseHas('reviews', [
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'body'       => 'Rewatch.',
+            'is_rewatch' => true,
+        ]);
+    }
+
+    public function test_rewatch_flag_is_per_user_not_per_movie(): void
+    {
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        // user1 has already logged the movie
+        Review::factory()->create(['user_id' => $user1->id, 'movie_id' => $movie->id]);
+
+        // user2 logs it for the first time — should NOT be flagged as rewatch
+        $this->actingAs($user2)
+            ->post(route('movies.review.store', $movie), ['body' => 'My first watch.']);
+
+        $this->assertDatabaseHas('reviews', [
+            'user_id'    => $user2->id,
+            'movie_id'   => $movie->id,
+            'is_rewatch' => false,
+        ]);
+    }
+
     public function test_watched_at_defaults_to_today_if_not_provided(): void
     {
         $user  = User::factory()->create();

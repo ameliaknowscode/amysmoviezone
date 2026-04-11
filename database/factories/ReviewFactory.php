@@ -19,6 +19,7 @@ class ReviewFactory extends Factory
             'movie_id'   => Movie::factory(),
             'body'       => fake()->paragraph(),
             'watched_at' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
+            'is_rewatch' => false,
         ];
     }
 }
