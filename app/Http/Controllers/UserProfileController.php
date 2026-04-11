@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MovieList;
 use App\Models\Rating;
+use App\Models\Review;
 use App\Models\User;
 use App\Models\WatchlistEntry;
 use Illuminate\Support\Facades\Auth;
@@ -86,6 +87,8 @@ class UserProfileController extends Controller
         $paginator = null;
         $entries   = null;
 
+        $diaryRatings = collect();
+
         if (! ($profileUser->profile_private && Auth::id() !== $profileUser->id)) {
             $paginator = $profileUser->reviews()
                 ->with('movie')
@@ -96,9 +99,19 @@ class UserProfileController extends Controller
 
             $entries = $paginator->getCollection()
                 ->groupBy(fn($r) => $r->watched_at->format('Y-m'));
+
+            $movieIds = $paginator->getCollection()->pluck('movie_id')->unique();
+
+            if ($movieIds->isNotEmpty()) {
+                $diaryRatings = Rating::where('user_id', $profileUser->id)
+                    ->whereIn('movie_id', $movieIds)
+                    ->whereNotNull('stars')
+                    ->get()
+                    ->keyBy('movie_id');
+            }
         }
 
-        return view('profile.diary', compact('profileUser', 'entries', 'paginator'));
+        return view('profile.diary', compact('profileUser', 'entries', 'paginator', 'diaryRatings'));
     }
 
     public function watchlist(string $username): View

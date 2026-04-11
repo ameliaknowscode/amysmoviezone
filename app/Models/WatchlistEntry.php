@@ -13,7 +13,9 @@ class WatchlistEntry extends Model
     const WANT_TO_WATCH = 'want_to_watch';
     const WATCHED       = 'watched';
 
-    protected $fillable = ['user_id', 'movie_id', 'list_type'];
+    protected $fillable = ['user_id', 'movie_id', 'list_type', 'watched_at'];
+
+    protected $casts = ['watched_at' => 'date'];
 
     public function user(): BelongsTo
     {

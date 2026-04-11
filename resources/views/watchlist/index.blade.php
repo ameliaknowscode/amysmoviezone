@@ -90,6 +90,9 @@
                                         {{ $entry->movie->title }}
                                     </a>
                                     <p class="text-xs text-gray-500">{{ $entry->movie->release_year }}</p>
+                                    @if($entry->watched_at)
+                                        <p class="text-xs text-gray-400 mt-0.5">Watched {{ $entry->watched_at->format('j M Y') }}</p>
+                                    @endif
                                     @if($rating)
                                     <div class="flex items-center gap-2 mt-1">
                                         @if($rating->stars)

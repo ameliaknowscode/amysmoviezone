@@ -11,10 +11,11 @@ class Review extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'movie_id', 'body', 'watched_at'];
+    protected $fillable = ['user_id', 'movie_id', 'body', 'watched_at', 'is_rewatch'];
 
     protected $casts = [
         'watched_at' => 'date',
+        'is_rewatch' => 'boolean',
     ];
 
     public function user(): BelongsTo

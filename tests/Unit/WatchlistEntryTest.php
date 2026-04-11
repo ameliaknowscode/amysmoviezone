@@ -24,7 +24,22 @@ class WatchlistEntryTest extends TestCase
     {
         $entry = new WatchlistEntry();
 
-        $this->assertEquals(['user_id', 'movie_id', 'list_type'], $entry->getFillable());
+        $this->assertEquals(['user_id', 'movie_id', 'list_type', 'watched_at'], $entry->getFillable());
+    }
+
+    public function test_watched_at_is_cast_to_date(): void
+    {
+        $entry = WatchlistEntry::factory()->watched()->create(['watched_at' => '2025-06-15']);
+
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $entry->watched_at);
+        $this->assertEquals('2025-06-15', $entry->watched_at->format('Y-m-d'));
+    }
+
+    public function test_watched_at_is_nullable(): void
+    {
+        $entry = WatchlistEntry::factory()->watched()->create(['watched_at' => null]);
+
+        $this->assertNull($entry->watched_at);
     }
 
     public function test_watchlist_entry_belongs_to_user(): void

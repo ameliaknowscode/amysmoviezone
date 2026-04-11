@@ -28,6 +28,7 @@ use App\Http\Controllers\RecommendationsController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\StatsController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -140,8 +141,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
+    Route::get('/stats', [StatsController::class, 'show'])->name('stats.show');
     Route::get('/watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
     Route::post('/movies/{movie}/watchlist', [WatchlistController::class, 'store'])->name('movies.watchlist.store');
+    Route::patch('/movies/{movie}/watchlist/watched-at', [WatchlistController::class, 'updateWatchedAt'])->name('movies.watchlist.watched-at');
     Route::delete('/movies/{movie}/watchlist', [WatchlistController::class, 'destroy'])->name('movies.watchlist.destroy');
     Route::patch('/watchlist/privacy', [WatchlistController::class, 'updatePrivacy'])->name('watchlist.privacy');
 

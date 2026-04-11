@@ -18,13 +18,18 @@ class ReviewController extends Controller
             'watched_at' => ['nullable', 'date'],
         ]);
 
+        $userId = $request->user()->id;
+
+        $isRewatch = $movie->reviews()->where('user_id', $userId)->exists();
+
         $movie->reviews()->create([
-            'user_id'    => $request->user()->id,
+            'user_id'    => $userId,
             'body'       => $validated['body'] ?? null,
             'watched_at' => $validated['watched_at'] ?? now()->toDateString(),
+            'is_rewatch' => $isRewatch,
         ]);
 
-        Cache::forget("user.{$request->user()->id}.profile_stats");
+        Cache::forget("user.{$userId}.profile_stats");
 
         // Notify followers who have also logged this movie (lazy chunks to avoid memory spike)
         $request->user()

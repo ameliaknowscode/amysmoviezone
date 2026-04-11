@@ -24,7 +24,22 @@ class ReviewTest extends TestCase
     {
         $review = new Review();
 
-        $this->assertEquals(['user_id', 'movie_id', 'body', 'watched_at'], $review->getFillable());
+        $this->assertEquals(['user_id', 'movie_id', 'body', 'watched_at', 'is_rewatch'], $review->getFillable());
+    }
+
+    public function test_is_rewatch_is_cast_to_boolean(): void
+    {
+        $review = Review::factory()->create(['is_rewatch' => true]);
+
+        $this->assertIsBool($review->is_rewatch);
+        $this->assertTrue($review->is_rewatch);
+    }
+
+    public function test_is_rewatch_defaults_to_false(): void
+    {
+        $review = Review::factory()->create();
+
+        $this->assertFalse($review->is_rewatch);
     }
 
     public function test_review_belongs_to_a_user(): void

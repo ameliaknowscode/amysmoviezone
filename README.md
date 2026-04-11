@@ -8,9 +8,11 @@ Built as a hands-on learning project for both Laravel and [Claude Code](https://
 
 - Movie catalog with cast and crew credits
 - Personal diary — log watches with dates and written reviews
+- Rewatch tracking — second and subsequent logs are flagged as rewatches, shown in the diary and on movie pages
 - Star ratings and liked/disliked tracking
-- Watchlist (want to watch / watched)
-- Movies can be attached to Genres and filtered as such
+- Watchlist (want to watch / watched) with watch date recording
+- Personal stats page — films by decade, by year watched, top genres, top directors, rating distribution
+- Movies can be attached to genres and browsed by genre
 - Social feed — follow other users and see their activity
 - Custom movie lists (ranked or unranked)
 - Director Connections — explore shared cast members for multiple directors
@@ -60,6 +62,8 @@ The app will be available at `http://localhost:8000`.
 ```bash
 php artisan db:seed
 ```
+
+To also seed rich stats/diary data for a specific account, set `SEED_PRIMARY_USER` in `.env` to that user's email before running the seeder.
 
 ## Queue Worker
 

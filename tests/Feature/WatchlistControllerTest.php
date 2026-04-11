@@ -143,6 +143,133 @@ class WatchlistControllerTest extends TestCase
             ->assertSessionHasErrors('list_type');
     }
 
+    public function test_store_saves_watched_at_when_marking_as_watched(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        $this->actingAs($user)->post(route('movies.watchlist.store', $movie), [
+            'list_type'  => 'watched',
+            'watched_at' => '2025-03-10',
+        ]);
+
+        $this->assertDatabaseHas('watchlist_entries', [
+            'user_id'   => $user->id,
+            'movie_id'  => $movie->id,
+            'list_type' => 'watched',
+        ]);
+        $entry = WatchlistEntry::where('user_id', $user->id)->where('movie_id', $movie->id)->first();
+        $this->assertEquals('2025-03-10', $entry->watched_at->format('Y-m-d'));
+    }
+
+    public function test_store_clears_watched_at_when_marking_as_want_to_watch(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        WatchlistEntry::factory()->create([
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'list_type'  => WatchlistEntry::WATCHED,
+            'watched_at' => '2025-03-10',
+        ]);
+
+        $this->actingAs($user)->post(route('movies.watchlist.store', $movie), [
+            'list_type' => 'want_to_watch',
+        ]);
+
+        $this->assertDatabaseHas('watchlist_entries', [
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'list_type'  => 'want_to_watch',
+            'watched_at' => null,
+        ]);
+    }
+
+    public function test_store_rejects_future_watched_at_date(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        $this->actingAs($user)->post(route('movies.watchlist.store', $movie), [
+            'list_type'  => 'watched',
+            'watched_at' => now()->addDay()->format('Y-m-d'),
+        ])->assertSessionHasErrors('watched_at');
+    }
+
+    // -------------------------------------------------------------------------
+    // Update watched_at
+    // -------------------------------------------------------------------------
+
+    public function test_user_can_update_watched_at_date(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+        WatchlistEntry::factory()->create([
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'list_type'  => WatchlistEntry::WATCHED,
+            'watched_at' => '2025-01-01',
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('movies.watchlist.watched-at', $movie), ['watched_at' => '2025-06-15'])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('watchlist_entries', [
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'watched_at' => '2025-06-15',
+        ]);
+    }
+
+    public function test_user_can_clear_watched_at_date(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+        WatchlistEntry::factory()->create([
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'list_type'  => WatchlistEntry::WATCHED,
+            'watched_at' => '2025-01-01',
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('movies.watchlist.watched-at', $movie), ['watched_at' => null])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('watchlist_entries', [
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'watched_at' => null,
+        ]);
+    }
+
+    public function test_unauthenticated_user_cannot_update_watched_at(): void
+    {
+        $movie = Movie::factory()->create();
+
+        $this->patch(route('movies.watchlist.watched-at', $movie), ['watched_at' => '2025-06-15'])
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_update_watched_at_rejects_future_date(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+        WatchlistEntry::factory()->create([
+            'user_id'   => $user->id,
+            'movie_id'  => $movie->id,
+            'list_type' => WatchlistEntry::WATCHED,
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('movies.watchlist.watched-at', $movie), [
+                'watched_at' => now()->addDay()->format('Y-m-d'),
+            ])
+            ->assertSessionHasErrors('watched_at');
+    }
+
     // -------------------------------------------------------------------------
     // Destroy
     // -------------------------------------------------------------------------
