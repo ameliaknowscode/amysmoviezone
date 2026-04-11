@@ -216,6 +216,105 @@ class MovieControllerTest extends TestCase
         ]);
     }
 
+    public function test_store_saves_rich_fields(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'          => 'Rich Movie',
+                'release_year'   => 2000,
+                'synopsis'       => 'A gripping tale of adventure.',
+                'runtime'        => 102,
+                'country'        => 'USA',
+                'language'       => 'English',
+                'imdb_url'       => 'https://www.imdb.com/title/tt0000000/',
+                'letterboxd_url' => 'https://letterboxd.com/film/rich-movie/',
+            ]);
+
+        $this->assertDatabaseHas('movies', [
+            'title'          => 'Rich Movie',
+            'synopsis'       => 'A gripping tale of adventure.',
+            'runtime'        => 102,
+            'country'        => 'USA',
+            'language'       => 'English',
+            'imdb_url'       => 'https://www.imdb.com/title/tt0000000/',
+            'letterboxd_url' => 'https://letterboxd.com/film/rich-movie/',
+        ]);
+    }
+
+    public function test_store_accepts_null_rich_fields(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'        => 'Minimal Movie',
+                'release_year' => 2000,
+            ])
+            ->assertRedirect(route('admin.movies.index'));
+
+        $movie = Movie::where('title', 'Minimal Movie')->firstOrFail();
+        $this->assertNull($movie->synopsis);
+        $this->assertNull($movie->runtime);
+        $this->assertNull($movie->country);
+        $this->assertNull($movie->language);
+        $this->assertNull($movie->imdb_url);
+        $this->assertNull($movie->letterboxd_url);
+    }
+
+    public function test_store_rejects_invalid_runtime(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'        => 'Bad Runtime Movie',
+                'release_year' => 2000,
+                'runtime'      => 'not-a-number',
+            ])
+            ->assertSessionHasErrors('runtime');
+    }
+
+    public function test_store_rejects_zero_runtime(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'        => 'Zero Runtime Movie',
+                'release_year' => 2000,
+                'runtime'      => 0,
+            ])
+            ->assertSessionHasErrors('runtime');
+    }
+
+    public function test_store_rejects_invalid_imdb_url(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'        => 'Bad IMDb Movie',
+                'release_year' => 2000,
+                'imdb_url'     => 'not-a-url',
+            ])
+            ->assertSessionHasErrors('imdb_url');
+    }
+
+    public function test_store_rejects_invalid_letterboxd_url(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.store'), [
+                'title'          => 'Bad Letterboxd Movie',
+                'release_year'   => 2000,
+                'letterboxd_url' => 'not-a-url',
+            ])
+            ->assertSessionHasErrors('letterboxd_url');
+    }
+
     public function test_store_syncs_genres(): void
     {
         $user   = User::factory()->admin()->create();
@@ -345,6 +444,58 @@ class MovieControllerTest extends TestCase
         ]);
     }
 
+    public function test_update_saves_rich_fields(): void
+    {
+        $user  = User::factory()->admin()->create();
+        $movie = Movie::factory()->create();
+
+        $this->actingAs($user)
+            ->patch(route('admin.movies.update', $movie), [
+                'title'          => $movie->title,
+                'release_year'   => $movie->release_year,
+                'synopsis'       => 'Updated synopsis.',
+                'runtime'        => 95,
+                'country'        => 'UK',
+                'language'       => 'English',
+                'imdb_url'       => 'https://www.imdb.com/title/tt9999999/',
+                'letterboxd_url' => 'https://letterboxd.com/film/updated/',
+            ]);
+
+        $this->assertDatabaseHas('movies', [
+            'id'             => $movie->id,
+            'synopsis'       => 'Updated synopsis.',
+            'runtime'        => 95,
+            'country'        => 'UK',
+            'language'       => 'English',
+            'imdb_url'       => 'https://www.imdb.com/title/tt9999999/',
+            'letterboxd_url' => 'https://letterboxd.com/film/updated/',
+        ]);
+    }
+
+    public function test_update_can_clear_rich_fields(): void
+    {
+        $user  = User::factory()->admin()->create();
+        $movie = Movie::factory()->create([
+            'synopsis' => 'Original synopsis.',
+            'runtime'  => 120,
+            'country'  => 'France',
+            'language' => 'French',
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('admin.movies.update', $movie), [
+                'title'        => $movie->title,
+                'release_year' => $movie->release_year,
+                // rich fields omitted — should be set to null
+            ]);
+
+        $movie->refresh();
+        $this->assertNull($movie->synopsis);
+        $this->assertNull($movie->runtime);
+        $this->assertNull($movie->country);
+        $this->assertNull($movie->language);
+    }
+
     public function test_update_syncs_genres(): void
     {
         $user   = User::factory()->admin()->create();
@@ -417,6 +568,54 @@ class MovieControllerTest extends TestCase
     {
         $this->get(route('movies.show', 999999))
             ->assertNotFound();
+    }
+
+    public function test_show_displays_synopsis(): void
+    {
+        $movie = Movie::factory()->create(['synopsis' => 'A gripping tale of adventure.']);
+
+        $this->get(route('movies.show', $movie))
+            ->assertSee('A gripping tale of adventure.');
+    }
+
+    public function test_show_displays_runtime_formatted(): void
+    {
+        $movie = Movie::factory()->create(['runtime' => 102]);
+
+        $this->get(route('movies.show', $movie))
+            ->assertSee('1h')
+            ->assertSee('42m');
+    }
+
+    public function test_show_displays_imdb_link(): void
+    {
+        $movie = Movie::factory()->create(['imdb_url' => 'https://www.imdb.com/title/tt0133093/']);
+
+        $this->get(route('movies.show', $movie))
+            ->assertSee('IMDb');
+    }
+
+    public function test_show_displays_letterboxd_link(): void
+    {
+        $movie = Movie::factory()->create(['letterboxd_url' => 'https://letterboxd.com/film/the-matrix/']);
+
+        $this->get(route('movies.show', $movie))
+            ->assertSee('Letterboxd');
+    }
+
+    public function test_show_omits_info_block_when_no_rich_fields(): void
+    {
+        $movie = Movie::factory()->create([
+            'synopsis'       => null,
+            'country'        => null,
+            'language'       => null,
+            'imdb_url'       => null,
+            'letterboxd_url' => null,
+        ]);
+
+        $this->get(route('movies.show', $movie))
+            ->assertDontSee('IMDb')
+            ->assertDontSee('Letterboxd');
     }
 
     public function test_show_displays_cast_section(): void

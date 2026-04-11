@@ -26,6 +26,13 @@
 
                     <p class="mt-1.5 text-indigo-300 text-sm">
                         {{ $movie->release_year }}
+                        @if($movie->runtime)
+                            @php
+                                $hours   = intdiv($movie->runtime, 60);
+                                $minutes = $movie->runtime % 60;
+                            @endphp
+                            &nbsp;·&nbsp;{{ $hours > 0 ? $hours . 'h ' : '' }}{{ $minutes > 0 ? $minutes . 'm' : '' }}
+                        @endif
                         @if(isset($crew['Director']))
                             &nbsp;·&nbsp;
                             {{ $crew['Director']->map(fn($c) => $c->person->name)->join(', ') }}
@@ -237,6 +244,49 @@
             </div>
         </div>
     </div>
+
+    {{-- ═══════════════════════════════════════════════════════════
+         MOVIE INFO (synopsis, metadata, external links)
+    ═══════════════════════════════════════════════════════════ --}}
+    @if($movie->synopsis || $movie->country || $movie->language || $movie->imdb_url || $movie->letterboxd_url)
+    <div class="border-t border-indigo-900 bg-indigo-950/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+            @if($movie->synopsis)
+                <p class="text-indigo-100 text-sm leading-relaxed max-w-3xl">{{ $movie->synopsis }}</p>
+            @endif
+
+            @if($movie->country || $movie->language || $movie->imdb_url || $movie->letterboxd_url)
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 text-indigo-300 text-xs">
+
+                    @if($movie->country)
+                        <span>{{ $movie->country }}</span>
+                    @endif
+
+                    @if($movie->language)
+                        <span>{{ $movie->language }}</span>
+                    @endif
+
+                    @if($movie->imdb_url)
+                        <a href="{{ $movie->imdb_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30 transition">
+                            IMDb ↗
+                        </a>
+                    @endif
+
+                    @if($movie->letterboxd_url)
+                        <a href="{{ $movie->letterboxd_url }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 transition">
+                            Letterboxd ↗
+                        </a>
+                    @endif
+
+                </div>
+            @endif
+
+        </div>
+    </div>
+    @endif
 
     {{-- ═══════════════════════════════════════════════════════════
          CONTENT
