@@ -24,14 +24,10 @@ class RecommendationsController extends Controller
             "recommendations.{$user->id}",
             now()->addMinutes(self::CACHE_TTL_MINUTES),
             function () use ($user) {
-                $ratedMovieIds = $user->ratings()->pluck('movie_id');
+                $ratedMovieIds = $user->ratings()->pluck('movie_id')->all();
 
-                if ($ratedMovieIds->count() < self::MIN_RATINGS_NEEDED) {
-                    return [
-                        'movies' => collect(),
-                        'tooFew' => true,
-                        'rated'  => $ratedMovieIds->count(),
-                    ];
+                if (count($ratedMovieIds) < self::MIN_RATINGS_NEEDED) {
+                    return ['scores' => [], 'tooFew' => true, 'rated' => count($ratedMovieIds)];
                 }
 
                 // Find users who rated at least MIN_OVERLAP of the same movies
@@ -41,17 +37,15 @@ class RecommendationsController extends Controller
                     ->havingRaw('COUNT(*) >= ?', [self::MIN_OVERLAP])
                     ->orderByRaw('COUNT(*) DESC')
                     ->limit(self::MAX_SIMILAR_USERS)
-                    ->pluck('user_id');
+                    ->pluck('user_id')
+                    ->all();
 
-                if ($similarUserIds->isEmpty()) {
-                    return [
-                        'movies' => collect(),
-                        'tooFew' => false,
-                        'rated'  => $ratedMovieIds->count(),
-                    ];
+                if (empty($similarUserIds)) {
+                    return ['scores' => [], 'tooFew' => false, 'rated' => count($ratedMovieIds)];
                 }
 
                 // Movies those users rated highly that the current user hasn't rated
+                // Stored as plain arrays so L13 cache deserialization doesn't block Eloquent objects
                 $scores = Rating::whereIn('user_id', $similarUserIds)
                     ->whereNotIn('movie_id', $ratedMovieIds)
                     ->whereNotNull('stars')
@@ -60,29 +54,36 @@ class RecommendationsController extends Controller
                     ->orderByRaw('COUNT(*) DESC, AVG(stars) DESC')
                     ->limit(self::MAX_RESULTS)
                     ->get()
-                    ->keyBy('movie_id');
+                    ->map(fn($s) => [
+                        'movie_id'          => $s->movie_id,
+                        'recommender_count' => $s->recommender_count,
+                        'avg_stars'         => $s->avg_stars,
+                    ])
+                    ->all();
 
-                $movies = Movie::whereIn('id', $scores->keys())
-                    ->get()
-                    ->keyBy('id')
-                    ->map(function ($movie) use ($scores) {
-                        $movie->recommender_count = $scores[$movie->id]->recommender_count;
-                        $movie->avg_stars         = $scores[$movie->id]->avg_stars;
-                        return $movie;
-                    })
-                    ->sortByDesc('recommender_count')
-                    ->values();
-
-                return [
-                    'movies' => $movies,
-                    'tooFew' => false,
-                    'rated'  => $ratedMovieIds->count(),
-                ];
+                return ['scores' => $scores, 'tooFew' => false, 'rated' => count($ratedMovieIds)];
             }
         );
 
+        // Hydrate Movie models from cached plain-array scores (models can't be cached in L13)
+        $scoresByMovieId = collect($data['scores'])->keyBy('movie_id');
+        if ($scoresByMovieId->isNotEmpty()) {
+            $movies = Movie::whereIn('id', $scoresByMovieId->keys())
+                ->get()
+                ->keyBy('id')
+                ->map(function ($movie) use ($scoresByMovieId) {
+                    $movie->recommender_count = $scoresByMovieId[$movie->id]['recommender_count'];
+                    $movie->avg_stars         = $scoresByMovieId[$movie->id]['avg_stars'];
+                    return $movie;
+                })
+                ->sortByDesc('recommender_count')
+                ->values();
+        } else {
+            $movies = collect();
+        }
+
         return view('recommendations', [
-            'movies'  => $data['movies'],
+            'movies'  => $movies,
             'tooFew'  => $data['tooFew'],
             'needed'  => self::MIN_RATINGS_NEEDED,
             'rated'   => $data['rated'],
