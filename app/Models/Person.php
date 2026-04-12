@@ -11,7 +11,7 @@ class Person extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'date_of_birth', 'date_of_death', 'nationality'];
+    protected $fillable = ['name', 'slug', 'date_of_birth', 'date_of_death', 'nationality', 'bio', 'photo'];
 
     public function credits(): HasMany
     {

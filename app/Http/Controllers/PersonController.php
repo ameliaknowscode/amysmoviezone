@@ -9,6 +9,7 @@ use App\Models\Person;
 use App\Models\Type;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PersonController extends Controller
@@ -41,7 +42,14 @@ class PersonController extends Controller
     {
         $validated = $request->validated();
         $validated['slug'] = Str::slug($validated['name']);
-        Person::create($validated);
+        unset($validated['photo'], $validated['remove_photo']);
+
+        $person = Person::create($validated);
+
+        if ($request->hasFile('photo')) {
+            $person->photo = $request->file('photo')->store('people', 'public');
+            $person->save();
+        }
 
         return redirect()->route('admin.people.index')->with('success', 'Person added successfully.');
     }
@@ -73,7 +81,21 @@ class PersonController extends Controller
     {
         $validated = $request->validated();
         $validated['slug'] = Str::slug($validated['name']);
+        unset($validated['photo'], $validated['remove_photo']);
+
         $person->update($validated);
+
+        if ($request->boolean('remove_photo') && $person->photo) {
+            Storage::disk('public')->delete($person->photo);
+            $person->photo = null;
+            $person->save();
+        } elseif ($request->hasFile('photo')) {
+            if ($person->photo) {
+                Storage::disk('public')->delete($person->photo);
+            }
+            $person->photo = $request->file('photo')->store('people', 'public');
+            $person->save();
+        }
 
         SyncCredits::for($person, $request->input('credits', []));
 
@@ -82,6 +104,10 @@ class PersonController extends Controller
 
     public function destroy(Person $person)
     {
+        if ($person->photo) {
+            Storage::disk('public')->delete($person->photo);
+        }
+
         $person->delete();
 
         return redirect()->route('admin.people.index')->with('success', 'Person deleted successfully.');
