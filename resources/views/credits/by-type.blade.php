@@ -3,21 +3,38 @@
     {{-- Hero Header --}}
     <div class="bg-gradient-to-br from-indigo-950 to-indigo-900 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                <div>
-                    <span class="inline-block text-xs font-semibold uppercase tracking-widest text-indigo-300 mb-2">
-                        {{ $type->name }}
-                    </span>
-                    <h1 class="text-3xl sm:text-4xl font-bold">{{ $person->name }}</h1>
-                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-indigo-200">
-                        @if($person->nationality)
-                            <span>{{ $person->nationality }}</span>
-                        @endif
-                        @if($person->date_of_birth)
-                            <span>b. {{ \Carbon\Carbon::parse($person->date_of_birth)->format('Y') }}</span>
-                        @endif
-                        @if($person->date_of_death)
-                            <span>d. {{ \Carbon\Carbon::parse($person->date_of_death)->format('Y') }}</span>
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+
+                {{-- Photo + Identity --}}
+                <div class="flex gap-5 items-start">
+                    @if($person->photo)
+                        <img src="{{ asset('storage/' . $person->photo) }}" alt="{{ $person->name }}"
+                             class="w-20 h-20 sm:w-28 sm:h-28 rounded-full object-cover shrink-0 ring-2 ring-white/20 shadow-lg">
+                    @endif
+                    <div class="flex-1 min-w-0">
+                        <span class="inline-block text-xs font-semibold uppercase tracking-widest text-indigo-300 mb-2">
+                            {{ $type->name }}
+                        </span>
+                        <h1 class="text-3xl sm:text-4xl font-bold">{{ $person->name }}</h1>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-indigo-200">
+                            @if($person->nationality)
+                                <span>{{ $person->nationality }}</span>
+                            @endif
+                            @if($person->date_of_birth)
+                                <span>b. {{ \Carbon\Carbon::parse($person->date_of_birth)->format('F j, Y') }}</span>
+                            @endif
+                            @if($person->date_of_death)
+                                <span>d. {{ \Carbon\Carbon::parse($person->date_of_death)->format('F j, Y') }}</span>
+                            @endif
+                        </div>
+                        @if($person->bio)
+                            <div x-data="{ expanded: false }" class="mt-3 max-w-2xl">
+                                <p class="text-sm text-indigo-200 leading-relaxed"
+                                   :class="expanded ? '' : 'line-clamp-3'">{{ $person->bio }}</p>
+                                <button @click="expanded = !expanded"
+                                        class="mt-1 text-xs text-indigo-400 hover:text-indigo-200 transition-colors"
+                                        x-text="expanded ? 'Show less' : 'Read more'"></button>
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -35,6 +52,7 @@
                         </div>
                     @endif
                 </div>
+
             </div>
         </div>
 

@@ -18,7 +18,7 @@
                         </ul>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.people.store') }}">
+                    <form method="POST" action="{{ route('admin.people.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <div class="mb-4">
@@ -43,6 +43,19 @@
                             <label for="nationality" class="block font-medium text-sm text-gray-700 mb-1">Nationality</label>
                             <input type="text" id="nationality" name="nationality" value="{{ old('nationality') }}"
                                 class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="bio" class="block font-medium text-sm text-gray-700 mb-1">Bio</label>
+                            <textarea id="bio" name="bio" rows="5"
+                                class="w-full max-w-2xl border-gray-300 rounded-md shadow-sm text-sm">{{ old('bio') }}</textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700 mb-1">Photo</label>
+                            <input type="file" name="photo" accept="image/*"
+                                   class="text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            <p class="text-xs text-gray-400 mt-1">JPG, PNG, WebP — max 2MB</p>
                         </div>
 
                         <div class="flex items-center gap-4">

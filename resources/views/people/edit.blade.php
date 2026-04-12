@@ -18,7 +18,7 @@
                         </ul>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.people.update', $person) }}">
+                    <form method="POST" action="{{ route('admin.people.update', $person) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PATCH')
 
@@ -47,6 +47,33 @@
                             <input type="text" id="nationality" name="nationality"
                                 value="{{ old('nationality', $person->nationality) }}"
                                 class="w-full max-w-md border-gray-300 rounded-md shadow-sm">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="bio" class="block font-medium text-sm text-gray-700 mb-1">Bio</label>
+                            <textarea id="bio" name="bio" rows="5"
+                                class="w-full max-w-2xl border-gray-300 rounded-md shadow-sm text-sm">{{ old('bio', $person->bio) }}</textarea>
+                        </div>
+
+                        <div class="mb-4" x-data="{ removing: false }">
+                            <label class="block font-medium text-sm text-gray-700 mb-1">Photo</label>
+                            @if($person->photo)
+                                <div class="flex items-start gap-4 mb-2">
+                                    <img src="{{ asset('storage/' . $person->photo) }}" alt="{{ $person->name }}"
+                                         class="w-24 h-24 object-cover rounded-md shadow-sm">
+                                    <div>
+                                        <label class="flex items-center gap-2 text-sm text-red-600 cursor-pointer">
+                                            <input type="checkbox" name="remove_photo" value="1" x-model="removing"
+                                                   class="rounded border-gray-300 text-red-600">
+                                            Remove current photo
+                                        </label>
+                                    </div>
+                                </div>
+                            @endif
+                            <input type="file" name="photo" accept="image/*"
+                                   x-bind:disabled="removing"
+                                   class="text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            <p class="text-xs text-gray-400 mt-1">JPG, PNG, WebP — max 2MB</p>
                         </div>
 
                         <div x-data="{ credits: {{ Js::from(old('credits', $initialCredits)) }} }" class="mb-4">

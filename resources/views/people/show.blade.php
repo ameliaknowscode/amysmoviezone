@@ -3,17 +3,31 @@
     {{-- Hero Header --}}
     <div class="bg-gradient-to-br from-indigo-950 to-indigo-900 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <h1 class="text-3xl sm:text-4xl font-bold">{{ $person->name }}</h1>
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-indigo-200">
-                @if($person->nationality)
-                    <span>{{ $person->nationality }}</span>
+            <div class="flex gap-6 items-start">
+
+                @if($person->photo)
+                    <img src="{{ asset('storage/' . $person->photo) }}" alt="{{ $person->name }}"
+                         class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover shrink-0 ring-2 ring-white/20 shadow-lg">
                 @endif
-                @if($person->date_of_birth)
-                    <span>b. {{ \Carbon\Carbon::parse($person->date_of_birth)->format('F j, Y') }}</span>
-                @endif
-                @if($person->date_of_death)
-                    <span>d. {{ \Carbon\Carbon::parse($person->date_of_death)->format('F j, Y') }}</span>
-                @endif
+
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-3xl sm:text-4xl font-bold">{{ $person->name }}</h1>
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-indigo-200">
+                        @if($person->nationality)
+                            <span>{{ $person->nationality }}</span>
+                        @endif
+                        @if($person->date_of_birth)
+                            <span>b. {{ \Carbon\Carbon::parse($person->date_of_birth)->format('F j, Y') }}</span>
+                        @endif
+                        @if($person->date_of_death)
+                            <span>d. {{ \Carbon\Carbon::parse($person->date_of_death)->format('F j, Y') }}</span>
+                        @endif
+                    </div>
+                    @if($person->bio)
+                        <p class="mt-3 text-sm text-indigo-200 leading-relaxed max-w-2xl">{{ $person->bio }}</p>
+                    @endif
+                </div>
+
             </div>
         </div>
     </div>
