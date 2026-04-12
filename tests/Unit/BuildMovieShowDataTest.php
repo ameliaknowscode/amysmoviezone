@@ -3,12 +3,15 @@
 namespace Tests\Unit;
 
 use App\Actions\BuildMovieShowData;
+use App\Models\Credit;
 use App\Models\Movie;
 use App\Models\MovieList;
 use App\Models\MovieListItem;
+use App\Models\Person;
 use App\Models\Rating;
 use App\Models\Review;
 use App\Models\ReviewLike;
+use App\Models\Type;
 use App\Models\User;
 use App\Models\WatchlistEntry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -41,6 +44,7 @@ class BuildMovieShowDataTest extends TestCase
         $this->assertArrayHasKey('movieListIds', $data);
         $this->assertArrayHasKey('friendActivity', $data);
         $this->assertArrayHasKey('likedReviewIds', $data);
+        $this->assertArrayHasKey('moreByDirector', $data);
     }
 
     public function test_guest_gets_null_user_specific_data(): void
@@ -210,5 +214,36 @@ class BuildMovieShowDataTest extends TestCase
         $data = BuildMovieShowData::for($movie, $user->id);
 
         $this->assertTrue($data['likedReviewIds']->contains($review->id));
+    }
+
+    public function test_more_by_director_returns_other_films_by_same_director(): void
+    {
+        $directorType = Type::factory()->create(['name' => 'Director']);
+        Cache::forget('director_type_id');
+
+        $director = Person::factory()->create();
+        $movie    = Movie::factory()->create();
+        $other    = Movie::factory()->create();
+        $unrelated = Movie::factory()->create();
+
+        Credit::factory()->create(['movie_id' => $movie->id,   'person_id' => $director->id, 'type_id' => $directorType->id]);
+        Credit::factory()->create(['movie_id' => $other->id,   'person_id' => $director->id, 'type_id' => $directorType->id]);
+        // $unrelated has no credits for this director
+
+        $data = BuildMovieShowData::for($movie, null);
+
+        $this->assertTrue($data['moreByDirector']->contains($other));
+        $this->assertFalse($data['moreByDirector']->contains($movie));
+        $this->assertFalse($data['moreByDirector']->contains($unrelated));
+    }
+
+    public function test_more_by_director_is_empty_when_no_director_credited(): void
+    {
+        Cache::forget('director_type_id');
+        $movie = Movie::factory()->create();
+
+        $data = BuildMovieShowData::for($movie, null);
+
+        $this->assertTrue($data['moreByDirector']->isEmpty());
     }
 }

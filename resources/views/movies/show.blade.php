@@ -678,4 +678,48 @@
         </div>
     </div>
 
+    {{-- ═══════════════════════════════════════════════════════════
+         MORE FROM THIS DIRECTOR
+    ═══════════════════════════════════════════════════════════ --}}
+    @if($moreByDirector->isNotEmpty())
+    <div class="border-t border-gray-100 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            @php
+                $directorNames = isset($crew['Director'])
+                    ? $crew['Director']->map(fn($c) => $c->person->name)->join(' & ')
+                    : 'This Director';
+            @endphp
+
+            <h2 class="text-sm font-semibold text-gray-900 mb-4">More from {{ $directorNames }}</h2>
+
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-4">
+                @foreach($moreByDirector as $film)
+                <a href="{{ $film->publicUrl() }}" class="group">
+                    <div class="aspect-[2/3] bg-gray-200 rounded-md overflow-hidden shadow-sm">
+                        @if($film->posterUrl())
+                            <img src="{{ $film->posterUrl() }}" alt="{{ $film->title }}"
+                                 class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center p-2 text-center">
+                                <span class="text-xs text-gray-500 leading-snug">{{ $film->title }}</span>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="mt-1.5">
+                        <div class="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+                            {{ $film->title }}
+                        </div>
+                        @if($film->release_year)
+                            <div class="text-xs text-gray-500">{{ $film->release_year }}</div>
+                        @endif
+                    </div>
+                </a>
+                @endforeach
+            </div>
+
+        </div>
+    </div>
+    @endif
+
 </x-app-layout>
