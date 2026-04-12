@@ -28,6 +28,7 @@ use App\Http\Controllers\RecommendationsController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GenreImportController;
 use App\Http\Controllers\StatsController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -186,6 +187,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/types/{type}', [TypeController::class, 'destroy'])->name('types.destroy');
 
         Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
+        Route::get('/genres/import', [GenreImportController::class, 'create'])->name('genres.import');
+        Route::post('/genres/import', [GenreImportController::class, 'store'])->name('genres.import.store');
         Route::get('/genres/create', [GenreController::class, 'create'])->name('genres.create');
         Route::post('/genres', [GenreController::class, 'store'])->name('genres.store');
         Route::get('/genres/{genre}/edit', [GenreController::class, 'edit'])->name('genres.edit');
