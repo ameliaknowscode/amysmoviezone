@@ -79,6 +79,9 @@
                             <x-dropdown-link :href="route('admin.genres.index')">
                                 {{ __('Genres') }}
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.genres.import')">
+                                {{ __('Import Genres') }}
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.types.index')">
                                 {{ __('Types') }}
                             </x-dropdown-link>
