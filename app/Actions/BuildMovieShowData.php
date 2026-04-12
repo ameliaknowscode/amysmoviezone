@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\Movie;
 use App\Models\MovieList;
+use App\Models\Type;
 use App\Models\MovieListItem;
 use App\Models\Rating;
 use App\Models\Review;
@@ -116,6 +117,25 @@ class BuildMovieShowData
             ];
         });
 
+        // "More from this director" — up to 6 other films, best-rated first
+        $directorTypeId = Cache::rememberForever('director_type_id', fn() => Type::where('name', 'Director')->value('id'));
+        $directorPersonIds = $movie->credits
+            ->where('type_id', $directorTypeId)
+            ->pluck('person_id');
+
+        $moreByDirector = $directorPersonIds->isNotEmpty()
+            ? Movie::withAvg('ratings', 'stars')
+                ->whereHas('credits', fn($q) => $q
+                    ->where('type_id', $directorTypeId)
+                    ->whereIn('person_id', $directorPersonIds)
+                )
+                ->where('id', '!=', $movie->id)
+                ->orderByDesc('ratings_avg_stars')
+                ->orderBy('title')
+                ->limit(6)
+                ->get()
+            : collect();
+
         return [
             'movie'              => $movie,
             'genres'             => $movie->genres,
@@ -138,6 +158,7 @@ class BuildMovieShowData
                     ->whereIn('review_id', $reviews->pluck('id'))
                     ->pluck('review_id')
                 : collect(),
+            'moreByDirector'     => $moreByDirector,
         ];
     }
 }
