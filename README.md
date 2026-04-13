@@ -6,15 +6,18 @@ Built as a hands-on learning project for both Laravel and [Claude Code](https://
 
 ## Features
 
-- Movie catalog with cast and crew credits
-- Personal diary — log watches with dates and written reviews
+- Movie catalog with cast, crew credits, synopsis, runtime, country, language, and IMDb/Letterboxd links
+- Personal diary — log watches with dates, written reviews, and spoiler warnings
 - Rewatch tracking — second and subsequent logs are flagged as rewatches, shown in the diary and on movie pages
 - Star ratings and liked/disliked tracking
 - Watchlist (want to watch / watched) with watch date recording
 - Personal stats page — films by decade, by year watched, top genres, top directors, rating distribution
-- Movies can be attached to genres and browsed by genre
+- Filtered browse — search by title, director, genre, and year range
+- "More from this director" section on every movie page
+- Genre taxonomy with browsing by genre
+- Person pages with bio, photo, birth/death dates, nationality, and full filmography
 - Social feed — follow other users and see their activity
-- Custom movie lists (ranked or unranked)
+- Custom movie lists (ranked or unranked) with list following — get notified when a followed list is updated
 - Director Connections — explore shared cast members for multiple directors
 - Admin panel for managing movies, people, genres, and credits
 
@@ -67,11 +70,13 @@ To also seed rich stats/diary data for a specific account, set `SEED_PRIMARY_USE
 
 ## Queue Worker
 
-Email notifications are dispatched via Laravel Queues. To process them locally:
+Notifications are dispatched via Laravel Queues. In production the `QUEUE_CONNECTION` is set to `database` and requires a worker:
 
 ```bash
 php artisan queue:work
 ```
+
+For local development it's simpler to set `QUEUE_CONNECTION=sync` in `.env` so notifications fire immediately without a worker.
 
 ## License
 
