@@ -36,6 +36,11 @@ class MovieList extends Model
             ->orderByPivot('position');
     }
 
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'movie_list_follows', 'movie_list_id', 'user_id')->withTimestamps();
+    }
+
     public function visibleTo(?User $user): bool
     {
         if ($this->is_public) {

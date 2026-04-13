@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Movie;
 use App\Models\MovieList;
 use App\Models\MovieListItem;
+use App\Notifications\ListItemAdded;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,6 +34,17 @@ class MovieListItemController extends Controller
             'position' => $position,
         ]);
 
+        // Notify list followers (excluding the owner who just made the change)
+        $currentUserId = $request->user()->id;
+        $followers = $movieList->followers()->get()->reject(fn($u) => $u->id === $currentUserId);
+
+        if ($followers->isNotEmpty()) {
+            $notifyMovie = Movie::find($movieId);
+            $notification = new ListItemAdded($movieList, $notifyMovie, $request->user());
+            foreach ($followers as $follower) {
+                $follower->notify($notification);
+            }
+        }
         if ($request->expectsJson()) {
             return response()->json(['in_list' => true, 'position' => $position]);
         }

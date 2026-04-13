@@ -14,15 +14,38 @@
                 <p class="text-sm text-gray-500 mt-0.5">
                     by <a href="{{ route('profile.show', $movieList->user->username) }}" class="hover:text-indigo-600 transition-colors">{{ $movieList->user->name }}</a>
                     · {{ $movieList->items->count() }} {{ Str::plural('film', $movieList->items->count()) }}
+                    @if($followerCount > 0)
+                        · {{ $followerCount }} {{ Str::plural('follower', $followerCount) }}
+                    @endif
                 </p>
             </div>
             @auth
-                @if(auth()->id() === $movieList->user_id)
-                    <a href="{{ route('lists.edit', $movieList) }}"
-                       class="shrink-0 px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                        Edit List
-                    </a>
-                @endif
+                <div class="flex items-center gap-2 shrink-0">
+                    @if(auth()->id() === $movieList->user_id)
+                        <a href="{{ route('lists.edit', $movieList) }}"
+                           class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                            Edit List
+                        </a>
+                    @elseif($movieList->is_public)
+                        @if($isFollowing)
+                            <form method="POST" action="{{ route('lists.unfollow', $movieList) }}">
+                                @csrf @method('DELETE')
+                                <button type="submit"
+                                        class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                    Following
+                                </button>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('lists.follow', $movieList) }}">
+                                @csrf
+                                <button type="submit"
+                                        class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+                                    Follow List
+                                </button>
+                            </form>
+                        @endif
+                    @endif
+                </div>
             @endauth
         </div>
     </x-slot>

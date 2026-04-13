@@ -21,6 +21,7 @@ use App\Http\Controllers\AdminCreditImportController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\MovieListController;
+use App\Http\Controllers\MovieListFollowController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReviewLikeController;
 use App\Http\Controllers\MovieListItemController;
@@ -126,6 +127,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/lists/{movieList}/movies', [MovieListItemController::class, 'store'])->name('lists.movies.store');
     Route::delete('/lists/{movieList}/movies/{movie}', [MovieListItemController::class, 'destroy'])->name('lists.movies.destroy');
     Route::post('/lists/{movieList}/reorder', [MovieListItemController::class, 'reorder'])->name('lists.movies.reorder');
+    Route::post('/lists/{movieList}/follow', [MovieListFollowController::class, 'store'])->name('lists.follow');
+    Route::delete('/lists/{movieList}/follow', [MovieListFollowController::class, 'destroy'])->name('lists.unfollow');
 
     Route::post('/u/{username}/follow', [FollowController::class, 'store'])->name('follow.store');
     Route::delete('/u/{username}/follow', [FollowController::class, 'destroy'])->name('follow.destroy');
