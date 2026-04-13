@@ -36,6 +36,12 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
                                     </div>
+                                @elseif($data['type'] === 'list_item_added')
+                                    <div class="h-9 w-9 rounded-full bg-violet-100 flex items-center justify-center">
+                                        <svg class="h-4 w-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                        </svg>
+                                    </div>
                                 @endif
                             </div>
 
@@ -60,6 +66,16 @@
                                         also logged
                                         <a href="{{ $data['movie_url'] }}"
                                            class="font-medium hover:text-indigo-600 transition-colors">{{ $data['movie_title'] }}</a>.
+
+                                    @elseif($data['type'] === 'list_item_added')
+                                        <a href="{{ route('profile.show', $data['owner_username']) }}"
+                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['owner_name'] }}</a>
+                                        added
+                                        <a href="{{ $data['movie_url'] }}"
+                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['movie_title'] }}</a>
+                                        to
+                                        <a href="{{ $data['list_url'] }}"
+                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['list_name'] }}</a>.
                                     @endif
                                 </p>
                                 <p class="text-xs text-gray-400 mt-0.5">{{ $notification->created_at->diffForHumans() }}</p>

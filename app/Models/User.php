@@ -94,4 +94,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(MovieList::class);
     }
+
+    public function followedLists(): BelongsToMany
+    {
+        return $this->belongsToMany(MovieList::class, 'movie_list_follows', 'user_id', 'movie_list_id')->withTimestamps();
+    }
 }

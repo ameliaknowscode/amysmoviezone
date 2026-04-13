@@ -52,7 +52,12 @@ class MovieListController extends Controller
 
         $movieList->load(['user', 'items.movie']);
 
-        return view('lists.show', compact('movieList'));
+        $followerCount = $movieList->followers()->count();
+        $isFollowing   = $request->user()
+            ? $movieList->followers()->where('user_id', $request->user()->id)->exists()
+            : false;
+
+        return view('lists.show', compact('movieList', 'followerCount', 'isFollowing'));
     }
 
     public function edit(Request $request, MovieList $movieList): View
@@ -78,7 +83,7 @@ class MovieListController extends Controller
         $movieList->update([
             'name'        => $validated['name'],
             'description' => $validated['description'] ?? null,
-            'is_public'   => $request->boolean('is_public', true),
+            'is_public'   => $request->boolean('is_public', false),
             'is_ranked'   => $request->boolean('is_ranked', false),
         ]);
 
