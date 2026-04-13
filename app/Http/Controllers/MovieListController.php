@@ -83,7 +83,7 @@ class MovieListController extends Controller
         $movieList->update([
             'name'        => $validated['name'],
             'description' => $validated['description'] ?? null,
-            'is_public'   => $request->boolean('is_public', true),
+            'is_public'   => $request->boolean('is_public', false),
             'is_ranked'   => $request->boolean('is_ranked', false),
         ]);
 
