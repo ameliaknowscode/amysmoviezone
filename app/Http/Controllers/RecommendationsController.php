@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\BuildRecommendations;
+use App\Actions\BuildUserTasteProfile;
 use App\Models\Movie;
-use App\Models\Rating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
@@ -11,82 +12,84 @@ use Illuminate\View\View;
 class RecommendationsController extends Controller
 {
     private const MIN_RATINGS_NEEDED = 3;
-    private const MIN_OVERLAP        = 2;
-    private const MAX_SIMILAR_USERS  = 50;
-    private const MAX_RESULTS        = 24;
     private const CACHE_TTL_MINUTES  = 30;
 
     public function index(Request $request): View
     {
         $user = $request->user();
 
-        $data = Cache::remember(
-            "recommendations.{$user->id}",
+        [$tasteProfile, $recommendations] = Cache::remember(
+            "recommendations.v2.{$user->id}",
             now()->addMinutes(self::CACHE_TTL_MINUTES),
             function () use ($user) {
-                $ratedMovieIds = $user->ratings()->pluck('movie_id')->all();
+                $tasteProfile    = (new BuildUserTasteProfile())->execute($user);
 
-                if (count($ratedMovieIds) < self::MIN_RATINGS_NEEDED) {
-                    return ['scores' => [], 'tooFew' => true, 'rated' => count($ratedMovieIds)];
-                }
+                $recommendations = (new BuildRecommendations())->execute($user, $tasteProfile);
 
-                // Find users who rated at least MIN_OVERLAP of the same movies
-                $similarUserIds = Rating::whereIn('movie_id', $ratedMovieIds)
-                    ->where('user_id', '!=', $user->id)
-                    ->groupBy('user_id')
-                    ->havingRaw('COUNT(*) >= ?', [self::MIN_OVERLAP])
-                    ->orderByRaw('COUNT(*) DESC')
-                    ->limit(self::MAX_SIMILAR_USERS)
-                    ->pluck('user_id')
-                    ->all();
-
-                if (empty($similarUserIds)) {
-                    return ['scores' => [], 'tooFew' => false, 'rated' => count($ratedMovieIds)];
-                }
-
-                // Movies those users rated highly that the current user hasn't rated
-                // Stored as plain arrays so L13 cache deserialization doesn't block Eloquent objects
-                $scores = Rating::whereIn('user_id', $similarUserIds)
-                    ->whereNotIn('movie_id', $ratedMovieIds)
-                    ->whereNotNull('stars')
-                    ->groupBy('movie_id')
-                    ->selectRaw('movie_id, COUNT(*) as recommender_count, ROUND(AVG(stars), 1) as avg_stars')
-                    ->orderByRaw('COUNT(*) DESC, AVG(stars) DESC')
-                    ->limit(self::MAX_RESULTS)
-                    ->get()
-                    ->map(fn($s) => [
-                        'movie_id'          => $s->movie_id,
-                        'recommender_count' => $s->recommender_count,
-                        'avg_stars'         => $s->avg_stars,
-                    ])
-                    ->all();
-
-                return ['scores' => $scores, 'tooFew' => false, 'rated' => count($ratedMovieIds)];
+                return [$tasteProfile, $recommendations];
             }
         );
 
-        // Hydrate Movie models from cached plain-array scores (models can't be cached in L13)
-        $scoresByMovieId = collect($data['scores'])->keyBy('movie_id');
-        if ($scoresByMovieId->isNotEmpty()) {
-            $movies = Movie::whereIn('id', $scoresByMovieId->keys())
-                ->get()
-                ->keyBy('id')
-                ->map(function ($movie) use ($scoresByMovieId) {
-                    $movie->recommender_count = $scoresByMovieId[$movie->id]['recommender_count'];
-                    $movie->avg_stars         = $scoresByMovieId[$movie->id]['avg_stars'];
+        // Collect every movie ID referenced across all buckets in one query
+        $allMovieIds = collect()
+            ->merge(collect($recommendations['genre_buckets'])->flatMap(fn ($b) => collect($b['movies'])->pluck('movie_id')))
+            ->merge(collect($recommendations['director_buckets'])->flatMap(fn ($b) => collect($b['movies'])->pluck('movie_id')))
+            ->merge(collect($recommendations['collaborative'])->pluck('movie_id'))
+            ->unique()
+            ->all();
+
+        $moviesById = Movie::whereIn('id', $allMovieIds)->get()->keyBy('id');
+
+        // Attach score data from a plain array of rows onto hydrated Movie models
+        $hydrateMovies = function (array $scores) use ($moviesById): \Illuminate\Support\Collection {
+            return collect($scores)
+                ->map(function ($score) use ($moviesById) {
+                    $movie = $moviesById->get($score['movie_id']);
+                    if (! $movie) {
+                        return null;
+                    }
+                    foreach ($score as $key => $value) {
+                        if ($key !== 'movie_id') {
+                            $movie->$key = $value;
+                        }
+                    }
                     return $movie;
                 })
-                ->sortByDesc('recommender_count')
+                ->filter()
                 ->values();
-        } else {
-            $movies = collect();
-        }
+        };
+
+        $genreBuckets = collect($recommendations['genre_buckets'])
+            ->map(fn ($b) => [
+                'genre'  => $b['genre'],
+                'movies' => $hydrateMovies($b['movies']),
+            ])
+            ->filter(fn ($b) => $b['movies']->isNotEmpty())
+            ->values();
+
+        $directorBuckets = collect($recommendations['director_buckets'])
+            ->map(fn ($b) => [
+                'director' => $b['director'],
+                'movies'   => $hydrateMovies($b['movies']),
+            ])
+            ->filter(fn ($b) => $b['movies']->isNotEmpty())
+            ->values();
+
+        $collaborativeMovies = $hydrateMovies($recommendations['collaborative']);
+
+        $hasAnyRecommendations = $genreBuckets->isNotEmpty()
+            || $directorBuckets->isNotEmpty()
+            || $collaborativeMovies->isNotEmpty();
 
         return view('recommendations', [
-            'movies'  => $movies,
-            'tooFew'  => $data['tooFew'],
-            'needed'  => self::MIN_RATINGS_NEEDED,
-            'rated'   => $data['rated'],
+            'tooFew'                => $recommendations['too_few'],
+            'needed'                => self::MIN_RATINGS_NEEDED,
+            'rated'                 => $recommendations['rated'],
+            'tasteProfile'          => $tasteProfile,
+            'genreBuckets'          => $genreBuckets,
+            'directorBuckets'       => $directorBuckets,
+            'collaborativeMovies'   => $collaborativeMovies,
+            'hasAnyRecommendations' => $hasAnyRecommendations,
         ]);
     }
 }
