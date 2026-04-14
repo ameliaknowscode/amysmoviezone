@@ -18,6 +18,7 @@ Built as a hands-on learning project for both Laravel and [Claude Code](https://
 - Person pages with bio, photo, birth/death dates, nationality, and full filmography
 - Social feed — follow other users and see their activity
 - Custom movie lists (ranked or unranked) with list following — get notified when a followed list is updated
+- Personalised recommendations — taste profile (top genres and directors) plus three independent buckets: genre-based, director-based, and collaborative filtering
 - Director Connections — explore shared cast members for multiple directors
 - Admin panel for managing movies, people, genres, and credits
 
