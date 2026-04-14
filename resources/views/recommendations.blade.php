@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="py-10">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
             @if($tooFew)
                 {{-- Not enough ratings yet --}}
@@ -21,57 +21,114 @@
                     </a>
                 </div>
 
-            @elseif($movies->isEmpty())
-                {{-- Rated enough but no similar users yet --}}
-                <div class="bg-white shadow-sm sm:rounded-lg px-6 py-12 text-center">
-                    <p class="text-3xl mb-3">👀</p>
-                    <h3 class="text-base font-semibold text-gray-800 mb-1">No recommendations yet</h3>
-                    <p class="text-sm text-gray-500">
-                        We couldn't find enough members with similar taste yet.
-                        Keep rating films and check back soon!
-                    </p>
-                </div>
-
             @else
-                <p class="text-sm text-gray-500 px-1">
-                    Based on members who rated the same films as you.
-                </p>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
-                    @foreach($movies as $movie)
-                        <a href="{{ $movie->publicUrl() }}" class="group block">
-                            {{-- Poster --}}
-                            <div class="aspect-[2/3] rounded-lg overflow-hidden bg-gray-200 shadow-sm ring-1 ring-black/5">
-                                @if($movie->posterUrl())
-                                    <img src="{{ $movie->posterUrl() }}" alt="{{ $movie->title }}"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-indigo-100 p-2 text-center">
-                                        <span class="text-xs text-indigo-400 leading-snug">{{ $movie->title }}</span>
+                {{-- ----------------------------------------------------------------
+                     Taste Profile Panel
+                ----------------------------------------------------------------- --}}
+                @if(!empty($tasteProfile['genres']) || !empty($tasteProfile['directors']))
+                    <div class="bg-white shadow-sm sm:rounded-lg px-6 py-5">
+                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Your taste profile</h3>
+                        <div class="flex flex-wrap gap-8">
+
+                            @if(!empty($tasteProfile['genres']))
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-2">Top genres</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach($tasteProfile['genres'] as $genre)
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100">
+                                                {{ $genre['name'] }}
+                                                <span class="text-yellow-500 font-semibold">★ {{ $genre['avg_stars'] }}</span>
+                                            </span>
+                                        @endforeach
                                     </div>
-                                @endif
-                            </div>
-
-                            {{-- Info --}}
-                            <div class="mt-2 space-y-0.5">
-                                <p class="text-xs font-medium text-gray-800 group-hover:text-indigo-600 transition-colors line-clamp-2 leading-snug">
-                                    {{ $movie->title }}
-                                </p>
-                                <div class="flex items-center gap-1.5">
-                                    @if($movie->release_year)
-                                        <span class="text-xs text-gray-400">{{ $movie->release_year }}</span>
-                                    @endif
-                                    @if($movie->avg_stars)
-                                        <span class="text-xs text-yellow-500 font-medium">★ {{ number_format($movie->avg_stars, 1) }}</span>
-                                    @endif
                                 </div>
-                                <p class="text-xs text-indigo-400">
-                                    {{ $movie->recommender_count }} {{ $movie->recommender_count === 1 ? 'person' : 'people' }} like you
-                                </p>
+                            @endif
+
+                            @if(!empty($tasteProfile['directors']))
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-2">Favourite directors</p>
+                                    <div class="flex flex-wrap gap-x-5 gap-y-1">
+                                        @foreach($tasteProfile['directors'] as $director)
+                                            <span class="text-sm text-gray-700">
+                                                {{ $director['name'] }}
+                                                <span class="text-xs text-yellow-500 font-semibold ml-1">★ {{ $director['avg_stars'] }}</span>
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                        </div>
+                    </div>
+                @endif
+
+                {{-- ----------------------------------------------------------------
+                     No recommendations at all
+                ----------------------------------------------------------------- --}}
+                @if(! $hasAnyRecommendations)
+                    <div class="bg-white shadow-sm sm:rounded-lg px-6 py-12 text-center">
+                        <p class="text-3xl mb-3">👀</p>
+                        <h3 class="text-base font-semibold text-gray-800 mb-1">No recommendations yet</h3>
+                        <p class="text-sm text-gray-500">
+                            Keep rating films — we'll have suggestions for you soon!
+                        </p>
+                    </div>
+
+                @else
+
+                    {{-- ------------------------------------------------------------
+                         Genre buckets
+                    ------------------------------------------------------------- --}}
+                    @foreach($genreBuckets as $bucket)
+                        <section>
+                            <h3 class="text-sm font-semibold text-gray-700 mb-3 px-1">
+                                Because you love <span class="text-indigo-600">{{ $bucket['genre'] }}</span>
+                            </h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                                @foreach($bucket['movies'] as $movie)
+                                    @include('recommendations._movie-card', ['movie' => $movie, 'subline' => null])
+                                @endforeach
                             </div>
-                        </a>
+                        </section>
                     @endforeach
-                </div>
+
+                    {{-- ------------------------------------------------------------
+                         Director buckets
+                    ------------------------------------------------------------- --}}
+                    @foreach($directorBuckets as $bucket)
+                        <section>
+                            <h3 class="text-sm font-semibold text-gray-700 mb-3 px-1">
+                                More from <span class="text-indigo-600">{{ $bucket['director'] }}</span>
+                            </h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                                @foreach($bucket['movies'] as $movie)
+                                    @include('recommendations._movie-card', ['movie' => $movie, 'subline' => null])
+                                @endforeach
+                            </div>
+                        </section>
+                    @endforeach
+
+                    {{-- ------------------------------------------------------------
+                         Collaborative bucket
+                    ------------------------------------------------------------- --}}
+                    @if($collaborativeMovies->isNotEmpty())
+                        <section>
+                            <h3 class="text-sm font-semibold text-gray-700 mb-1 px-1">Picked for you</h3>
+                            <p class="text-xs text-gray-400 mb-3 px-1">Based on members who rated the same films as you.</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                                @foreach($collaborativeMovies as $movie)
+                                    @include('recommendations._movie-card', [
+                                        'movie'   => $movie,
+                                        'subline' => $movie->recommender_count . ' ' . ($movie->recommender_count === 1 ? 'person' : 'people') . ' like you',
+                                    ])
+                                @endforeach
+                            </div>
+                        </section>
+                    @endif
+
+                @endif
+
             @endif
 
         </div>

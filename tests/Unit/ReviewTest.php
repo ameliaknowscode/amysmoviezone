@@ -24,7 +24,7 @@ class ReviewTest extends TestCase
     {
         $review = new Review();
 
-        $this->assertEquals(['user_id', 'movie_id', 'body', 'watched_at', 'is_rewatch'], $review->getFillable());
+        $this->assertEquals(['user_id', 'movie_id', 'body', 'watched_at', 'is_rewatch', 'has_spoilers'], $review->getFillable());
     }
 
     public function test_is_rewatch_is_cast_to_boolean(): void

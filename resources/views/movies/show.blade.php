@@ -524,6 +524,9 @@
                                                 @if($userReview->is_rewatch)
                                                     <span class="text-xs text-indigo-500 border border-indigo-200 rounded px-1.5 py-0.5 leading-none">Rewatch</span>
                                                 @endif
+                                                @if($userReview->has_spoilers)
+                                                    <span class="text-xs text-amber-600 border border-amber-200 rounded px-1.5 py-0.5 leading-none">Spoilers</span>
+                                                @endif
                                                 <button @click="editing = true"
                                                         class="text-xs text-indigo-500 hover:text-indigo-700 transition underline">
                                                     Edit
@@ -551,6 +554,12 @@
                                                 @error('body')
                                                     <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                                                 @enderror
+                                                <label class="flex items-center gap-2 mt-2 text-xs text-gray-500 cursor-pointer select-none">
+                                                    <input type="checkbox" name="has_spoilers" value="1"
+                                                           {{ old('has_spoilers', $userReview->has_spoilers) ? 'checked' : '' }}
+                                                           class="rounded border-gray-300 text-indigo-600">
+                                                    This review contains spoilers
+                                                </label>
                                                 <div class="flex items-center gap-3 mt-2">
                                                     <button type="submit" class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Update</button>
                                                     <button type="button" @click="editing = false" class="text-xs text-gray-400 hover:text-gray-600 transition underline">Cancel</button>
@@ -589,6 +598,12 @@
                                         @error('body')
                                             <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                                         @enderror
+                                        <label class="flex items-center gap-2 mt-2 text-xs text-gray-500 cursor-pointer select-none">
+                                            <input type="checkbox" name="has_spoilers" value="1"
+                                                   {{ old('has_spoilers') ? 'checked' : '' }}
+                                                   class="rounded border-gray-300 text-indigo-600">
+                                            This review contains spoilers
+                                        </label>
                                         <div class="flex items-center gap-3 mt-2">
                                             <button type="submit" class="px-4 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Save</button>
                                             <button type="button" @click="open = false" class="text-xs text-gray-400 hover:text-gray-600 transition underline">Cancel</button>
@@ -628,10 +643,25 @@
                                         @if($review->watched_at)
                                             <span class="text-xs text-gray-400">watched {{ $review->watched_at->format('j M Y') }}</span>
                                         @endif
+                                        @if($review->has_spoilers)
+                                            <span class="text-xs text-amber-600 border border-amber-200 rounded px-1.5 py-0.5 leading-none">Spoilers</span>
+                                        @endif
                                         <span class="text-xs text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
                                     </div>
                                     @if($review->body)
-                                        <p class="text-sm text-gray-700 mt-1.5 leading-relaxed">{{ $review->body }}</p>
+                                        @if($review->has_spoilers)
+                                            <div x-data="{ revealed: false }" class="mt-1.5">
+                                                <div x-show="!revealed"
+                                                     class="text-sm text-gray-400 italic cursor-pointer hover:text-gray-600 transition-colors"
+                                                     @click="revealed = true">
+                                                    ⚠ Spoilers hidden — click to reveal
+                                                </div>
+                                                <p x-show="revealed" x-cloak
+                                                   class="text-sm text-gray-700 leading-relaxed">{{ $review->body }}</p>
+                                            </div>
+                                        @else
+                                            <p class="text-sm text-gray-700 mt-1.5 leading-relaxed">{{ $review->body }}</p>
+                                        @endif
                                     @endif
 
                                     {{-- Like button --}}

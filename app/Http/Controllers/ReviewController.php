@@ -14,8 +14,9 @@ class ReviewController extends Controller
     public function store(Request $request, Movie $movie): RedirectResponse
     {
         $validated = $request->validate([
-            'body'       => ['nullable', 'string', 'max:5000'],
-            'watched_at' => ['nullable', 'date'],
+            'body'         => ['nullable', 'string', 'max:5000'],
+            'watched_at'   => ['nullable', 'date'],
+            'has_spoilers' => ['boolean'],
         ]);
 
         $userId = $request->user()->id;
@@ -23,10 +24,11 @@ class ReviewController extends Controller
         $isRewatch = $movie->reviews()->where('user_id', $userId)->exists();
 
         $movie->reviews()->create([
-            'user_id'    => $userId,
-            'body'       => $validated['body'] ?? null,
-            'watched_at' => $validated['watched_at'] ?? now()->toDateString(),
-            'is_rewatch' => $isRewatch,
+            'user_id'      => $userId,
+            'body'         => $validated['body'] ?? null,
+            'watched_at'   => $validated['watched_at'] ?? now()->toDateString(),
+            'is_rewatch'   => $isRewatch,
+            'has_spoilers' => $request->boolean('has_spoilers'),
         ]);
 
         Cache::forget("user.{$userId}.profile_stats");
@@ -46,13 +48,15 @@ class ReviewController extends Controller
         abort_if($review->user_id !== $request->user()->id, 403);
 
         $validated = $request->validate([
-            'body'       => ['nullable', 'string', 'max:5000'],
-            'watched_at' => ['nullable', 'date'],
+            'body'         => ['nullable', 'string', 'max:5000'],
+            'watched_at'   => ['nullable', 'date'],
+            'has_spoilers' => ['boolean'],
         ]);
 
         $review->update([
-            'body'       => $validated['body'] ?? null,
-            'watched_at' => $validated['watched_at'] ?? null,
+            'body'         => $validated['body'] ?? null,
+            'watched_at'   => $validated['watched_at'] ?? null,
+            'has_spoilers' => $request->boolean('has_spoilers'),
         ]);
 
         return back()->with('status', 'review-saved');

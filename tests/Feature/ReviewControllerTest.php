@@ -265,4 +265,66 @@ class ReviewControllerTest extends TestCase
 
         $this->assertDatabaseHas('reviews', ['id' => $review->id]);
     }
+
+    // -------------------------------------------------------------------------
+    // Spoiler flag
+    // -------------------------------------------------------------------------
+
+    public function test_store_saves_has_spoilers_when_checked(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('movies.review.store', $movie), [
+                'body'         => 'He was dead the whole time.',
+                'has_spoilers' => '1',
+            ]);
+
+        $this->assertDatabaseHas('reviews', [
+            'user_id'      => $user->id,
+            'movie_id'     => $movie->id,
+            'has_spoilers' => true,
+        ]);
+    }
+
+    public function test_store_defaults_has_spoilers_to_false(): void
+    {
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('movies.review.store', $movie), ['body' => 'Great film.']);
+
+        $this->assertDatabaseHas('reviews', [
+            'user_id'      => $user->id,
+            'movie_id'     => $movie->id,
+            'has_spoilers' => false,
+        ]);
+    }
+
+    public function test_update_can_set_has_spoilers(): void
+    {
+        $user   = User::factory()->create();
+        $review = Review::factory()->create(['user_id' => $user->id, 'has_spoilers' => false]);
+
+        $this->actingAs($user)
+            ->patch(route('reviews.update', $review), [
+                'body'         => 'Updated with spoilers.',
+                'has_spoilers' => '1',
+            ]);
+
+        $this->assertTrue($review->fresh()->has_spoilers);
+    }
+
+    public function test_update_can_clear_has_spoilers(): void
+    {
+        $user   = User::factory()->create();
+        $review = Review::factory()->create(['user_id' => $user->id, 'has_spoilers' => true]);
+
+        $this->actingAs($user)
+            ->patch(route('reviews.update', $review), ['body' => 'No spoilers now.']);
+
+        $this->assertFalse($review->fresh()->has_spoilers);
+    }
 }
