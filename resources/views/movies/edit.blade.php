@@ -161,7 +161,7 @@
                             <label class="block font-medium text-sm text-gray-700 mb-2">Credits</label>
                             <template x-for="(row, i) in credits" :key="i">
                                 <div class="flex gap-2 mb-2 max-w-3xl items-center">
-                                    <div class="relative flex-1">
+                                    <div class="relative flex-1 min-w-0">
                                         <input
                                             type="text"
                                             :value="row.query"
@@ -188,7 +188,7 @@
                                         </div>
                                     </div>
                                     <select x-model="row.type_id"
-                                        class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
+                                        class="flex-1 min-w-0 border-gray-300 rounded-md shadow-sm text-sm">
                                         <option value="">Select type…</option>
                                         @foreach($types as $type)
                                             <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -196,7 +196,7 @@
                                     </select>
                                     <input type="text" x-model="row.character"
                                         placeholder="Character (optional)"
-                                        class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
+                                        class="flex-1 min-w-0 border-gray-300 rounded-md shadow-sm text-sm">
                                     <button type="button" @click="removeCredit(i)"
                                         class="text-red-500 hover:text-red-700 text-xl leading-none px-1"
                                         title="Remove">&times;</button>
