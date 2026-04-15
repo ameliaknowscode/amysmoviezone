@@ -17,7 +17,7 @@
                     <div class="flex items-center">
                         <x-dropdown align="left" width="48">
                             <x-slot name="trigger">
-                                <button class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('movies.browse', 'recommendations', 'director-connections') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out">
+                                <button class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('movies.browse', 'recommendations', 'director-connections', 'compare.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out">
                                     {{ __('Explore') }}
                                     <svg class="ms-1 fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -35,6 +35,9 @@
                                 @endauth
                                 <x-dropdown-link :href="route('director-connections')">
                                     {{ __('Director Connections') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('compare.index')">
+                                    {{ __('Head to Head') }}
                                 </x-dropdown-link>
                             </x-slot>
                         </x-dropdown>
@@ -252,6 +255,9 @@
             @endauth
             <x-responsive-nav-link :href="route('director-connections')" :active="request()->routeIs('director-connections')">
                 {{ __('Director Connections') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('compare.index')" :active="request()->routeIs('compare.*')">
+                {{ __('Head to Head') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                 {{ __('Users') }}
