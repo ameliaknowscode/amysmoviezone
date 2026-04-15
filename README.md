@@ -19,6 +19,7 @@ Built as a hands-on learning project for both Laravel and [Claude Code](https://
 - Social feed — follow other users and see their activity
 - Custom movie lists (ranked or unranked) with list following — get notified when a followed list is updated
 - Personalised recommendations — taste profile (top genres and directors) plus three independent buckets: genre-based, director-based, and collaborative filtering
+- Collections — admin-curated themed groupings of films (e.g. "Criterion Collection", "A24 Films", "Based on a Novel") with browsable discovery pages and poster strip previews
 - Director Connections — explore shared cast members for multiple directors
 - Head to Head — compare two directors side by side: film counts, average ratings, career span, decade activity, top genres, shared collaborators, and full filmographies
 - Admin panel for managing movies, people, genres, and credits
