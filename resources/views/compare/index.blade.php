@@ -3,8 +3,8 @@
         <div class="w-full max-w-2xl">
 
             <div class="text-center mb-10">
-                <p class="text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-2">Head to Head</p>
-                <h1 class="text-4xl sm:text-5xl font-bold text-white">Compare Directors</h1>
+                <p class="text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-2">Director</p>
+                <h1 class="text-4xl sm:text-5xl font-bold text-white">Head to Head</h1>
                 <p class="mt-3 text-indigo-300 text-sm">Pick two directors and see how their filmographies stack up.</p>
             </div>
 

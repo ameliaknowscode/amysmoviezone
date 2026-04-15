@@ -37,7 +37,7 @@
                                     {{ __('Director Connections') }}
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('compare.index')">
-                                    {{ __('Director Comparison') }}
+                                    {{ __('Head to Head') }}
                                 </x-dropdown-link>
                             </x-slot>
                         </x-dropdown>
@@ -257,7 +257,7 @@
                 {{ __('Director Connections') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('compare.index')" :active="request()->routeIs('compare.*')">
-                {{ __('Director Comparison') }}
+                {{ __('Head to Head') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                 {{ __('Users') }}

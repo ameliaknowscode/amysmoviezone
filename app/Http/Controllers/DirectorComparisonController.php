@@ -33,8 +33,8 @@ class DirectorComparisonController extends Controller
         abort_if($dataA['films']->isEmpty() || $dataB['films']->isEmpty(), 404);
 
         $sharedCast = $this->buildSharedCast(
-            $dataA['movie_ids'],
-            $dataB['movie_ids'],
+            $dataA['movieIds'],
+            $dataB['movieIds'],
             $directorType,
             $personA,
             $personB,
