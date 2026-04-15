@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Collection as MovieCollection;
 use Illuminate\Support\Str;
 
 class Movie extends Model
@@ -22,6 +23,11 @@ class Movie extends Model
     public function genres(): BelongsToMany
     {
         return $this->belongsToMany(Genre::class)->orderBy('name');
+    }
+
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(MovieCollection::class, 'collection_movie')->orderBy('name');
     }
 
     public function credits(): HasMany

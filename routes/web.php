@@ -29,6 +29,7 @@ use App\Http\Controllers\RecommendationsController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DirectorComparisonController;
+use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GenreImportController;
 use App\Http\Controllers\StatsController;
@@ -91,6 +92,8 @@ Route::get('/director-connections', [SearchController::class, 'directorConnectio
 Route::get('/directors/search', [PersonController::class, 'searchDirectors'])->name('directors.search');
 Route::get('/compare', [DirectorComparisonController::class, 'index'])->name('compare.index');
 Route::get('/compare/{personA}/{personB}', [DirectorComparisonController::class, 'show'])->name('compare.show');
+Route::get('/collections', [CollectionController::class, 'publicIndex'])->name('collections.public.index');
+Route::get('/collections/{slug}', [CollectionController::class, 'publicShow'])->name('collections.public.show');
 Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/people/{person}', [PersonController::class, 'show'])->name('people.show');
 Route::get('/u/{username}', [UserProfileController::class, 'show'])->name('profile.show');
@@ -192,6 +195,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/types/{type}/edit', [TypeController::class, 'edit'])->name('types.edit');
         Route::patch('/types/{type}', [TypeController::class, 'update'])->name('types.update');
         Route::delete('/types/{type}', [TypeController::class, 'destroy'])->name('types.destroy');
+
+        Route::get('/collections', [CollectionController::class, 'index'])->name('collections.index');
+        Route::get('/collections/create', [CollectionController::class, 'create'])->name('collections.create');
+        Route::post('/collections', [CollectionController::class, 'store'])->name('collections.store');
+        Route::get('/collections/{collection}/edit', [CollectionController::class, 'edit'])->name('collections.edit');
+        Route::patch('/collections/{collection}', [CollectionController::class, 'update'])->name('collections.update');
+        Route::delete('/collections/{collection}', [CollectionController::class, 'destroy'])->name('collections.destroy');
 
         Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
         Route::get('/genres/import', [GenreImportController::class, 'create'])->name('genres.import');

@@ -140,6 +140,22 @@
                             </div>
                         </div>
 
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Collections</label>
+                            <div class="flex flex-wrap gap-x-6 gap-y-2 max-w-3xl">
+                                @foreach($collections as $collection)
+                                    <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="checkbox"
+                                               name="collections[]"
+                                               value="{{ $collection->id }}"
+                                               {{ in_array($collection->id, old('collections', $selectedCollections)) ? 'checked' : '' }}
+                                               class="rounded border-gray-300 text-indigo-600 shadow-sm">
+                                        {{ $collection->name }}
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
                         <div x-data="creditsManager({{ Js::from(old('credits_json') ? json_decode(old('credits_json'), true) : $initialCredits) }}, '{{ route('admin.people.search') }}')" class="mb-4">
                             <input type="hidden" name="credits_json" :value="JSON.stringify(credits)">
                             <label class="block font-medium text-sm text-gray-700 mb-2">Credits</label>
