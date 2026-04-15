@@ -49,12 +49,12 @@ class RatingTest extends TestCase
         $this->assertTrue($rating->liked);
     }
 
-    public function test_stars_is_cast_to_integer(): void
+    public function test_stars_is_cast_to_float(): void
     {
-        $rating = Rating::factory()->create(['stars' => 4]);
+        $rating = Rating::factory()->create(['stars' => 4.5]);
 
-        $this->assertIsInt($rating->stars);
-        $this->assertSame(4, $rating->stars);
+        $this->assertIsFloat($rating->stars);
+        $this->assertSame(4.5, $rating->stars);
     }
 
     public function test_stars_and_liked_can_be_null(): void

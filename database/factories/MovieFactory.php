@@ -28,7 +28,7 @@ class MovieFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(
-            fn(Movie $movie) => $movie->update(['slug' => Str::slug($movie->title)])
+            fn(Movie $movie) => $movie->update(['slug' => Str::slug($movie->title . ' ' . ($movie->release_year ?? ''))])
         );
     }
 }

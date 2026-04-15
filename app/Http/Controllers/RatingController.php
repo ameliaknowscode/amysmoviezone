@@ -13,7 +13,7 @@ class RatingController extends Controller
     public function store(Request $request, Movie $movie): RedirectResponse
     {
         $request->validate([
-            'stars' => ['nullable', 'integer', 'min:1', 'max:5'],
+            'stars' => ['nullable', 'numeric', 'in:0.5,1,1.5,2,2.5,3,3.5,4,4.5,5'],
             'liked' => ['nullable', 'boolean'],
         ]);
 

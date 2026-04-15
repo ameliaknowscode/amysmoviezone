@@ -55,7 +55,7 @@ class MovieController extends Controller
 
         $movie = Movie::create([
             'title'          => $validated['title'],
-            'slug'           => Str::slug($validated['title']),
+            'slug'           => Str::slug($validated['title'] . ' ' . ($validated['release_year'] ?? '')),
             'release_year'   => $validated['release_year'],
             'synopsis'       => $validated['synopsis'] ?? null,
             'runtime'        => $validated['runtime'] ?? null,
@@ -103,7 +103,7 @@ class MovieController extends Controller
 
         $movie->update([
             'title'          => $validated['title'],
-            'slug'           => Str::slug($validated['title']),
+            'slug'           => Str::slug($validated['title'] . ' ' . ($validated['release_year'] ?? '')),
             'release_year'   => $validated['release_year'],
             'synopsis'       => $validated['synopsis'] ?? null,
             'runtime'        => $validated['runtime'] ?? null,

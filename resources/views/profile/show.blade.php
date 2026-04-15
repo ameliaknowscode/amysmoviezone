@@ -145,9 +145,7 @@
                                 </div>
                                 @if($rating->stars)
                                 <div class="mt-0.5 flex justify-center">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <span class="text-xs {{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
-                                    @endfor
+                                    <x-star-display :value="$rating->stars" class="text-xs" />
                                 </div>
                                 @endif
                             </a>
@@ -179,11 +177,7 @@
                                             {{ $review->movie->title }}
                                         </a>
                                         @if($rating = $reviewRatings->get($review->movie_id))
-                                            <span class="text-xs leading-none">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <span class="{{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
-                                                @endfor
-                                            </span>
+                                            <x-star-display :value="$rating->stars" class="text-xs" />
                                         @endif
                                         @if($review->watched_at)
                                             <span class="text-xs text-gray-400">{{ $review->watched_at->format('j M Y') }}</span>

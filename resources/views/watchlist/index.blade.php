@@ -96,11 +96,7 @@
                                     @if($rating)
                                     <div class="flex items-center gap-2 mt-1">
                                         @if($rating->stars)
-                                        <span class="text-sm text-yellow-400">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                <span class="{{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
-                                            @endfor
-                                        </span>
+                                        <x-star-display :value="$rating->stars" class="text-sm" />
                                         @endif
                                         @if($rating->liked)
                                         <span class="text-red-500 text-sm">&#10084;</span>
