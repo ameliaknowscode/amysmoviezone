@@ -58,11 +58,7 @@
                         @if($ratingCount > 0)
                             <div class="flex items-center gap-1.5">
                                 <span class="text-yellow-400 text-xl font-bold">{{ number_format($avgRating, 1) }}</span>
-                                <div class="flex text-sm leading-none">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <span class="{{ $i <= round($avgRating) ? 'text-yellow-400' : 'text-indigo-800' }}">&#9733;</span>
-                                    @endfor
-                                </div>
+                                <x-star-display :value="$avgRating" class="text-sm" emptyClass="text-indigo-800" />
                                 <span class="text-indigo-300 text-xs">{{ $ratingCount }} {{ Str::plural('rating', $ratingCount) }}</span>
                             </div>
                             <span class="text-indigo-800 hidden sm:inline">·</span>
@@ -96,19 +92,29 @@
                     >
                         {{-- Stars + Remove + Heart --}}
                         <div class="flex items-center gap-4">
-                            <form method="POST" action="{{ route('movies.rate', $movie) }}" class="flex items-center gap-0.5">
+                            <form method="POST" action="{{ route('movies.rate', $movie) }}" x-ref="ratingForm" class="flex items-center">
                                 @csrf
                                 <input type="hidden" name="stars" x-bind:value="stars">
                                 @foreach([1,2,3,4,5] as $star)
-                                <button
-                                    type="submit"
-                                    @mouseenter="hovered = {{ $star }}"
+                                {{-- Single star span: mousemove detects left (half) vs right (full) half --}}
+                                <span
+                                    class="relative inline-block text-2xl sm:text-3xl leading-none cursor-pointer select-none"
+                                    @mousemove="hovered = $event.offsetX < $el.offsetWidth / 2 ? {{ $star - 0.5 }} : {{ $star }}"
                                     @mouseleave="hovered = 0"
-                                    @click="stars = {{ $star }}"
-                                    class="text-2xl sm:text-3xl leading-none focus:outline-none transition-colors"
-                                    :class="(hovered ? hovered >= {{ $star }} : stars >= {{ $star }}) ? 'text-yellow-400' : 'text-indigo-700 hover:text-indigo-400'"
-                                    title="{{ $star }} {{ $star === 1 ? 'star' : 'stars' }}"
-                                >&#9733;</button>
+                                    @click="stars = hovered; $nextTick(() => $refs.ratingForm.submit())"
+                                    :title="(hovered || stars) + ' ' + ((hovered || stars) === 1 ? 'star' : 'stars')"
+                                >
+                                    {{-- Base star (full or empty) --}}
+                                    <span class="transition-colors"
+                                          :class="(hovered || stars) >= {{ $star }} ? 'text-yellow-400' : 'text-indigo-700'"
+                                    >&#9733;</span>
+                                    {{-- Half overlay --}}
+                                    <span
+                                        class="absolute top-0 left-0 text-yellow-400 pointer-events-none transition-opacity"
+                                        :class="(hovered || stars) >= {{ $star - 0.5 }} && (hovered || stars) < {{ $star }} ? 'opacity-100' : 'opacity-0'"
+                                        style="clip-path: inset(0 50% 0 0)"
+                                    >&#9733;</span>
+                                </span>
                                 @endforeach
                             </form>
 
@@ -439,11 +445,7 @@
                             {{-- Activity --}}
                             <div class="shrink-0 flex items-center gap-2 text-sm text-gray-500">
                                 @if($friend->rating?->stars)
-                                    <span class="flex text-xs leading-none">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            <span class="{{ $i <= $friend->rating->stars ? 'text-yellow-400' : 'text-gray-200' }}">&#9733;</span>
-                                        @endfor
-                                    </span>
+                                    <x-star-display :value="$friend->rating->stars" class="text-xs" emptyClass="text-gray-200" />
                                 @elseif($friend->rating?->liked)
                                     <svg class="w-4 h-4 text-red-400" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -512,11 +514,7 @@
                                             <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                                                 <span class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</span>
                                                 @if($userRating?->stars)
-                                                    <span class="text-xs leading-none">
-                                                        @for($i = 1; $i <= 5; $i++)
-                                                            <span class="{{ $i <= $userRating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
-                                                        @endfor
-                                                    </span>
+                                                    <x-star-display :value="$userRating->stars" class="text-xs" />
                                                 @endif
                                                 @if($userReview->watched_at)
                                                     <span class="text-xs text-gray-400">watched {{ $userReview->watched_at->format('j M Y') }}</span>
@@ -634,11 +632,7 @@
                                             {{ $review->user->name }}
                                         </a>
                                         @if($rating = $reviewerRatings->get($review->user_id))
-                                            <span class="text-xs leading-none">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <span class="{{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
-                                                @endfor
-                                            </span>
+                                            <x-star-display :value="$rating->stars" class="text-xs" />
                                         @endif
                                         @if($review->watched_at)
                                             <span class="text-xs text-gray-400">watched {{ $review->watched_at->format('j M Y') }}</span>

@@ -61,11 +61,7 @@
                                         @endif
                                         @php $rating = $diaryRatings->get($entry->movie_id); @endphp
                                         @if($rating)
-                                            <span class="text-xs leading-none">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <span class="{{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
-                                                @endfor
-                                            </span>
+                                            <x-star-display :value="$rating->stars" class="text-xs" />
                                         @endif
                                     </div>
                                     @if($entry->body)

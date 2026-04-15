@@ -13,9 +13,7 @@
         <div class="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">{{ $rating->movie->title }}</div>
         @if($rating->stars)
         <div class="text-xs">
-            @for($i = 1; $i <= 5; $i++)
-                <span class="{{ $i <= $rating->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>
-            @endfor
+            <x-star-display :value="$rating->stars" class="text-xs" />
         </div>
         @endif
         <div class="text-xs text-gray-500 truncate">

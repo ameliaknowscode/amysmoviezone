@@ -34,9 +34,7 @@
                 @if($item->stars)
                     rated
                     <a href="{{ $movie->publicUrl() }}" class="font-medium hover:text-indigo-600 transition-colors">{{ $movie->title }}</a>
-                    <span class="text-yellow-400 text-xs">
-                        @for($i = 1; $i <= 5; $i++)<span class="{{ $i <= $item->stars ? 'text-yellow-400' : 'text-gray-300' }}">&#9733;</span>@endfor
-                    </span>
+                    <x-star-display :value="$item->stars" class="text-xs" />
                 @elseif($item->liked)
                     liked
                     <a href="{{ $movie->publicUrl() }}" class="font-medium hover:text-indigo-600 transition-colors">{{ $movie->title }}</a>

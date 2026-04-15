@@ -76,7 +76,7 @@ class DcExportCommandTest extends TestCase
         $this->artisan('dc:export');
 
         $json  = json_decode(Storage::disk('local')->get('dc-export.json'), true);
-        $movie = collect($json['movies'])->firstWhere('slug', 'inception');
+        $movie = collect($json['movies'])->firstWhere('slug', 'inception-2010');
 
         $this->assertNotNull($movie);
         $this->assertSame('Inception', $movie['title']);
@@ -101,7 +101,7 @@ class DcExportCommandTest extends TestCase
     public function test_exported_credits_use_slugs_not_ids(): void
     {
         // Provide name/title so factory afterCreating sets the correct slug
-        $movie  = Movie::factory()->create(['title' => 'Alien']);   // slug → 'alien'
+        $movie  = Movie::factory()->create(['title' => 'Alien', 'release_year' => 1979]);   // slug → 'alien'
         $person = Person::factory()->create(['name' => 'Ridley Scott']); // slug → 'ridley-scott'
         $type   = Type::factory()->create(['name' => 'Director', 'slug' => 'director']);
 
@@ -114,7 +114,7 @@ class DcExportCommandTest extends TestCase
         $credit = collect($json['credits'])->firstWhere('person_slug', 'ridley-scott');
 
         $this->assertNotNull($credit);
-        $this->assertSame('alien', $credit['movie_slug']);
+        $this->assertSame('alien-1979', $credit['movie_slug']);
         $this->assertSame('director', $credit['type_slug']);
         $this->assertArrayNotHasKey('movie_id', $credit);
         $this->assertArrayNotHasKey('person_id', $credit);

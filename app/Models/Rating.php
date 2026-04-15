@@ -16,7 +16,7 @@ class Rating extends Model
     {
         return [
             'liked' => 'boolean',
-            'stars' => 'integer',
+            'stars' => 'float',
         ];
     }
 

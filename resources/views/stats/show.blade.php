@@ -142,10 +142,8 @@
                             $pct = $maxRatingCount > 0 ? round(($count / $maxRatingCount) * 100) : 0;
                         @endphp
                         <div class="flex items-center gap-3">
-                            <div class="w-24 text-right shrink-0">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <span class="text-sm {{ $i <= $stars ? 'text-yellow-400' : 'text-gray-200' }}">&#9733;</span>
-                                @endfor
+                            <div class="w-24 flex justify-end shrink-0">
+                                <x-star-display :value="$stars" class="text-sm" emptyClass="text-gray-200" />
                             </div>
                             <div class="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
                                 @if($count > 0)
