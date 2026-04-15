@@ -140,12 +140,28 @@
                             </div>
                         </div>
 
+                        <div class="mb-4">
+                            <label class="block font-medium text-sm text-gray-700 mb-2">Collections</label>
+                            <div class="flex flex-wrap gap-x-6 gap-y-2 max-w-3xl">
+                                @foreach($collections as $collection)
+                                    <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="checkbox"
+                                               name="collections[]"
+                                               value="{{ $collection->id }}"
+                                               {{ in_array($collection->id, old('collections', $selectedCollections)) ? 'checked' : '' }}
+                                               class="rounded border-gray-300 text-indigo-600 shadow-sm">
+                                        {{ $collection->name }}
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
                         <div x-data="creditsManager({{ Js::from(old('credits_json') ? json_decode(old('credits_json'), true) : $initialCredits) }}, '{{ route('admin.people.search') }}')" class="mb-4">
                             <input type="hidden" name="credits_json" :value="JSON.stringify(credits)">
                             <label class="block font-medium text-sm text-gray-700 mb-2">Credits</label>
                             <template x-for="(row, i) in credits" :key="i">
                                 <div class="flex gap-2 mb-2 max-w-3xl items-center">
-                                    <div class="relative flex-1">
+                                    <div class="relative flex-1 min-w-0">
                                         <input
                                             type="text"
                                             :value="row.query"
@@ -172,7 +188,7 @@
                                         </div>
                                     </div>
                                     <select x-model="row.type_id"
-                                        class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
+                                        class="flex-1 min-w-0 border-gray-300 rounded-md shadow-sm text-sm">
                                         <option value="">Select type…</option>
                                         @foreach($types as $type)
                                             <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -180,7 +196,7 @@
                                     </select>
                                     <input type="text" x-model="row.character"
                                         placeholder="Character (optional)"
-                                        class="flex-1 border-gray-300 rounded-md shadow-sm text-sm">
+                                        class="flex-1 min-w-0 border-gray-300 rounded-md shadow-sm text-sm">
                                     <button type="button" @click="removeCredit(i)"
                                         class="text-red-500 hover:text-red-700 text-xl leading-none px-1"
                                         title="Remove">&times;</button>
