@@ -129,4 +129,21 @@ class PersonController extends Controller
         );
     }
 
+    public function searchDirectors(Request $request): JsonResponse
+    {
+        $q = trim($request->query('q', ''));
+
+        if (mb_strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        return response()->json(
+            Person::where('name', 'like', '%' . $q . '%')
+                ->whereHas('credits', fn($q) => $q->whereHas('type', fn($t) => $t->where('name', 'Director')))
+                ->orderBy('name')
+                ->limit(10)
+                ->get(['id', 'name', 'slug'])
+        );
+    }
+
 }
