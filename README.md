@@ -22,6 +22,7 @@ Built as a hands-on learning project for both Laravel and [Claude Code](https://
 - Collections — admin-curated themed groupings of films (e.g. "Criterion Collection", "A24 Films", "Based on a Novel") with browsable discovery pages and poster strip previews
 - Director Connections — explore shared cast members for multiple directors
 - Head to Head — compare two directors side by side: film counts, average ratings, career span, decade activity, top genres, shared collaborators, and full filmographies
+- Watch parties and comments — comment threads on any review; co-watched detection surfaces an amber chip on diary entries when a followed user logged the same film on the same night; movie pages show a watch party banner when two or more friends share a watched date
 - Admin panel for managing movies, people, genres, and credits
 
 ## Tech Stack
