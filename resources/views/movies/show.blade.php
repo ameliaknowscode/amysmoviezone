@@ -418,33 +418,59 @@
                 {{-- Friends' Activity --}}
                 @if($friendActivity->isNotEmpty())
                 @php
-                    // Group friends by shared watched_at date for watch party detection
-                    $friendsByDate = collect();
+                    // Build date→[friends] map; also include the viewer's own watched dates
+                    // so that Amy + 1 friend sharing a date counts as a watch party.
+                    $friendsByDate = [];
+
+                    // Seed with the viewer's own watch dates (friends listed per date, not Amy herself)
+                    $myWatchedDates = $userReviews
+                        ->pluck('watched_at')
+                        ->filter()
+                        ->map->toDateString()
+                        ->unique()
+                        ->values();
+
+                    foreach ($myWatchedDates as $dateStr) {
+                        $friendsByDate[$dateStr] = [];   // placeholder — Amy watched, slot for friends
+                    }
+
                     foreach ($friendActivity as $friend) {
                         foreach ($friend->watched_dates as $date) {
                             $key = $date->toDateString();
-                            if (!isset($friendsByDate[$key])) $friendsByDate[$key] = collect();
-                            if (!$friendsByDate[$key]->contains('user_id', $friend->user->id)) {
-                                $friendsByDate[$key]->push($friend->user);
+                            if (!array_key_exists($key, $friendsByDate)) {
+                                $friendsByDate[$key] = [];
+                            }
+                            $existingIds = array_column($friendsByDate[$key], 'id');
+                            if (!in_array($friend->user->id, $existingIds)) {
+                                $friendsByDate[$key][] = $friend->user;
                             }
                         }
                     }
-                    $watchPartyDates = $friendsByDate->filter(fn($users) => $users->count() >= 2)->keys();
+
+                    // A watch party needs at least 1 friend on a date Amy also watched,
+                    // OR 2+ friends sharing a date regardless of Amy.
+                    $watchPartyDates = array_keys(array_filter(
+                        $friendsByDate,
+                        fn($friends, $date) =>
+                            count($friends) >= 2 ||                          // 2+ friends alone
+                            (count($friends) >= 1 && in_array($date, $myWatchedDates->all())), // Amy + 1 friend
+                        ARRAY_FILTER_USE_BOTH
+                    ));
                 @endphp
                 <div class="bg-white rounded-lg shadow-sm mb-5">
                     <div class="px-5 py-3 border-b border-gray-100">
                         <h2 class="text-sm font-semibold text-gray-900">Friends</h2>
                     </div>
-                    @if($watchPartyDates->isNotEmpty())
+                    @if(count($watchPartyDates) > 0)
                         @foreach($watchPartyDates as $partyDate)
-                        @php $partyUsers = $friendsByDate[$partyDate]; @endphp
+                        @php $partyFriends = $friendsByDate[$partyDate]; @endphp
                         <div class="px-5 py-2.5 bg-amber-50 border-b border-amber-100 flex items-center gap-2">
                             <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
                             </svg>
                             <span class="text-xs text-amber-700 font-medium">Watch party · {{ \Carbon\Carbon::parse($partyDate)->format('j M Y') }}</span>
                             <span class="text-xs text-amber-600">
-                                {{ $partyUsers->map(fn($u) => $u->name)->join(', ') }}
+                                @if(in_array($partyDate, $myWatchedDates->all()))You and @endif{{ implode(', ', array_map(fn($u) => $u->name, $partyFriends)) }}
                             </span>
                         </div>
                         @endforeach
