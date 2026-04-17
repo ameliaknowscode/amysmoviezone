@@ -624,7 +624,7 @@
                                                     </div>
                                                     <div class="flex-1 min-w-0">
                                                         <span class="font-medium text-gray-800 text-xs">
-                                                            <a href="{{ route('profile.show', $comment->user->username) }}" class="hover:text-indigo-600 transition-colors">@{{ $comment->user->username }}</a>
+                                                            <a href="{{ route('profile.show', $comment->user->username) }}" class="hover:text-indigo-600 transition-colors">{{ $comment->user->username }}</a>
                                                         </span>
                                                         <span class="text-gray-600 text-xs ml-1">{{ $comment->body }}</span>
                                                         <span class="text-gray-300 text-xs ml-1">{{ $comment->created_at->diffForHumans() }}</span>
@@ -773,7 +773,7 @@
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <span class="font-medium text-gray-800 text-xs">
-                                                    <a href="{{ route('profile.show', $comment->user->username) }}" class="hover:text-indigo-600 transition-colors">@{{ $comment->user->username }}</a>
+                                                    <a href="{{ route('profile.show', $comment->user->username) }}" class="hover:text-indigo-600 transition-colors">{{ $comment->user->username }}</a>
                                                 </span>
                                                 <span class="text-gray-600 text-xs ml-1">{{ $comment->body }}</span>
                                                 <span class="text-gray-300 text-xs ml-1">{{ $comment->created_at->diffForHumans() }}</span>
