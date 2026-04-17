@@ -628,7 +628,7 @@
                                                         </span>
                                                         <span class="text-gray-600 text-xs ml-1">{{ $comment->body }}</span>
                                                         <span class="text-gray-300 text-xs ml-1">{{ $comment->created_at->diffForHumans() }}</span>
-                                                        @if(auth()->id() === $comment->user_id)
+                                                        @if(auth()->id() === $comment->user_id || auth()->id() === $userReview->user_id)
                                                         <form method="POST" action="{{ route('review-comments.destroy', $comment) }}" class="inline ml-1">
                                                             @csrf @method('DELETE')
                                                             <button type="submit" class="text-xs text-gray-300 hover:text-red-400 transition-colors">✕</button>
