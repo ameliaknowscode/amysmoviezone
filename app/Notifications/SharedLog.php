@@ -16,6 +16,7 @@ class SharedLog extends Notification implements ShouldQueue
     public function __construct(
         public readonly User  $logger,
         public readonly Movie $movie,
+        public readonly bool  $sameNight = false,
     ) {}
 
     public function via($notifiable): array
@@ -29,6 +30,15 @@ class SharedLog extends Notification implements ShouldQueue
 
     public function toMail($notifiable): MailMessage
     {
+        if ($this->sameNight) {
+            return (new MailMessage)
+                ->subject("You and @{$this->logger->username} watched {$this->movie->title} on the same night!")
+                ->greeting("Hi {$notifiable->name}!")
+                ->line("You and **@{$this->logger->username}** both watched *{$this->movie->title}* on the same night!")
+                ->action('See the film', $this->movie->publicUrl())
+                ->line('You can manage your email notification preferences in your profile settings.');
+        }
+
         return (new MailMessage)
             ->subject("@{$this->logger->username} watched {$this->movie->title}")
             ->greeting("Hi {$notifiable->name}!")
@@ -47,6 +57,7 @@ class SharedLog extends Notification implements ShouldQueue
             'movie_id'        => $this->movie->id,
             'movie_title'     => $this->movie->title,
             'movie_url'       => $this->movie->publicUrl(),
+            'same_night'      => $this->sameNight,
         ];
     }
 }

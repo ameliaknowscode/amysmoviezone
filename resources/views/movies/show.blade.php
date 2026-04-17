@@ -417,10 +417,64 @@
 
                 {{-- Friends' Activity --}}
                 @if($friendActivity->isNotEmpty())
+                @php
+                    // Build date→[friends] map; also include the viewer's own watched dates
+                    // so that Amy + 1 friend sharing a date counts as a watch party.
+                    $friendsByDate = [];
+
+                    // Seed with the viewer's own watch dates (friends listed per date, not Amy herself)
+                    $myWatchedDates = $userReviews
+                        ->pluck('watched_at')
+                        ->filter()
+                        ->map->toDateString()
+                        ->unique()
+                        ->values();
+
+                    foreach ($myWatchedDates as $dateStr) {
+                        $friendsByDate[$dateStr] = [];   // placeholder — Amy watched, slot for friends
+                    }
+
+                    foreach ($friendActivity as $friend) {
+                        foreach ($friend->watched_dates as $date) {
+                            $key = $date->toDateString();
+                            if (!array_key_exists($key, $friendsByDate)) {
+                                $friendsByDate[$key] = [];
+                            }
+                            $existingIds = array_column($friendsByDate[$key], 'id');
+                            if (!in_array($friend->user->id, $existingIds)) {
+                                $friendsByDate[$key][] = $friend->user;
+                            }
+                        }
+                    }
+
+                    // A watch party needs at least 1 friend on a date Amy also watched,
+                    // OR 2+ friends sharing a date regardless of Amy.
+                    $watchPartyDates = array_keys(array_filter(
+                        $friendsByDate,
+                        fn($friends, $date) =>
+                            count($friends) >= 2 ||                          // 2+ friends alone
+                            (count($friends) >= 1 && in_array($date, $myWatchedDates->all())), // Amy + 1 friend
+                        ARRAY_FILTER_USE_BOTH
+                    ));
+                @endphp
                 <div class="bg-white rounded-lg shadow-sm mb-5">
                     <div class="px-5 py-3 border-b border-gray-100">
                         <h2 class="text-sm font-semibold text-gray-900">Friends</h2>
                     </div>
+                    @if(count($watchPartyDates) > 0)
+                        @foreach($watchPartyDates as $partyDate)
+                        @php $partyFriends = $friendsByDate[$partyDate]; @endphp
+                        <div class="px-5 py-2.5 bg-amber-50 border-b border-amber-100 flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                            </svg>
+                            <span class="text-xs text-amber-700 font-medium">Watch party · {{ \Carbon\Carbon::parse($partyDate)->format('j M Y') }}</span>
+                            <span class="text-xs text-amber-600">
+                                @if(in_array($partyDate, $myWatchedDates->all()))You and @endif{{ implode(', ', array_map(fn($u) => $u->name, $partyFriends)) }}
+                            </span>
+                        </div>
+                        @endforeach
+                    @endif
                     <ul class="divide-y divide-gray-100">
                         @foreach($friendActivity as $friend)
                         <li class="flex items-center gap-3 px-5 py-3">
@@ -455,6 +509,9 @@
                                 @if($friend->review_count > 0)
                                     <span class="text-xs text-gray-400">
                                         logged {{ $friend->review_count > 1 ? $friend->review_count . '×' : '' }}
+                                        @if($friend->watched_dates->isNotEmpty())
+                                            · {{ $friend->watched_dates->first()->format('j M Y') }}
+                                        @endif
                                     </span>
                                 @elseif($friend->watchlist?->list_type === 'watched' && !$friend->rating)
                                     <span class="text-xs text-gray-400">watched</span>
@@ -483,6 +540,12 @@
                         @if(session('status') === 'review-deleted')
                             <p class="text-xs text-gray-400 px-5 pt-3">Review deleted.</p>
                         @endif
+                        @if(session('status') === 'comment-posted')
+                            <p class="text-xs text-emerald-600 px-5 pt-3">Comment posted.</p>
+                        @endif
+                        @if(session('status') === 'comment-deleted')
+                            <p class="text-xs text-gray-400 px-5 pt-3">Comment deleted.</p>
+                        @endif
 
                         <div class="divide-y divide-gray-50">
 
@@ -494,7 +557,7 @@
                                 </div>
                             @endif
                             @foreach($userReviews as $userReview)
-                            <div x-data="{ editing: false }" class="px-5 py-4">
+                            <div x-data="{ editing: false, showComments: false }" class="px-5 py-4">
                                 <div class="flex gap-3">
                                     <div class="shrink-0">
                                         @if(auth()->user()->avatar)
@@ -569,6 +632,46 @@
                                             </form>
                                         </div>
 
+                                        {{-- Comments --}}
+                                        <div class="mt-2">
+                                            <button @click="showComments = !showComments"
+                                                    class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-500 transition-colors">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                                </svg>
+                                                {{ $userReview->comments->count() ?: '' }}
+                                                {{ $userReview->comments->count() === 1 ? 'comment' : ($userReview->comments->count() > 1 ? 'comments' : 'Comment') }}
+                                            </button>
+                                            <div x-show="showComments" x-cloak class="mt-2 space-y-2">
+                                                @foreach($userReview->comments as $comment)
+                                                <div class="flex gap-2 text-sm">
+                                                    <div class="shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold select-none">
+                                                        {{ strtoupper(substr($comment->user->name, 0, 1)) }}
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <span class="font-medium text-gray-800 text-xs">
+                                                            <a href="{{ route('profile.show', $comment->user->username) }}" class="hover:text-indigo-600 transition-colors">{{ $comment->user->username }}</a>
+                                                        </span>
+                                                        <span class="text-gray-600 text-xs ml-1">{{ $comment->body }}</span>
+                                                        <span class="text-gray-300 text-xs ml-1">{{ $comment->created_at->diffForHumans() }}</span>
+                                                        @if(auth()->id() === $comment->user_id || auth()->id() === $userReview->user_id)
+                                                        <form method="POST" action="{{ route('review-comments.destroy', $comment) }}" class="inline ml-1">
+                                                            @csrf @method('DELETE')
+                                                            <button type="submit" class="text-xs text-gray-300 hover:text-red-400 transition-colors">✕</button>
+                                                        </form>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                                <form method="POST" action="{{ route('reviews.comments.store', $userReview) }}" class="flex gap-2 mt-1">
+                                                    @csrf
+                                                    <input type="text" name="body" placeholder="Add a comment…" maxlength="1000"
+                                                           class="flex-1 rounded-md border-gray-200 shadow-sm text-xs focus:border-indigo-400 focus:ring-indigo-400 py-1.5">
+                                                    <button type="submit" class="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Post</button>
+                                                </form>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -613,7 +716,7 @@
 
                             {{-- Public reviews from other users --}}
                             @foreach($reviews as $review)
-                            <div class="px-5 py-4 flex gap-3">
+                            <div x-data="{ showComments: false }" class="px-5 py-4 flex gap-3">
                                 <div class="shrink-0">
                                     @if($review->user->avatar)
                                         <img src="{{ asset('storage/' . $review->user->avatar) }}"
@@ -658,10 +761,10 @@
                                         @endif
                                     @endif
 
-                                    {{-- Like button --}}
-                                    @auth
-                                    @php $liked = $likedReviewIds->contains($review->id); @endphp
-                                    <div class="mt-2">
+                                    {{-- Like + Comment actions --}}
+                                    <div class="mt-2 flex items-center gap-3">
+                                        @auth
+                                        @php $liked = $likedReviewIds->contains($review->id); @endphp
                                         <form method="POST"
                                               action="{{ $liked
                                                   ? route('reviews.likes.destroy', $review)
@@ -678,8 +781,48 @@
                                                 @endif
                                             </button>
                                         </form>
+                                        @endauth
+                                        <button @click="showComments = !showComments"
+                                                class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-500 transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                            </svg>
+                                            {{ $review->comments->count() ?: '' }}
+                                            {{ $review->comments->count() === 1 ? 'comment' : ($review->comments->count() > 1 ? 'comments' : 'Comment') }}
+                                        </button>
                                     </div>
-                                    @endauth
+                                    <div x-show="showComments" x-cloak class="mt-2 space-y-2">
+                                        @foreach($review->comments as $comment)
+                                        <div class="flex gap-2 text-sm">
+                                            <div class="shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold select-none">
+                                                {{ strtoupper(substr($comment->user->name, 0, 1)) }}
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <span class="font-medium text-gray-800 text-xs">
+                                                    <a href="{{ route('profile.show', $comment->user->username) }}" class="hover:text-indigo-600 transition-colors">{{ $comment->user->username }}</a>
+                                                </span>
+                                                <span class="text-gray-600 text-xs ml-1">{{ $comment->body }}</span>
+                                                <span class="text-gray-300 text-xs ml-1">{{ $comment->created_at->diffForHumans() }}</span>
+                                                @auth
+                                                @if(auth()->id() === $comment->user_id || auth()->id() === $review->user_id)
+                                                <form method="POST" action="{{ route('review-comments.destroy', $comment) }}" class="inline ml-1">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="text-xs text-gray-300 hover:text-red-400 transition-colors">✕</button>
+                                                </form>
+                                                @endif
+                                                @endauth
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                        @auth
+                                        <form method="POST" action="{{ route('reviews.comments.store', $review) }}" class="flex gap-2 mt-1">
+                                            @csrf
+                                            <input type="text" name="body" placeholder="Add a comment…" maxlength="1000"
+                                                   class="flex-1 rounded-md border-gray-200 shadow-sm text-xs focus:border-indigo-400 focus:ring-indigo-400 py-1.5">
+                                            <button type="submit" class="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Post</button>
+                                        </form>
+                                        @endauth
+                                    </div>
                                 </div>
                             </div>
                             @endforeach

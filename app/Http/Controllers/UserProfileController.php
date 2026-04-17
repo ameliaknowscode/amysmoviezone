@@ -84,10 +84,10 @@ class UserProfileController extends Controller
     {
         $profileUser = User::where('username', $username)->firstOrFail();
 
-        $paginator = null;
-        $entries   = null;
-
+        $paginator    = null;
+        $entries      = null;
         $diaryRatings = collect();
+        $coWatchedMap = [];
 
         if (! ($profileUser->profile_private && Auth::id() !== $profileUser->id)) {
             $paginator = $profileUser->reviews()
@@ -100,7 +100,8 @@ class UserProfileController extends Controller
             $entries = $paginator->getCollection()
                 ->groupBy(fn($r) => $r->watched_at->format('Y-m'));
 
-            $movieIds = $paginator->getCollection()->pluck('movie_id')->unique();
+            $pageEntries = $paginator->getCollection();
+            $movieIds    = $pageEntries->pluck('movie_id')->unique();
 
             if ($movieIds->isNotEmpty()) {
                 $diaryRatings = Rating::where('user_id', $profileUser->id)
@@ -109,9 +110,33 @@ class UserProfileController extends Controller
                     ->get()
                     ->keyBy('movie_id');
             }
+
+            // Build co-watched map: (movie_id)_(date) → [User, ...]
+            if (Auth::check()) {
+                $followingIds = $profileUser->following()->pluck('users.id');
+
+                if ($followingIds->isNotEmpty() && $movieIds->isNotEmpty()) {
+                    $pairs = $pageEntries
+                        ->map(fn($r) => $r->movie_id . '_' . $r->watched_at->toDateString())
+                        ->unique()
+                        ->values();
+
+                    Review::with('user')
+                        ->whereIn('user_id', $followingIds)
+                        ->whereIn('movie_id', $movieIds)
+                        ->whereNotNull('watched_at')
+                        ->get()
+                        ->each(function ($r) use (&$coWatchedMap, $pairs) {
+                            $key = $r->movie_id . '_' . $r->watched_at->toDateString();
+                            if ($pairs->contains($key)) {
+                                $coWatchedMap[$key][] = $r->user;
+                            }
+                        });
+                }
+            }
         }
 
-        return view('profile.diary', compact('profileUser', 'entries', 'paginator', 'diaryRatings'));
+        return view('profile.diary', compact('profileUser', 'entries', 'paginator', 'diaryRatings', 'coWatchedMap'));
     }
 
     public function watchlist(string $username): View

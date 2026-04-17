@@ -79,6 +79,9 @@
                             <x-dropdown-link :href="route('admin.movies.index')">
                                 {{ __('Movies') }}
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.collections.index')">
+                                {{ __('Collections') }}
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.people.index')">
                                 {{ __('People') }}
                             </x-dropdown-link>
@@ -291,6 +294,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.movies.index')" :active="request()->routeIs('admin.movies.*')" class="pl-8">
                 {{ __('— Movies') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.collections.index')" :active="request()->routeIs('admin.collections.*')" class="pl-8">
+                {{ __('— Collections') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.people.index')" :active="request()->routeIs('admin.people.*')" class="pl-8">
                 {{ __('— People') }}
