@@ -23,6 +23,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\MovieListController;
 use App\Http\Controllers\MovieListFollowController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReviewCommentController;
 use App\Http\Controllers\ReviewLikeController;
 use App\Http\Controllers\MovieListItemController;
 use App\Http\Controllers\RecommendationsController;
@@ -119,6 +120,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/reviews/{review}/likes', [ReviewLikeController::class, 'store'])->name('reviews.likes.store');
     Route::delete('/reviews/{review}/likes', [ReviewLikeController::class, 'destroy'])->name('reviews.likes.destroy');
+
+    Route::post('/reviews/{review}/comments', [ReviewCommentController::class, 'store'])->name('reviews.comments.store');
+    Route::delete('/review-comments/{comment}', [ReviewCommentController::class, 'destroy'])->name('review-comments.destroy');
 
     Route::get('/feed', [FeedController::class, 'index'])->name('feed');
     Route::get('/feed/more', [FeedController::class, 'more'])->name('feed.more');

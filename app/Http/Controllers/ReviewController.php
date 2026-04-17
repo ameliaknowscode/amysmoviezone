@@ -33,12 +33,20 @@ class ReviewController extends Controller
 
         Cache::forget("user.{$userId}.profile_stats");
 
-        // Notify followers who have also logged this movie (lazy chunks to avoid memory spike)
+        $watchedDate = $validated['watched_at'] ?? now()->toDateString();
+
+        // Notify followers who have also logged this movie; detect same-night watches
         $request->user()
             ->followers()
             ->whereHas('reviews', fn($q) => $q->where('movie_id', $movie->id))
             ->lazyById()
-            ->each(fn($follower) => $follower->notify(new SharedLog($request->user(), $movie)));
+            ->each(function ($follower) use ($request, $movie, $watchedDate) {
+                $sameNight = $follower->reviews()
+                    ->where('movie_id', $movie->id)
+                    ->where('watched_at', $watchedDate)
+                    ->exists();
+                $follower->notify(new SharedLog($request->user(), $movie, $sameNight));
+            });
 
         return back()->with('status', 'review-saved');
     }

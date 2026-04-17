@@ -67,6 +67,23 @@
                                     @if($entry->body)
                                         <p class="text-sm text-gray-600 mt-1 leading-relaxed">{{ $entry->body }}</p>
                                     @endif
+                                    @php
+                                        $coKey      = $entry->movie_id . '_' . $entry->watched_at->toDateString();
+                                        $coWatchers = $coWatchedMap[$coKey] ?? [];
+                                    @endphp
+                                    @if(count($coWatchers) > 0)
+                                        <div class="flex items-center gap-1 mt-1.5">
+                                            <svg class="w-3 h-3 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                                            </svg>
+                                            <span class="text-xs text-amber-600">Co-watched with
+                                                @foreach($coWatchers as $i => $coUser)
+                                                    <a href="{{ route('profile.show', $coUser->username) }}"
+                                                       class="font-medium hover:text-amber-800 transition-colors">{{ $coUser->name }}</a>@if($i < count($coWatchers) - 1), @endif
+                                                @endforeach
+                                            </span>
+                                        </div>
+                                    @endif
                                 </div>
 
                             </div>

@@ -32,7 +32,7 @@ class BuildMovieShowData
         if ($userId) {
             $userRating         = Rating::where('user_id', $userId)->where('movie_id', $movie->id)->first();
             $userWatchlistEntry = WatchlistEntry::where('user_id', $userId)->where('movie_id', $movie->id)->first();
-            $userReviews        = Review::where('user_id', $userId)->where('movie_id', $movie->id)->latest()->get();
+            $userReviews        = Review::where('user_id', $userId)->where('movie_id', $movie->id)->with('comments.user')->latest()->get();
             $userLists    = MovieList::where('user_id', $userId)->orderBy('name')->get();
             // Single query instead of one exists() per list
             $movieListIds = MovieListItem::whereIn('movie_list_id', $userLists->pluck('id'))
@@ -61,19 +61,28 @@ class BuildMovieShowData
                     ->groupBy('user_id')
                     ->pluck('cnt', 'user_id');
 
+                $friendWatchedDates = Review::whereIn('user_id', $followingIds)
+                    ->where('movie_id', $movie->id)
+                    ->whereNotNull('watched_at')
+                    ->orderByDesc('watched_at')
+                    ->get(['user_id', 'watched_at'])
+                    ->groupBy('user_id')
+                    ->map(fn($rows) => $rows->pluck('watched_at'));
+
                 $friendActivity = $friendRatings->keys()
                     ->merge($friendWatchlist->keys())
                     ->unique()
-                    ->map(function ($uid) use ($friendRatings, $friendWatchlist, $friendReviewCounts) {
+                    ->map(function ($uid) use ($friendRatings, $friendWatchlist, $friendReviewCounts, $friendWatchedDates) {
                         $rating    = $friendRatings->get($uid);
                         $watchlist = $friendWatchlist->get($uid);
                         $user      = $rating?->user ?? $watchlist?->user;
 
                         return $user ? (object) [
-                            'user'         => $user,
-                            'rating'       => $rating,
-                            'watchlist'    => $watchlist,
-                            'review_count' => $friendReviewCounts->get($uid, 0),
+                            'user'          => $user,
+                            'rating'        => $rating,
+                            'watchlist'     => $watchlist,
+                            'review_count'  => $friendReviewCounts->get($uid, 0),
+                            'watched_dates' => $friendWatchedDates->get($uid, collect()),
                         ] : null;
                     })
                     ->filter()
@@ -83,7 +92,7 @@ class BuildMovieShowData
 
         // Public reviews from other users, most recent first
         $reviews = $movie->reviews()
-            ->with('user')
+            ->with(['user', 'comments.user'])
             ->withCount('likes')
             ->when($userId, fn($q) => $q->where('user_id', '!=', $userId))
             ->whereHas('user', fn($q) => $q->where('profile_private', false))
