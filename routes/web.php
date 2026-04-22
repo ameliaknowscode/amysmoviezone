@@ -34,6 +34,7 @@ use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GenreImportController;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\YearReviewController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -157,6 +158,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     Route::get('/stats', [StatsController::class, 'show'])->name('stats.show');
+    Route::get('/year-review', [YearReviewController::class, 'index'])->name('year-review.index');
+    Route::get('/year-review/{year}', [YearReviewController::class, 'show'])->name('year-review.show');
     Route::get('/watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
     Route::post('/movies/{movie}/watchlist', [WatchlistController::class, 'store'])->name('movies.watchlist.store');
     Route::patch('/movies/{movie}/watchlist/watched-at', [WatchlistController::class, 'updateWatchedAt'])->name('movies.watchlist.watched-at');
