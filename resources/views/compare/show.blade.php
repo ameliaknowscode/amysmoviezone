@@ -1,12 +1,12 @@
 <x-app-layout>
 
     {{-- Hero --}}
-    <div class="bg-gradient-to-br from-indigo-950 to-indigo-900 text-white">
+    <div class="bg-zinc-900 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
             {{-- Back link --}}
             <div class="mb-6">
-                <a href="{{ route('compare.index') }}" class="text-xs text-indigo-400 hover:text-indigo-200 transition-colors">&larr; Compare another pair</a>
+                <a href="{{ route('compare.index') }}" class="text-xs text-amber-400 hover:text-zinc-300 transition-colors">&larr; Compare another pair</a>
             </div>
 
             {{-- Director cards --}}
@@ -20,22 +20,22 @@
                                 <img src="{{ asset('storage/' . $personA->photo) }}" alt="{{ $personA->name }}"
                                      class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover ring-2 ring-white/20 shrink-0">
                             @else
-                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-indigo-800 flex items-center justify-center ring-2 ring-white/20 shrink-0">
-                                    <span class="text-2xl font-bold text-indigo-400">{{ strtoupper(substr($personA->name, 0, 1)) }}</span>
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-zinc-800 flex items-center justify-center ring-2 ring-white/20 shrink-0">
+                                    <span class="text-2xl font-bold text-amber-400">{{ strtoupper(substr($personA->name, 0, 1)) }}</span>
                                 </div>
                             @endif
                             <div class="min-w-0">
-                                <h2 class="text-xl sm:text-2xl font-bold leading-tight group-hover:text-indigo-300 transition-colors">{{ $personA->name }}</h2>
+                                <h2 class="text-xl sm:text-2xl font-bold leading-tight group-hover:text-zinc-400 transition-colors">{{ $personA->name }}</h2>
                                 @if($personA->nationality)
-                                    <p class="text-xs text-indigo-400 mt-0.5">{{ $personA->nationality }}</p>
+                                    <p class="text-xs text-amber-400 mt-0.5">{{ $personA->nationality }}</p>
                                 @endif
                                 <div class="mt-2 flex flex-wrap gap-3 text-sm">
-                                    <span><span class="font-bold text-lg">{{ $dataA['films']->count() }}</span> <span class="text-indigo-300 text-xs">films</span></span>
+                                    <span><span class="font-bold text-lg">{{ $dataA['films']->count() }}</span> <span class="text-zinc-400 text-xs">films</span></span>
                                     @if($dataA['overallAvg'])
-                                        <span><span class="font-bold text-lg">{{ number_format($dataA['overallAvg'], 1) }}</span> <span class="text-indigo-300 text-xs">avg ★</span></span>
+                                        <span><span class="font-bold text-lg">{{ number_format($dataA['overallAvg'], 1) }}</span> <span class="text-zinc-400 text-xs">avg ★</span></span>
                                     @endif
                                     @if($dataA['firstYear'])
-                                        <span class="text-indigo-300 text-xs self-end">{{ $dataA['firstYear'] }}–{{ $dataA['lastYear'] }}</span>
+                                        <span class="text-zinc-400 text-xs self-end">{{ $dataA['firstYear'] }}–{{ $dataA['lastYear'] }}</span>
                                     @endif
                                 </div>
                             </div>
@@ -45,7 +45,7 @@
 
                 {{-- VS --}}
                 <div class="text-center">
-                    <span class="text-2xl sm:text-3xl font-black text-indigo-600 tracking-widest">VS</span>
+                    <span class="text-2xl sm:text-3xl font-black text-amber-400 tracking-widest">VS</span>
                 </div>
 
                 {{-- Director B --}}
@@ -56,22 +56,22 @@
                                 <img src="{{ asset('storage/' . $personB->photo) }}" alt="{{ $personB->name }}"
                                      class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover ring-2 ring-white/20 shrink-0">
                             @else
-                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-indigo-800 flex items-center justify-center ring-2 ring-white/20 shrink-0">
-                                    <span class="text-2xl font-bold text-indigo-400">{{ strtoupper(substr($personB->name, 0, 1)) }}</span>
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-zinc-800 flex items-center justify-center ring-2 ring-white/20 shrink-0">
+                                    <span class="text-2xl font-bold text-amber-400">{{ strtoupper(substr($personB->name, 0, 1)) }}</span>
                                 </div>
                             @endif
                             <div class="min-w-0">
-                                <h2 class="text-xl sm:text-2xl font-bold leading-tight group-hover:text-indigo-300 transition-colors">{{ $personB->name }}</h2>
+                                <h2 class="text-xl sm:text-2xl font-bold leading-tight group-hover:text-zinc-400 transition-colors">{{ $personB->name }}</h2>
                                 @if($personB->nationality)
-                                    <p class="text-xs text-indigo-400 mt-0.5">{{ $personB->nationality }}</p>
+                                    <p class="text-xs text-amber-400 mt-0.5">{{ $personB->nationality }}</p>
                                 @endif
                                 <div class="mt-2 flex flex-wrap gap-3 text-sm justify-end">
-                                    <span><span class="font-bold text-lg">{{ $dataB['films']->count() }}</span> <span class="text-indigo-300 text-xs">films</span></span>
+                                    <span><span class="font-bold text-lg">{{ $dataB['films']->count() }}</span> <span class="text-zinc-400 text-xs">films</span></span>
                                     @if($dataB['overallAvg'])
-                                        <span><span class="font-bold text-lg">{{ number_format($dataB['overallAvg'], 1) }}</span> <span class="text-indigo-300 text-xs">avg ★</span></span>
+                                        <span><span class="font-bold text-lg">{{ number_format($dataB['overallAvg'], 1) }}</span> <span class="text-zinc-400 text-xs">avg ★</span></span>
                                     @endif
                                     @if($dataB['firstYear'])
-                                        <span class="text-indigo-300 text-xs self-end">{{ $dataB['firstYear'] }}–{{ $dataB['lastYear'] }}</span>
+                                        <span class="text-zinc-400 text-xs self-end">{{ $dataB['firstYear'] }}–{{ $dataB['lastYear'] }}</span>
                                     @endif
                                 </div>
                             </div>
@@ -90,22 +90,22 @@
             $maxFilms = max($dataA['films']->count(), $dataB['films']->count(), 1);
             $maxAvg   = max($dataA['overallAvg'] ?? 0, $dataB['overallAvg'] ?? 0, 0.1);
         @endphp
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h2 class="text-sm font-semibold uppercase tracking-widest text-gray-500">By the numbers</h2>
+        <div class="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 overflow-hidden">
+            <div class="px-6 py-4 border-b border-zinc-800">
+                <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500">By the numbers</h2>
             </div>
             <div class="divide-y divide-gray-50">
 
                 {{-- Films --}}
                 <div class="px-6 py-4 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
                     <div class="flex items-center gap-2 justify-end">
-                        <span class="text-sm font-semibold text-gray-800">{{ $dataA['films']->count() }}</span>
-                        <div class="h-2 rounded-full bg-indigo-500 transition-all" style="width: {{ round(($dataA['films']->count() / $maxFilms) * 100) }}px; max-width: 160px"></div>
+                        <span class="text-sm font-semibold text-zinc-200">{{ $dataA['films']->count() }}</span>
+                        <div class="h-2 rounded-full bg-amber-900/200 transition-all" style="width: {{ round(($dataA['films']->count() / $maxFilms) * 100) }}px; max-width: 160px"></div>
                     </div>
-                    <span class="text-xs text-gray-400 uppercase tracking-wide text-center w-20">Films</span>
+                    <span class="text-xs text-zinc-500 uppercase tracking-wide text-center w-20">Films</span>
                     <div class="flex items-center gap-2">
                         <div class="h-2 rounded-full bg-purple-500 transition-all" style="width: {{ round(($dataB['films']->count() / $maxFilms) * 100) }}px; max-width: 160px"></div>
-                        <span class="text-sm font-semibold text-gray-800">{{ $dataB['films']->count() }}</span>
+                        <span class="text-sm font-semibold text-zinc-200">{{ $dataB['films']->count() }}</span>
                     </div>
                 </div>
 
@@ -113,17 +113,17 @@
                 @if($dataA['overallAvg'] || $dataB['overallAvg'])
                 <div class="px-6 py-4 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
                     <div class="flex items-center gap-2 justify-end">
-                        <span class="text-sm font-semibold text-gray-800">{{ $dataA['overallAvg'] ? number_format($dataA['overallAvg'], 1) : '—' }}</span>
+                        <span class="text-sm font-semibold text-zinc-200">{{ $dataA['overallAvg'] ? number_format($dataA['overallAvg'], 1) : '—' }}</span>
                         @if($dataA['overallAvg'])
-                            <div class="h-2 rounded-full bg-indigo-500" style="width: {{ round(($dataA['overallAvg'] / $maxAvg) * 100) }}px; max-width: 160px"></div>
+                            <div class="h-2 rounded-full bg-amber-900/200" style="width: {{ round(($dataA['overallAvg'] / $maxAvg) * 100) }}px; max-width: 160px"></div>
                         @endif
                     </div>
-                    <span class="text-xs text-gray-400 uppercase tracking-wide text-center w-20">Avg ★</span>
+                    <span class="text-xs text-zinc-500 uppercase tracking-wide text-center w-20">Avg ★</span>
                     <div class="flex items-center gap-2">
                         @if($dataB['overallAvg'])
                             <div class="h-2 rounded-full bg-purple-500" style="width: {{ round(($dataB['overallAvg'] / $maxAvg) * 100) }}px; max-width: 160px"></div>
                         @endif
-                        <span class="text-sm font-semibold text-gray-800">{{ $dataB['overallAvg'] ? number_format($dataB['overallAvg'], 1) : '—' }}</span>
+                        <span class="text-sm font-semibold text-zinc-200">{{ $dataB['overallAvg'] ? number_format($dataB['overallAvg'], 1) : '—' }}</span>
                     </div>
                 </div>
                 @endif
@@ -132,19 +132,19 @@
                 <div class="px-6 py-4 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
                     <div class="text-right">
                         @if($dataA['firstYear'])
-                            <span class="text-sm font-semibold text-gray-800">{{ $dataA['firstYear'] }}–{{ $dataA['lastYear'] }}</span>
-                            <span class="text-xs text-gray-400 ml-1">({{ $dataA['lastYear'] - $dataA['firstYear'] + 1 }}yr)</span>
+                            <span class="text-sm font-semibold text-zinc-200">{{ $dataA['firstYear'] }}–{{ $dataA['lastYear'] }}</span>
+                            <span class="text-xs text-zinc-500 ml-1">({{ $dataA['lastYear'] - $dataA['firstYear'] + 1 }}yr)</span>
                         @else
-                            <span class="text-sm text-gray-400">—</span>
+                            <span class="text-sm text-zinc-500">—</span>
                         @endif
                     </div>
-                    <span class="text-xs text-gray-400 uppercase tracking-wide text-center w-20">Career</span>
+                    <span class="text-xs text-zinc-500 uppercase tracking-wide text-center w-20">Career</span>
                     <div>
                         @if($dataB['firstYear'])
-                            <span class="text-sm font-semibold text-gray-800">{{ $dataB['firstYear'] }}–{{ $dataB['lastYear'] }}</span>
-                            <span class="text-xs text-gray-400 ml-1">({{ $dataB['lastYear'] - $dataB['firstYear'] + 1 }}yr)</span>
+                            <span class="text-sm font-semibold text-zinc-200">{{ $dataB['firstYear'] }}–{{ $dataB['lastYear'] }}</span>
+                            <span class="text-xs text-zinc-500 ml-1">({{ $dataB['lastYear'] - $dataB['firstYear'] + 1 }}yr)</span>
                         @else
-                            <span class="text-sm text-gray-400">—</span>
+                            <span class="text-sm text-zinc-500">—</span>
                         @endif
                     </div>
                 </div>
@@ -158,9 +158,9 @@
             $allDecades = $dataA['decades']->keys()->merge($dataB['decades']->keys())->unique()->sort()->values();
             $maxDecadeCount = max($dataA['decades']->max() ?? 0, $dataB['decades']->max() ?? 0, 1);
         @endphp
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h2 class="text-sm font-semibold uppercase tracking-widest text-gray-500">Activity by decade</h2>
+        <div class="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 overflow-hidden">
+            <div class="px-6 py-4 border-b border-zinc-800">
+                <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500">Activity by decade</h2>
             </div>
             <div class="px-6 py-5">
                 <div class="flex items-end gap-1 sm:gap-2">
@@ -173,16 +173,16 @@
                     @endphp
                     <div class="flex-1 flex flex-col items-center gap-1">
                         <div class="w-full flex items-end justify-center gap-0.5" style="height: 80px">
-                            <div class="w-2 sm:w-3 rounded-t bg-indigo-500 transition-all" style="height: {{ $hA }}px" title="{{ $personA->name }}: {{ $cA }} film{{ $cA !== 1 ? 's' : '' }}"></div>
+                            <div class="w-2 sm:w-3 rounded-t bg-amber-900/200 transition-all" style="height: {{ $hA }}px" title="{{ $personA->name }}: {{ $cA }} film{{ $cA !== 1 ? 's' : '' }}"></div>
                             <div class="w-2 sm:w-3 rounded-t bg-purple-400 transition-all" style="height: {{ $hB }}px" title="{{ $personB->name }}: {{ $cB }} film{{ $cB !== 1 ? 's' : '' }}"></div>
                         </div>
-                        <span class="text-xs text-gray-400">{{ $decade }}s</span>
+                        <span class="text-xs text-zinc-500">{{ $decade }}s</span>
                     </div>
                     @endforeach
                 </div>
                 {{-- Legend --}}
-                <div class="flex items-center gap-6 mt-4 text-xs text-gray-500">
-                    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded bg-indigo-500"></span>{{ $personA->name }}</span>
+                <div class="flex items-center gap-6 mt-4 text-xs text-zinc-500">
+                    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded bg-amber-900/200"></span>{{ $personA->name }}</span>
                     <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded bg-purple-400"></span>{{ $personB->name }}</span>
                 </div>
             </div>
@@ -193,42 +193,42 @@
         @if($dataA['topGenres']->isNotEmpty() || $dataB['topGenres']->isNotEmpty())
         <div class="grid sm:grid-cols-2 gap-6">
 
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100">
-                    <h2 class="text-sm font-semibold uppercase tracking-widest text-gray-500">{{ $personA->name }}'s top genres</h2>
+            <div class="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 overflow-hidden">
+                <div class="px-6 py-4 border-b border-zinc-800">
+                    <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500">{{ $personA->name }}'s top genres</h2>
                 </div>
                 <div class="px-6 py-4 space-y-2.5">
                     @forelse($dataA['topGenres'] as $genre)
                     @php $pct = $dataA['films']->count() > 0 ? round(($genre->movies_count / $dataA['films']->count()) * 100) : 0; @endphp
                     <div class="flex items-center gap-3">
-                        <span class="w-28 text-sm text-gray-700 truncate">{{ $genre->name }}</span>
-                        <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-indigo-500 rounded-full" style="width: {{ $pct }}%"></div>
+                        <span class="w-28 text-sm text-zinc-300 truncate">{{ $genre->name }}</span>
+                        <div class="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-amber-900/200 rounded-full" style="width: {{ $pct }}%"></div>
                         </div>
-                        <span class="text-xs text-gray-400 w-6 text-right">{{ $genre->movies_count }}</span>
+                        <span class="text-xs text-zinc-500 w-6 text-right">{{ $genre->movies_count }}</span>
                     </div>
                     @empty
-                        <p class="text-sm text-gray-400">No genre data.</p>
+                        <p class="text-sm text-zinc-500">No genre data.</p>
                     @endforelse
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100">
-                    <h2 class="text-sm font-semibold uppercase tracking-widest text-gray-500">{{ $personB->name }}'s top genres</h2>
+            <div class="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 overflow-hidden">
+                <div class="px-6 py-4 border-b border-zinc-800">
+                    <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500">{{ $personB->name }}'s top genres</h2>
                 </div>
                 <div class="px-6 py-4 space-y-2.5">
                     @forelse($dataB['topGenres'] as $genre)
                     @php $pct = $dataB['films']->count() > 0 ? round(($genre->movies_count / $dataB['films']->count()) * 100) : 0; @endphp
                     <div class="flex items-center gap-3">
-                        <span class="w-28 text-sm text-gray-700 truncate">{{ $genre->name }}</span>
-                        <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <span class="w-28 text-sm text-zinc-300 truncate">{{ $genre->name }}</span>
+                        <div class="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
                             <div class="h-full bg-purple-400 rounded-full" style="width: {{ $pct }}%"></div>
                         </div>
-                        <span class="text-xs text-gray-400 w-6 text-right">{{ $genre->movies_count }}</span>
+                        <span class="text-xs text-zinc-500 w-6 text-right">{{ $genre->movies_count }}</span>
                     </div>
                     @empty
-                        <p class="text-sm text-gray-400">No genre data.</p>
+                        <p class="text-sm text-zinc-500">No genre data.</p>
                     @endforelse
                 </div>
             </div>
@@ -238,22 +238,22 @@
 
         {{-- Shared cast --}}
         @if($sharedCast->isNotEmpty())
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h2 class="text-sm font-semibold uppercase tracking-widest text-gray-500">Shared collaborators</h2>
-                <p class="text-xs text-gray-400 mt-0.5">People who appeared in films by both directors</p>
+        <div class="bg-zinc-900 rounded-xl shadow-sm border border-zinc-800 overflow-hidden">
+            <div class="px-6 py-4 border-b border-zinc-800">
+                <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500">Shared collaborators</h2>
+                <p class="text-xs text-zinc-500 mt-0.5">People who appeared in films by both directors</p>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 divide-x divide-y divide-gray-50">
                 @foreach($sharedCast as $row)
                 <a href="{{ route('people.show', $row['person']) }}"
-                   class="px-4 py-3 hover:bg-gray-50 transition-colors group">
-                    <p class="text-sm font-medium text-gray-800 group-hover:text-indigo-600 transition-colors truncate">{{ $row['person']->name }}</p>
-                    <div class="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                   class="px-4 py-3 hover:bg-zinc-800 transition-colors group">
+                    <p class="text-sm font-medium text-zinc-200 group-hover:text-amber-400 transition-colors truncate">{{ $row['person']->name }}</p>
+                    <div class="flex items-center gap-2 mt-1 text-xs text-zinc-500">
                         <span class="flex items-center gap-1">
-                            <span class="inline-block w-2 h-2 rounded bg-indigo-400"></span>
+                            <span class="inline-block w-2 h-2 rounded bg-amber-400"></span>
                             {{ $row['films_with_a'] }} film{{ $row['films_with_a'] !== 1 ? 's' : '' }}
                         </span>
-                        <span class="text-gray-200">·</span>
+                        <span class="text-zinc-600">·</span>
                         <span class="flex items-center gap-1">
                             <span class="inline-block w-2 h-2 rounded bg-purple-400"></span>
                             {{ $row['films_with_b'] }} film{{ $row['films_with_b'] !== 1 ? 's' : '' }}
@@ -270,24 +270,24 @@
 
             {{-- Director A filmography --}}
             <div>
-                <h2 class="text-sm font-semibold uppercase tracking-widest text-gray-500 mb-4">{{ $personA->name }}</h2>
+                <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 mb-4">{{ $personA->name }}</h2>
                 <div class="grid grid-cols-3 gap-3">
                     @foreach($dataA['films'] as $credit)
                     @php $avgRating = $dataA['avgRatings']->get($credit->movie_id); @endphp
                     <a href="{{ $credit->movie->publicUrl() }}" class="group">
-                        <div class="aspect-[2/3] bg-gray-100 rounded-lg overflow-hidden shadow-sm">
+                        <div class="aspect-[2/3] bg-zinc-800 rounded-lg overflow-hidden shadow-sm ring-1 ring-zinc-700">
                             @if($credit->movie->posterUrl())
                                 <img src="{{ $credit->movie->posterUrl() }}" alt="{{ $credit->movie->title }}"
                                      class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
                             @else
                                 <div class="w-full h-full flex items-center justify-center p-1 text-center">
-                                    <span class="text-xs text-gray-400 leading-tight">{{ $credit->movie->title }}</span>
+                                    <span class="text-xs text-zinc-500 leading-tight">{{ $credit->movie->title }}</span>
                                 </div>
                             @endif
                         </div>
                         <div class="mt-1">
-                            <p class="text-xs font-medium text-gray-800 truncate group-hover:text-indigo-600 transition-colors leading-snug">{{ $credit->movie->title }}</p>
-                            <p class="text-xs text-gray-400">{{ $credit->movie->release_year }}</p>
+                            <p class="text-xs font-medium text-zinc-200 truncate group-hover:text-amber-400 transition-colors leading-snug">{{ $credit->movie->title }}</p>
+                            <p class="text-xs text-zinc-500">{{ $credit->movie->release_year }}</p>
                             @if($avgRating)
                                 <p class="text-xs text-yellow-500">{{ number_format($avgRating, 1) }} ★</p>
                             @endif
@@ -299,24 +299,24 @@
 
             {{-- Director B filmography --}}
             <div>
-                <h2 class="text-sm font-semibold uppercase tracking-widest text-gray-500 mb-4">{{ $personB->name }}</h2>
+                <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 mb-4">{{ $personB->name }}</h2>
                 <div class="grid grid-cols-3 gap-3">
                     @foreach($dataB['films'] as $credit)
                     @php $avgRating = $dataB['avgRatings']->get($credit->movie_id); @endphp
                     <a href="{{ $credit->movie->publicUrl() }}" class="group">
-                        <div class="aspect-[2/3] bg-gray-100 rounded-lg overflow-hidden shadow-sm">
+                        <div class="aspect-[2/3] bg-zinc-800 rounded-lg overflow-hidden shadow-sm ring-1 ring-zinc-700">
                             @if($credit->movie->posterUrl())
                                 <img src="{{ $credit->movie->posterUrl() }}" alt="{{ $credit->movie->title }}"
                                      class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
                             @else
                                 <div class="w-full h-full flex items-center justify-center p-1 text-center">
-                                    <span class="text-xs text-gray-400 leading-tight">{{ $credit->movie->title }}</span>
+                                    <span class="text-xs text-zinc-500 leading-tight">{{ $credit->movie->title }}</span>
                                 </div>
                             @endif
                         </div>
                         <div class="mt-1">
-                            <p class="text-xs font-medium text-gray-800 truncate group-hover:text-indigo-600 transition-colors leading-snug">{{ $credit->movie->title }}</p>
-                            <p class="text-xs text-gray-400">{{ $credit->movie->release_year }}</p>
+                            <p class="text-xs font-medium text-zinc-200 truncate group-hover:text-amber-400 transition-colors leading-snug">{{ $credit->movie->title }}</p>
+                            <p class="text-xs text-zinc-500">{{ $credit->movie->release_year }}</p>
                             @if($avgRating)
                                 <p class="text-xs text-yellow-500">{{ number_format($avgRating, 1) }} ★</p>
                             @endif

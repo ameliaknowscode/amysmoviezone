@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit Collection</h2>
+        <h2 class="font-semibold text-xl text-zinc-100 leading-tight">Edit Collection</h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg p-6">
 
                 @if($errors->any())
                     <div class="mb-4 p-4 bg-red-50 text-red-700 rounded-md text-sm">
@@ -19,24 +19,24 @@
                     @csrf @method('PATCH')
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <label class="block text-sm font-medium text-zinc-300 mb-1">Name</label>
                         <input type="text" name="name" value="{{ old('name', $collection->name) }}"
-                               class="w-full max-w-md rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                               class="w-full max-w-md rounded-md border-zinc-700 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm"
                                required>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description <span class="text-gray-400 font-normal">(optional)</span></label>
+                        <label class="block text-sm font-medium text-zinc-300 mb-1">Description <span class="text-zinc-500 font-normal">(optional)</span></label>
                         <textarea name="description" rows="3"
-                                  class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ old('description', $collection->description) }}</textarea>
+                                  class="w-full rounded-md border-zinc-700 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm">{{ old('description', $collection->description) }}</textarea>
                     </div>
 
                     <div class="flex items-center gap-4 pt-2">
                         <button type="submit"
-                                class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition">
+                                class="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-md hover:bg-amber-400 transition">
                             Save Changes
                         </button>
-                        <a href="{{ route('admin.collections.index') }}" class="text-sm text-gray-500 hover:text-gray-700">Cancel</a>
+                        <a href="{{ route('admin.collections.index') }}" class="text-sm text-zinc-500 hover:text-zinc-300">Cancel</a>
                     </div>
                 </form>
 

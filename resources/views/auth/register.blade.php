@@ -13,7 +13,7 @@
         <div class="mt-4">
             <x-input-label for="username" :value="__('Username')" />
             <div class="flex mt-1">
-                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">@</span>
+                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-zinc-700 bg-zinc-900 text-zinc-500 text-sm">@</span>
                 <x-text-input id="username" class="block w-full rounded-l-none" type="text" name="username" :value="old('username')" required autocomplete="username" />
             </div>
             <x-input-error :messages="$errors->get('username')" class="mt-2" />
@@ -50,7 +50,7 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+            <a class="underline text-sm text-zinc-400 hover:text-zinc-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
             </a>
 
