@@ -94,17 +94,17 @@
             <div class="px-6 py-4 border-b border-zinc-800">
                 <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500">By the numbers</h2>
             </div>
-            <div class="divide-y divide-gray-50">
+            <div class="divide-y divide-zinc-800">
 
                 {{-- Films --}}
                 <div class="px-6 py-4 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
                     <div class="flex items-center gap-2 justify-end">
                         <span class="text-sm font-semibold text-zinc-200">{{ $dataA['films']->count() }}</span>
-                        <div class="h-2 rounded-full bg-amber-900/200 transition-all" style="width: {{ round(($dataA['films']->count() / $maxFilms) * 100) }}px; max-width: 160px"></div>
+                        <div class="h-2 rounded-full bg-amber-500 transition-all" style="width: {{ round(($dataA['films']->count() / $maxFilms) * 100) }}px; max-width: 160px"></div>
                     </div>
                     <span class="text-xs text-zinc-500 uppercase tracking-wide text-center w-20">Films</span>
                     <div class="flex items-center gap-2">
-                        <div class="h-2 rounded-full bg-purple-500 transition-all" style="width: {{ round(($dataB['films']->count() / $maxFilms) * 100) }}px; max-width: 160px"></div>
+                        <div class="h-2 rounded-full bg-emerald-400 transition-all" style="width: {{ round(($dataB['films']->count() / $maxFilms) * 100) }}px; max-width: 160px"></div>
                         <span class="text-sm font-semibold text-zinc-200">{{ $dataB['films']->count() }}</span>
                     </div>
                 </div>
@@ -115,13 +115,13 @@
                     <div class="flex items-center gap-2 justify-end">
                         <span class="text-sm font-semibold text-zinc-200">{{ $dataA['overallAvg'] ? number_format($dataA['overallAvg'], 1) : '—' }}</span>
                         @if($dataA['overallAvg'])
-                            <div class="h-2 rounded-full bg-amber-900/200" style="width: {{ round(($dataA['overallAvg'] / $maxAvg) * 100) }}px; max-width: 160px"></div>
+                            <div class="h-2 rounded-full bg-amber-500" style="width: {{ round(($dataA['overallAvg'] / $maxAvg) * 100) }}px; max-width: 160px"></div>
                         @endif
                     </div>
                     <span class="text-xs text-zinc-500 uppercase tracking-wide text-center w-20">Avg ★</span>
                     <div class="flex items-center gap-2">
                         @if($dataB['overallAvg'])
-                            <div class="h-2 rounded-full bg-purple-500" style="width: {{ round(($dataB['overallAvg'] / $maxAvg) * 100) }}px; max-width: 160px"></div>
+                            <div class="h-2 rounded-full bg-emerald-400" style="width: {{ round(($dataB['overallAvg'] / $maxAvg) * 100) }}px; max-width: 160px"></div>
                         @endif
                         <span class="text-sm font-semibold text-zinc-200">{{ $dataB['overallAvg'] ? number_format($dataB['overallAvg'], 1) : '—' }}</span>
                     </div>
@@ -173,8 +173,8 @@
                     @endphp
                     <div class="flex-1 flex flex-col items-center gap-1">
                         <div class="w-full flex items-end justify-center gap-0.5" style="height: 80px">
-                            <div class="w-2 sm:w-3 rounded-t bg-amber-900/200 transition-all" style="height: {{ $hA }}px" title="{{ $personA->name }}: {{ $cA }} film{{ $cA !== 1 ? 's' : '' }}"></div>
-                            <div class="w-2 sm:w-3 rounded-t bg-purple-400 transition-all" style="height: {{ $hB }}px" title="{{ $personB->name }}: {{ $cB }} film{{ $cB !== 1 ? 's' : '' }}"></div>
+                            <div class="w-2 sm:w-3 rounded-t bg-amber-500 transition-all" style="height: {{ $hA }}px" title="{{ $personA->name }}: {{ $cA }} film{{ $cA !== 1 ? 's' : '' }}"></div>
+                            <div class="w-2 sm:w-3 rounded-t bg-emerald-400 transition-all" style="height: {{ $hB }}px" title="{{ $personB->name }}: {{ $cB }} film{{ $cB !== 1 ? 's' : '' }}"></div>
                         </div>
                         <span class="text-xs text-zinc-500">{{ $decade }}s</span>
                     </div>
@@ -182,8 +182,8 @@
                 </div>
                 {{-- Legend --}}
                 <div class="flex items-center gap-6 mt-4 text-xs text-zinc-500">
-                    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded bg-amber-900/200"></span>{{ $personA->name }}</span>
-                    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded bg-purple-400"></span>{{ $personB->name }}</span>
+                    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded bg-amber-500"></span>{{ $personA->name }}</span>
+                    <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded bg-emerald-400"></span>{{ $personB->name }}</span>
                 </div>
             </div>
         </div>
@@ -203,7 +203,7 @@
                     <div class="flex items-center gap-3">
                         <span class="w-28 text-sm text-zinc-300 truncate">{{ $genre->name }}</span>
                         <div class="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-amber-900/200 rounded-full" style="width: {{ $pct }}%"></div>
+                            <div class="h-full bg-amber-500 rounded-full" style="width: {{ $pct }}%"></div>
                         </div>
                         <span class="text-xs text-zinc-500 w-6 text-right">{{ $genre->movies_count }}</span>
                     </div>
@@ -223,7 +223,7 @@
                     <div class="flex items-center gap-3">
                         <span class="w-28 text-sm text-zinc-300 truncate">{{ $genre->name }}</span>
                         <div class="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-purple-400 rounded-full" style="width: {{ $pct }}%"></div>
+                            <div class="h-full bg-emerald-400 rounded-full" style="width: {{ $pct }}%"></div>
                         </div>
                         <span class="text-xs text-zinc-500 w-6 text-right">{{ $genre->movies_count }}</span>
                     </div>
@@ -243,7 +243,7 @@
                 <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500">Shared collaborators</h2>
                 <p class="text-xs text-zinc-500 mt-0.5">People who appeared in films by both directors</p>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 divide-x divide-y divide-gray-50">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 divide-x divide-y divide-zinc-800">
                 @foreach($sharedCast as $row)
                 <a href="{{ route('people.show', $row['person']) }}"
                    class="px-4 py-3 hover:bg-zinc-800 transition-colors group">
@@ -255,7 +255,7 @@
                         </span>
                         <span class="text-zinc-600">·</span>
                         <span class="flex items-center gap-1">
-                            <span class="inline-block w-2 h-2 rounded bg-purple-400"></span>
+                            <span class="inline-block w-2 h-2 rounded bg-emerald-400"></span>
                             {{ $row['films_with_b'] }} film{{ $row['films_with_b'] !== 1 ? 's' : '' }}
                         </span>
                     </div>
