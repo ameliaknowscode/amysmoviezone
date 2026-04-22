@@ -23,6 +23,7 @@ Built as a hands-on learning project for both Laravel and [Claude Code](https://
 - Director Connections — explore shared cast members for multiple directors
 - Head to Head — compare two directors side by side: film counts, average ratings, career span, decade activity, top genres, shared collaborators, and full filmographies
 - Watch parties and comments — comment threads on any review; co-watched detection surfaces an amber chip on diary entries when a followed user logged the same film on the same night; movie pages show a watch party banner when two or more friends share a watched date
+- Year in Review — per-user annual summary at `/year-review` with total films logged, hours watched, average rating, rewatch count, favourite film, month-by-month activity chart, top genres, top directors, rating distribution, and release decade breakdown; navigate between years with prev/next arrows and a year-picker strip
 - Admin panel for managing movies, people, genres, and credits
 
 ## Tech Stack
