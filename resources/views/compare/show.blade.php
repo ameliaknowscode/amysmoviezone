@@ -273,26 +273,9 @@
                 <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 mb-4">{{ $personA->name }}</h2>
                 <div class="grid grid-cols-3 gap-3">
                     @foreach($dataA['films'] as $credit)
-                    @php $avgRating = $dataA['avgRatings']->get($credit->movie_id); @endphp
-                    <a href="{{ $credit->movie->publicUrl() }}" class="group">
-                        <div class="aspect-[2/3] bg-zinc-800 rounded-lg overflow-hidden shadow-sm ring-1 ring-zinc-700">
-                            @if($credit->movie->posterUrl())
-                                <img src="{{ $credit->movie->posterUrl() }}" alt="{{ $credit->movie->title }}"
-                                     class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center p-1 text-center">
-                                    <span class="text-xs text-zinc-500 leading-tight">{{ $credit->movie->title }}</span>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="mt-1">
-                            <p class="text-xs font-medium text-zinc-200 truncate group-hover:text-amber-400 transition-colors leading-snug">{{ $credit->movie->title }}</p>
-                            <p class="text-xs text-zinc-500">{{ $credit->movie->release_year }}</p>
-                            @if($avgRating)
-                                <p class="text-xs text-yellow-500">{{ number_format($avgRating, 1) }} ★</p>
-                            @endif
-                        </div>
-                    </a>
+                    <x-movie-poster-card
+                        :movie="$credit->movie"
+                        :avg-rating="$dataA['avgRatings']->get($credit->movie_id)" />
                     @endforeach
                 </div>
             </div>
@@ -302,26 +285,9 @@
                 <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 mb-4">{{ $personB->name }}</h2>
                 <div class="grid grid-cols-3 gap-3">
                     @foreach($dataB['films'] as $credit)
-                    @php $avgRating = $dataB['avgRatings']->get($credit->movie_id); @endphp
-                    <a href="{{ $credit->movie->publicUrl() }}" class="group">
-                        <div class="aspect-[2/3] bg-zinc-800 rounded-lg overflow-hidden shadow-sm ring-1 ring-zinc-700">
-                            @if($credit->movie->posterUrl())
-                                <img src="{{ $credit->movie->posterUrl() }}" alt="{{ $credit->movie->title }}"
-                                     class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center p-1 text-center">
-                                    <span class="text-xs text-zinc-500 leading-tight">{{ $credit->movie->title }}</span>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="mt-1">
-                            <p class="text-xs font-medium text-zinc-200 truncate group-hover:text-amber-400 transition-colors leading-snug">{{ $credit->movie->title }}</p>
-                            <p class="text-xs text-zinc-500">{{ $credit->movie->release_year }}</p>
-                            @if($avgRating)
-                                <p class="text-xs text-yellow-500">{{ number_format($avgRating, 1) }} ★</p>
-                            @endif
-                        </div>
-                    </a>
+                    <x-movie-poster-card
+                        :movie="$credit->movie"
+                        :avg-rating="$dataB['avgRatings']->get($credit->movie_id)" />
                     @endforeach
                 </div>
             </div>

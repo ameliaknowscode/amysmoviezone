@@ -87,24 +87,7 @@
                 <h2 class="text-lg font-semibold text-zinc-100 mb-4">Recently Added</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     @foreach($recentMovies as $movie)
-                    <a href="{{ $movie->publicUrl() }}" class="group">
-                        <div class="aspect-[2/3] bg-zinc-800 rounded-md overflow-hidden shadow-sm ring-1 ring-zinc-700">
-                            @if($movie->posterUrl())
-                                <img src="{{ $movie->posterUrl() }}" alt="{{ $movie->title }}"
-                                    class="w-full h-full object-cover group-hover:opacity-80 transition-opacity">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center p-2 text-center">
-                                    <span class="text-xs text-zinc-500 leading-snug">{{ $movie->title }}</span>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="mt-1.5">
-                            <div class="text-sm font-medium text-zinc-200 truncate group-hover:text-amber-400 transition-colors">{{ $movie->title }}</div>
-                            @if($movie->release_year)
-                            <div class="text-xs text-zinc-500">{{ $movie->release_year }}</div>
-                            @endif
-                        </div>
-                    </a>
+                    <x-movie-poster-card :movie="$movie" />
                     @endforeach
                 </div>
             </div>

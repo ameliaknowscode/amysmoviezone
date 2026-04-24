@@ -872,26 +872,7 @@
 
             <div class="grid grid-cols-3 sm:grid-cols-6 gap-4">
                 @foreach($moreByDirector as $film)
-                <a href="{{ $film->publicUrl() }}" class="group">
-                    <div class="aspect-[2/3] bg-zinc-700 rounded-md overflow-hidden shadow-sm ring-1 ring-zinc-700">
-                        @if($film->posterUrl())
-                            <img src="{{ $film->posterUrl() }}" alt="{{ $film->title }}"
-                                 class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center p-2 text-center">
-                                <span class="text-xs text-zinc-500 leading-snug">{{ $film->title }}</span>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="mt-1.5">
-                        <div class="text-sm font-medium text-zinc-100 truncate group-hover:text-amber-400 transition-colors">
-                            {{ $film->title }}
-                        </div>
-                        @if($film->release_year)
-                            <div class="text-xs text-zinc-500">{{ $film->release_year }}</div>
-                        @endif
-                    </div>
-                </a>
+                <x-movie-poster-card :movie="$film" />
                 @endforeach
             </div>
 

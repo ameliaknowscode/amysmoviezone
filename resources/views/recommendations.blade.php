@@ -87,7 +87,7 @@
                             </h3>
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
                                 @foreach($bucket['movies'] as $movie)
-                                    @include('recommendations._movie-card', ['movie' => $movie, 'subline' => null])
+                                    <x-movie-poster-card :movie="$movie" />
                                 @endforeach
                             </div>
                         </section>
@@ -103,7 +103,7 @@
                             </h3>
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
                                 @foreach($bucket['movies'] as $movie)
-                                    @include('recommendations._movie-card', ['movie' => $movie, 'subline' => null])
+                                    <x-movie-poster-card :movie="$movie" />
                                 @endforeach
                             </div>
                         </section>
@@ -118,10 +118,9 @@
                             <p class="text-xs text-zinc-500 mb-3 px-1">Based on members who rated the same films as you.</p>
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
                                 @foreach($collaborativeMovies as $movie)
-                                    @include('recommendations._movie-card', [
-                                        'movie'   => $movie,
-                                        'subline' => $movie->recommender_count . ' ' . ($movie->recommender_count === 1 ? 'person' : 'people') . ' like you',
-                                    ])
+                                    <x-movie-poster-card
+                                        :movie="$movie"
+                                        :subline="$movie->recommender_count . ' ' . ($movie->recommender_count === 1 ? 'person' : 'people') . ' like you'" />
                                 @endforeach
                             </div>
                         </section>
