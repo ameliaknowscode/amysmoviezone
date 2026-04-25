@@ -567,124 +567,38 @@
                                 </div>
                             @endif
                             @foreach($userReviews as $userReview)
-                            <div x-data="{ editing: false, showComments: false }" class="px-5 py-4">
-                                <div class="flex gap-3">
-                                    <div class="shrink-0">
-                                        @if(auth()->user()->avatar)
-                                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
-                                                 alt="{{ auth()->user()->name }}"
-                                                 class="h-8 w-8 rounded-full object-cover ring-1 ring-gray-200">
-                                        @else
-                                            <div class="h-8 w-8 rounded-full bg-amber-900/30 flex items-center justify-center text-amber-400 font-bold text-sm select-none">
-                                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                            </div>
-                                        @endif
+                            <x-review-card :review="$userReview" :rating="$userRating" :is-own="true">
+                                <form method="POST" action="{{ route('reviews.update', $userReview) }}">
+                                    @csrf @method('PATCH')
+                                    <div class="mb-2">
+                                        <label class="block text-xs text-zinc-500 mb-1">Watch date</label>
+                                        <input type="date" name="watched_at"
+                                               value="{{ old('watched_at', $userReview->watched_at?->format('Y-m-d')) }}"
+                                               class="rounded-md border-zinc-700 shadow-sm text-sm focus:border-amber-500 focus:ring-amber-500">
                                     </div>
-                                    <div class="flex-1 min-w-0">
-
-                                        {{-- Read view --}}
-                                        <div x-show="!editing">
-                                            <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                                                <span class="text-sm font-medium text-zinc-100">{{ auth()->user()->name }}</span>
-                                                @if($userRating?->stars)
-                                                    <x-star-display :value="$userRating->stars" class="text-xs" />
-                                                @endif
-                                                @if($userReview->watched_at)
-                                                    <span class="text-xs text-zinc-500">watched {{ $userReview->watched_at->format('j M Y') }}</span>
-                                                @endif
-                                                @if($userReview->is_rewatch)
-                                                    <span class="text-xs text-zinc-400 border border-zinc-600 rounded px-1.5 py-0.5 leading-none">Rewatch</span>
-                                                @endif
-                                                @if($userReview->has_spoilers)
-                                                    <span class="text-xs text-amber-600 border border-amber-200 rounded px-1.5 py-0.5 leading-none">Spoilers</span>
-                                                @endif
-                                                <button @click="editing = true"
-                                                        class="text-xs text-zinc-500 hover:text-amber-400 transition underline">
-                                                    Edit
-                                                </button>
-                                            </div>
-                                            @if($userReview->body)
-                                                <p class="text-sm text-zinc-300 mt-1.5 leading-relaxed">{{ $userReview->body }}</p>
-                                            @endif
-                                        </div>
-
-                                        {{-- Edit form --}}
-                                        <div x-show="editing" x-cloak>
-                                            <form method="POST" action="{{ route('reviews.update', $userReview) }}">
-                                                @csrf @method('PATCH')
-                                                <div class="mb-2">
-                                                    <label class="block text-xs text-zinc-500 mb-1">Watch date</label>
-                                                    <input type="date" name="watched_at"
-                                                           value="{{ old('watched_at', $userReview->watched_at?->format('Y-m-d')) }}"
-                                                           class="rounded-md border-zinc-700 shadow-sm text-sm focus:border-amber-500 focus:ring-amber-500">
-                                                </div>
-                                                <textarea name="body" rows="4"
-                                                    placeholder="Write your review… (optional)"
-                                                    class="w-full rounded-md border-zinc-700 shadow-sm text-sm focus:border-amber-500 focus:ring-amber-500"
-                                                >{{ old('body', $userReview->body) }}</textarea>
-                                                @error('body')
-                                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                                                @enderror
-                                                <label class="flex items-center gap-2 mt-2 text-xs text-zinc-500 cursor-pointer select-none">
-                                                    <input type="checkbox" name="has_spoilers" value="1"
-                                                           {{ old('has_spoilers', $userReview->has_spoilers) ? 'checked' : '' }}
-                                                           class="rounded border-zinc-700 text-amber-400">
-                                                    This review contains spoilers
-                                                </label>
-                                                <div class="flex items-center gap-3 mt-2">
-                                                    <button type="submit" class="px-4 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-400 transition">Update</button>
-                                                    <button type="button" @click="editing = false" class="text-xs text-zinc-500 hover:text-zinc-400 transition underline">Cancel</button>
-                                                </div>
-                                            </form>
-                                            <form method="POST" action="{{ route('reviews.destroy', $userReview) }}" class="mt-2">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="text-xs text-red-400 hover:text-red-600 transition underline">Delete review</button>
-                                            </form>
-                                        </div>
-
-                                        {{-- Comments --}}
-                                        <div class="mt-2">
-                                            <button @click="showComments = !showComments"
-                                                    class="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-amber-400 transition-colors">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                                </svg>
-                                                {{ $userReview->comments->count() ?: '' }}
-                                                {{ $userReview->comments->count() === 1 ? 'comment' : ($userReview->comments->count() > 1 ? 'comments' : 'Comment') }}
-                                            </button>
-                                            <div x-show="showComments" x-cloak class="mt-2 space-y-2">
-                                                @foreach($userReview->comments as $comment)
-                                                <div class="flex gap-2 text-sm">
-                                                    <div class="shrink-0 h-6 w-6 rounded-full bg-amber-900/30 flex items-center justify-center text-amber-400 text-xs font-bold select-none">
-                                                        {{ strtoupper(substr($comment->user->name, 0, 1)) }}
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <span class="font-medium text-zinc-200 text-xs">
-                                                            <a href="{{ route('profile.show', $comment->user->username) }}" class="hover:text-amber-400 transition-colors">{{ $comment->user->username }}</a>
-                                                        </span>
-                                                        <span class="text-zinc-400 text-xs ml-1">{{ $comment->body }}</span>
-                                                        <span class="text-zinc-600 text-xs ml-1">{{ $comment->created_at->diffForHumans() }}</span>
-                                                        @if(auth()->id() === $comment->user_id || auth()->id() === $userReview->user_id)
-                                                        <form method="POST" action="{{ route('review-comments.destroy', $comment) }}" class="inline ml-1">
-                                                            @csrf @method('DELETE')
-                                                            <button type="submit" class="text-xs text-zinc-600 hover:text-red-400 transition-colors">✕</button>
-                                                        </form>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                @endforeach
-                                                <form method="POST" action="{{ route('reviews.comments.store', $userReview) }}" class="flex gap-2 mt-1">
-                                                    @csrf
-                                                    <input type="text" name="body" placeholder="Add a comment…" maxlength="1000"
-                                                           class="flex-1 rounded-md border-zinc-800 bg-zinc-800 text-zinc-100 placeholder-zinc-500 shadow-sm text-xs focus:border-amber-500 focus:ring-amber-500 py-1.5">
-                                                    <button type="submit" class="px-3 py-1.5 text-xs bg-amber-500 text-white rounded-md hover:bg-amber-400 transition">Post</button>
-                                                </form>
-                                            </div>
-                                        </div>
-
+                                    <textarea name="body" rows="4"
+                                        placeholder="Write your review… (optional)"
+                                        class="w-full rounded-md border-zinc-700 shadow-sm text-sm focus:border-amber-500 focus:ring-amber-500"
+                                    >{{ old('body', $userReview->body) }}</textarea>
+                                    @error('body')
+                                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                    @enderror
+                                    <label class="flex items-center gap-2 mt-2 text-xs text-zinc-500 cursor-pointer select-none">
+                                        <input type="checkbox" name="has_spoilers" value="1"
+                                               {{ old('has_spoilers', $userReview->has_spoilers) ? 'checked' : '' }}
+                                               class="rounded border-zinc-700 text-amber-400">
+                                        This review contains spoilers
+                                    </label>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <button type="submit" class="px-4 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-400 transition">Update</button>
+                                        <button type="button" @click="editing = false" class="text-xs text-zinc-500 hover:text-zinc-400 transition underline">Cancel</button>
                                     </div>
-                                </div>
-                            </div>
+                                </form>
+                                <form method="POST" action="{{ route('reviews.destroy', $userReview) }}" class="mt-2">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-xs text-red-400 hover:text-red-600 transition underline">Delete review</button>
+                                </form>
+                            </x-review-card>
                             @endforeach
 
                             {{-- Review or Log form --}}
@@ -726,115 +640,10 @@
 
                             {{-- Public reviews from other users --}}
                             @foreach($reviews as $review)
-                            <div x-data="{ showComments: false }" class="px-5 py-4 flex gap-3">
-                                <div class="shrink-0">
-                                    @if($review->user->avatar)
-                                        <img src="{{ asset('storage/' . $review->user->avatar) }}"
-                                             alt="{{ $review->user->name }}"
-                                             class="h-8 w-8 rounded-full object-cover ring-1 ring-gray-200">
-                                    @else
-                                        <div class="h-8 w-8 rounded-full bg-amber-900/30 flex items-center justify-center text-amber-400 font-bold text-sm select-none">
-                                            {{ strtoupper(substr($review->user->name, 0, 1)) }}
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                                        <a href="{{ route('profile.show', $review->user->username) }}"
-                                           class="text-sm font-medium text-zinc-100 hover:text-amber-400 transition-colors">
-                                            {{ $review->user->name }}
-                                        </a>
-                                        @if($rating = $reviewerRatings->get($review->user_id))
-                                            <x-star-display :value="$rating->stars" class="text-xs" />
-                                        @endif
-                                        @if($review->watched_at)
-                                            <span class="text-xs text-zinc-500">watched {{ $review->watched_at->format('j M Y') }}</span>
-                                        @endif
-                                        @if($review->has_spoilers)
-                                            <span class="text-xs text-amber-600 border border-amber-200 rounded px-1.5 py-0.5 leading-none">Spoilers</span>
-                                        @endif
-                                        <span class="text-xs text-zinc-500">{{ $review->created_at->diffForHumans() }}</span>
-                                    </div>
-                                    @if($review->body)
-                                        @if($review->has_spoilers)
-                                            <div x-data="{ revealed: false }" class="mt-1.5">
-                                                <div x-show="!revealed"
-                                                     class="text-sm text-zinc-500 italic cursor-pointer hover:text-zinc-400 transition-colors"
-                                                     @click="revealed = true">
-                                                    ⚠ Spoilers hidden — click to reveal
-                                                </div>
-                                                <p x-show="revealed" x-cloak
-                                                   class="text-sm text-zinc-300 leading-relaxed">{{ $review->body }}</p>
-                                            </div>
-                                        @else
-                                            <p class="text-sm text-zinc-300 mt-1.5 leading-relaxed">{{ $review->body }}</p>
-                                        @endif
-                                    @endif
-
-                                    {{-- Like + Comment actions --}}
-                                    <div class="mt-2 flex items-center gap-3">
-                                        @auth
-                                        @php $liked = $likedReviewIds->contains($review->id); @endphp
-                                        <form method="POST"
-                                              action="{{ $liked
-                                                  ? route('reviews.likes.destroy', $review)
-                                                  : route('reviews.likes.store', $review) }}">
-                                            @csrf
-                                            @if($liked) @method('DELETE') @endif
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1 text-xs transition-colors {{ $liked ? 'text-red-400 hover:text-red-500' : 'text-zinc-600 hover:text-red-400' }}">
-                                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                                </svg>
-                                                @if($review->likes_count > 0)
-                                                    {{ $review->likes_count }}
-                                                @endif
-                                            </button>
-                                        </form>
-                                        @endauth
-                                        <button @click="showComments = !showComments"
-                                                class="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-amber-400 transition-colors">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                            </svg>
-                                            {{ $review->comments->count() ?: '' }}
-                                            {{ $review->comments->count() === 1 ? 'comment' : ($review->comments->count() > 1 ? 'comments' : 'Comment') }}
-                                        </button>
-                                    </div>
-                                    <div x-show="showComments" x-cloak class="mt-2 space-y-2">
-                                        @foreach($review->comments as $comment)
-                                        <div class="flex gap-2 text-sm">
-                                            <div class="shrink-0 h-6 w-6 rounded-full bg-amber-900/30 flex items-center justify-center text-amber-400 text-xs font-bold select-none">
-                                                {{ strtoupper(substr($comment->user->name, 0, 1)) }}
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <span class="font-medium text-zinc-200 text-xs">
-                                                    <a href="{{ route('profile.show', $comment->user->username) }}" class="hover:text-amber-400 transition-colors">{{ $comment->user->username }}</a>
-                                                </span>
-                                                <span class="text-zinc-400 text-xs ml-1">{{ $comment->body }}</span>
-                                                <span class="text-zinc-600 text-xs ml-1">{{ $comment->created_at->diffForHumans() }}</span>
-                                                @auth
-                                                @if(auth()->id() === $comment->user_id || auth()->id() === $review->user_id)
-                                                <form method="POST" action="{{ route('review-comments.destroy', $comment) }}" class="inline ml-1">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="text-xs text-zinc-600 hover:text-red-400 transition-colors">✕</button>
-                                                </form>
-                                                @endif
-                                                @endauth
-                                            </div>
-                                        </div>
-                                        @endforeach
-                                        @auth
-                                        <form method="POST" action="{{ route('reviews.comments.store', $review) }}" class="flex gap-2 mt-1">
-                                            @csrf
-                                            <input type="text" name="body" placeholder="Add a comment…" maxlength="1000"
-                                                   class="flex-1 rounded-md border-zinc-800 bg-zinc-800 text-zinc-100 placeholder-zinc-500 shadow-sm text-xs focus:border-amber-500 focus:ring-amber-500 py-1.5">
-                                            <button type="submit" class="px-3 py-1.5 text-xs bg-amber-500 text-white rounded-md hover:bg-amber-400 transition">Post</button>
-                                        </form>
-                                        @endauth
-                                    </div>
-                                </div>
-                            </div>
+                            <x-review-card
+                                :review="$review"
+                                :rating="$reviewerRatings->get($review->user_id)"
+                                :liked="$likedReviewIds->contains($review->id)" />
                             @endforeach
 
                             {{-- Empty state --}}
