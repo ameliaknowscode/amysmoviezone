@@ -31,7 +31,7 @@
                             <input type="hidden" name="direction" value="{{ $direction }}">
                             <input type="text" name="search" value="{{ $search }}"
                                 placeholder="Filter by name or nationality…"
-                                class="border-zinc-700 rounded-md shadow-sm text-sm w-full sm:w-72">
+                                class="input-dark text-sm w-full sm:w-72">
                             <button type="submit"
                                 class="btn-amber px-3 py-1.5 text-sm">
                                 Filter
