@@ -1,25 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Notifications</h2>
+        <h2 class="font-semibold text-xl text-zinc-100 leading-tight">Notifications</h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             @if($notifications->isEmpty())
-                <div class="bg-white shadow-sm sm:rounded-lg p-10 text-center text-gray-400 text-sm">
+                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-500 text-sm">
                     You're all caught up — no notifications yet.
                 </div>
             @else
-                <div class="bg-white shadow-sm sm:rounded-lg divide-y divide-gray-100">
+                <div class="bg-zinc-900 sm:rounded-lg divide-y divide-zinc-800">
                     @foreach($notifications as $notification)
                         @php $data = $notification->data; @endphp
-                        <div class="flex items-start gap-4 px-5 py-4 {{ $notification->read_at ? '' : 'bg-indigo-50' }}">
+                        <div class="flex items-start gap-4 px-5 py-4 {{ $notification->read_at ? '' : 'bg-amber-900/20' }}">
 
                             {{-- Icon --}}
                             <div class="shrink-0 mt-0.5">
                                 @if($data['type'] === 'user_followed')
-                                    <div class="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center">
-                                        <svg class="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <div class="h-9 w-9 rounded-full bg-amber-900/30 flex items-center justify-center">
+                                        <svg class="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                         </svg>
                                     </div>
@@ -59,58 +59,58 @@
 
                             {{-- Message --}}
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm text-gray-800 leading-snug">
+                                <p class="text-sm text-zinc-200 leading-snug">
                                     @if($data['type'] === 'user_followed')
                                         <a href="{{ route('profile.show', $data['follower_username']) }}"
-                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['follower_name'] }}</a>
+                                           class="font-medium hover:text-amber-400 transition-colors">{{ $data['follower_name'] }}</a>
                                         started following you.
 
                                     @elseif($data['type'] === 'review_liked')
                                         <a href="{{ route('profile.show', $data['liker_username']) }}"
-                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['liker_name'] }}</a>
+                                           class="font-medium hover:text-amber-400 transition-colors">{{ $data['liker_name'] }}</a>
                                         liked your review of
                                         <a href="{{ $data['movie_url'] }}"
-                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['movie_title'] }}</a>.
+                                           class="font-medium hover:text-amber-400 transition-colors">{{ $data['movie_title'] }}</a>.
 
                                     @elseif($data['type'] === 'shared_log')
                                         <a href="{{ route('profile.show', $data['logger_username']) }}"
-                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['logger_name'] }}</a>
+                                           class="font-medium hover:text-amber-400 transition-colors">{{ $data['logger_name'] }}</a>
                                         @if($data['same_night'] ?? false)
                                             watched
                                             <a href="{{ $data['movie_url'] }}"
-                                               class="font-medium hover:text-indigo-600 transition-colors">{{ $data['movie_title'] }}</a>
+                                               class="font-medium hover:text-amber-400 transition-colors">{{ $data['movie_title'] }}</a>
                                             on the same night as you!
                                         @else
                                             also logged
                                             <a href="{{ $data['movie_url'] }}"
-                                               class="font-medium hover:text-indigo-600 transition-colors">{{ $data['movie_title'] }}</a>.
+                                               class="font-medium hover:text-amber-400 transition-colors">{{ $data['movie_title'] }}</a>.
                                         @endif
 
                                     @elseif($data['type'] === 'review_commented')
                                         <a href="{{ route('profile.show', $data['commenter_username']) }}"
-                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['commenter_name'] }}</a>
+                                           class="font-medium hover:text-amber-400 transition-colors">{{ $data['commenter_name'] }}</a>
                                         commented on your review of
                                         <a href="{{ $data['movie_url'] }}"
-                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['movie_title'] }}</a>.
+                                           class="font-medium hover:text-amber-400 transition-colors">{{ $data['movie_title'] }}</a>.
 
                                     @elseif($data['type'] === 'list_item_added')
                                         <a href="{{ route('profile.show', $data['owner_username']) }}"
-                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['owner_name'] }}</a>
+                                           class="font-medium hover:text-amber-400 transition-colors">{{ $data['owner_name'] }}</a>
                                         added
                                         <a href="{{ $data['movie_url'] }}"
-                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['movie_title'] }}</a>
+                                           class="font-medium hover:text-amber-400 transition-colors">{{ $data['movie_title'] }}</a>
                                         to
                                         <a href="{{ $data['list_url'] }}"
-                                           class="font-medium hover:text-indigo-600 transition-colors">{{ $data['list_name'] }}</a>.
+                                           class="font-medium hover:text-amber-400 transition-colors">{{ $data['list_name'] }}</a>.
                                     @endif
                                 </p>
-                                <p class="text-xs text-gray-400 mt-0.5">{{ $notification->created_at->diffForHumans() }}</p>
+                                <p class="text-xs text-zinc-500 mt-0.5">{{ $notification->created_at->diffForHumans() }}</p>
                             </div>
 
                             {{-- Dismiss --}}
                             <form method="POST" action="{{ route('notifications.destroy', $notification->id) }}" class="shrink-0">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="text-gray-300 hover:text-gray-500 transition-colors p-1" title="Dismiss" aria-label="Dismiss notification">
+                                <button type="submit" class="text-zinc-600 hover:text-zinc-500 transition-colors p-1" title="Dismiss" aria-label="Dismiss notification">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>

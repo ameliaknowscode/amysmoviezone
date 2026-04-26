@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Activity Feed</h2>
+        <h2 class="font-semibold text-xl text-zinc-100 leading-tight">Activity Feed</h2>
     </x-slot>
 
     <div class="py-12">
@@ -28,14 +28,14 @@
                     }
                 }"
             >
-                <div class="bg-white shadow-sm sm:rounded-lg divide-y divide-gray-100" x-ref="items">
+                <div class="bg-zinc-900 sm:rounded-lg divide-y divide-zinc-800" x-ref="items">
                     @if($activities->isEmpty())
                         <div class="p-10 text-center">
                             <div class="text-3xl mb-3">&#128101;</div>
-                            <h3 class="font-semibold text-gray-700 mb-1">Nothing here yet</h3>
-                            <p class="text-sm text-gray-400 mb-5">Follow other members to see their ratings, reviews, and watchlist activity here.</p>
+                            <h3 class="font-semibold text-zinc-300 mb-1">Nothing here yet</h3>
+                            <p class="text-sm text-zinc-500 mb-5">Follow other members to see their ratings, reviews, and watchlist activity here.</p>
                             <a href="{{ route('users.index') }}"
-                               class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                               class="inline-block bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                 Find people to follow
                             </a>
                         </div>
@@ -47,8 +47,8 @@
                 {{-- Sentinel: triggers load more when scrolled into view --}}
                 <div x-ref="sentinel" class="h-1"></div>
 
-                <div x-show="loading" class="text-center py-6 text-sm text-gray-400">Loading…</div>
-                <div x-show="done && {{ $activities->isNotEmpty() ? 'true' : 'false' }}" class="text-center py-6 text-sm text-gray-400">
+                <div x-show="loading" class="text-center py-6 text-sm text-zinc-500">Loading…</div>
+                <div x-show="done && {{ $activities->isNotEmpty() ? 'true' : 'false' }}" class="text-center py-6 text-sm text-zinc-500">
                     You're all caught up.
                 </div>
             </div>

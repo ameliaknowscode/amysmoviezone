@@ -1,11 +1,11 @@
 <x-app-layout>
-    <div class="min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 flex items-center justify-center px-4 py-16">
+    <div class="min-h-screen bg-zinc-950 flex items-center justify-center px-4 py-16">
         <div class="w-full max-w-2xl">
 
             <div class="text-center mb-10">
-                <p class="text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-2">Director</p>
+                <p class="text-xs font-semibold uppercase tracking-widest text-amber-400 mb-2">Director</p>
                 <h1 class="text-4xl sm:text-5xl font-bold text-white">Head to Head</h1>
-                <p class="mt-3 text-indigo-300 text-sm">Pick two directors and see how their filmographies stack up.</p>
+                <p class="mt-3 text-zinc-400 text-sm">Pick two directors and see how their filmographies stack up.</p>
             </div>
 
             <div
@@ -39,11 +39,11 @@
                 }"
                 @keydown.escape="a.open = false; b.open = false"
             >
-                <div class="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8 space-y-6">
+                <div class="bg-zinc-900 rounded-2xl border border-zinc-800 p-8 space-y-6">
 
                     {{-- Director A --}}
                     <div class="relative" @click.outside="a.open = false">
-                        <label class="block text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-2">Director A</label>
+                        <label class="block text-xs font-semibold uppercase tracking-widest text-amber-400 mb-2">Director A</label>
                         <input
                             type="text"
                             x-model="a.query"
@@ -52,20 +52,20 @@
                             @keydown.arrow-down.prevent="$refs.aList?.querySelector('button')?.focus()"
                             placeholder="Search by name…"
                             autocomplete="off"
-                            class="w-full rounded-xl bg-white/10 border border-white/20 text-white placeholder-indigo-400 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-sm"
+                            class="w-full rounded-xl bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
                         >
                         <div x-show="a.open" x-ref="aList"
-                             class="absolute z-20 mt-1 w-full bg-indigo-900 border border-indigo-700 rounded-xl shadow-xl overflow-hidden">
+                             class="absolute z-20 mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-xl shadow-xl overflow-hidden">
                             <template x-for="person in a.results" :key="person.id">
                                 <button
                                     type="button"
                                     @click="pick('a', person)"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-white hover:bg-indigo-700 transition-colors"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-white hover:bg-amber-500 transition-colors"
                                     x-text="person.name"
                                 ></button>
                             </template>
                         </div>
-                        <div x-show="a.selected" class="mt-2 flex items-center gap-2 text-xs text-indigo-300">
+                        <div x-show="a.selected" class="mt-2 flex items-center gap-2 text-xs text-zinc-400">
                             <svg class="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                             <span x-text="a.selected?.name"></span>
                         </div>
@@ -73,14 +73,14 @@
 
                     {{-- VS divider --}}
                     <div class="flex items-center gap-4">
-                        <div class="flex-1 h-px bg-white/10"></div>
-                        <span class="text-2xl font-black text-indigo-500 tracking-widest">VS</span>
-                        <div class="flex-1 h-px bg-white/10"></div>
+                        <div class="flex-1 h-px bg-zinc-700"></div>
+                        <span class="text-2xl font-black text-amber-400 tracking-widest">VS</span>
+                        <div class="flex-1 h-px bg-zinc-700"></div>
                     </div>
 
                     {{-- Director B --}}
                     <div class="relative" @click.outside="b.open = false">
-                        <label class="block text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-2">Director B</label>
+                        <label class="block text-xs font-semibold uppercase tracking-widest text-amber-400 mb-2">Director B</label>
                         <input
                             type="text"
                             x-model="b.query"
@@ -89,20 +89,20 @@
                             @keydown.arrow-down.prevent="$refs.bList?.querySelector('button')?.focus()"
                             placeholder="Search by name…"
                             autocomplete="off"
-                            class="w-full rounded-xl bg-white/10 border border-white/20 text-white placeholder-indigo-400 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-sm"
+                            class="w-full rounded-xl bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
                         >
                         <div x-show="b.open" x-ref="bList"
-                             class="absolute z-20 mt-1 w-full bg-indigo-900 border border-indigo-700 rounded-xl shadow-xl overflow-hidden">
+                             class="absolute z-20 mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-xl shadow-xl overflow-hidden">
                             <template x-for="person in b.results" :key="person.id">
                                 <button
                                     type="button"
                                     @click="pick('b', person)"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-white hover:bg-indigo-700 transition-colors"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-white hover:bg-amber-500 transition-colors"
                                     x-text="person.name"
                                 ></button>
                             </template>
                         </div>
-                        <div x-show="b.selected" class="mt-2 flex items-center gap-2 text-xs text-indigo-300">
+                        <div x-show="b.selected" class="mt-2 flex items-center gap-2 text-xs text-zinc-400">
                             <svg class="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                             <span x-text="b.selected?.name"></span>
                         </div>
@@ -114,8 +114,8 @@
                         @click="go()"
                         :disabled="!canCompare"
                         :class="canCompare
-                            ? 'bg-indigo-500 hover:bg-indigo-400 text-white cursor-pointer'
-                            : 'bg-white/5 text-white/30 cursor-not-allowed'"
+                            ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950 cursor-pointer'
+                            : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'"
                         class="w-full py-3 rounded-xl font-semibold text-sm transition-colors"
                     >
                         Compare &rarr;

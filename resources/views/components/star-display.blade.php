@@ -3,10 +3,10 @@
 
     Props:
       $value      – numeric star value (0–5, supports .5 increments)
-      $emptyClass – Tailwind text colour class for empty/unfilled stars (default: text-gray-300)
+      $emptyClass – Tailwind text colour class for empty/unfilled stars (default: text-zinc-600)
       $class      – extra classes applied to the wrapper span (e.g. text-xs, text-sm)
 --}}
-@props(['value', 'emptyClass' => 'text-gray-300', 'class' => ''])
+@props(['value', 'emptyClass' => 'text-zinc-600', 'class' => ''])
 
 <span class="flex leading-none {{ $class }}">
     @for($i = 1; $i <= 5; $i++)

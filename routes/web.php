@@ -58,6 +58,11 @@ Route::get('/', function () {
         ->limit(8)
         ->get();
 
+    $featuredMovie = \App\Models\Movie::whereNotNull('poster')
+        ->with('genres')
+        ->inRandomOrder()
+        ->first();
+
     $recentReviews = \App\Models\Review::with('movie', 'user')
         ->whereNotNull('body')
         ->whereHas('user', fn ($q) => $q->where('profile_private', false))
@@ -84,7 +89,7 @@ Route::get('/', function () {
         }
     }
 
-    return view('welcome', compact('movieCount', 'peopleCount', 'creditCount', 'memberCount', 'recentMovies', 'recentRatings', 'followingRatings', 'recentReviews'));
+    return view('welcome', compact('movieCount', 'peopleCount', 'creditCount', 'memberCount', 'recentMovies', 'recentRatings', 'followingRatings', 'recentReviews', 'featuredMovie'));
 })->name('home');
 
 Route::get('/search', [SearchController::class, 'search'])->name('search');

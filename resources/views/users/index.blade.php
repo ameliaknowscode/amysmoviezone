@@ -1,21 +1,21 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-zinc-100 leading-tight">
             {{ __('Users') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+                <div class="p-6 text-zinc-100">
 
                     @if(session('success'))
                         <p class="mb-4 text-green-600">{{ session('success') }}</p>
                     @endif
 
                     <div class="mb-4">
-                        <a href="{{ route('admin.users.create') }}" class="text-indigo-600 hover:underline">+ Create User</a>
+                        <a href="{{ route('admin.users.create') }}" class="text-amber-400 hover:underline">+ Create User</a>
                     </div>
 
                     @if($users->isEmpty())
@@ -24,24 +24,24 @@
                         <div class="overflow-x-auto">
                         <table class="w-full border-collapse">
                             <thead>
-                                <tr class="bg-gray-100 text-left">
-                                    <th class="border border-gray-300 px-4 py-2">ID</th>
-                                    <th class="border border-gray-300 px-4 py-2">Name</th>
-                                    <th class="border border-gray-300 px-4 py-2">Username</th>
-                                    <th class="border border-gray-300 px-4 py-2">Email</th>
-                                    <th class="border border-gray-300 px-4 py-2">Created At</th>
-                                    <th class="border border-gray-300 px-4 py-2"></th>
+                                <tr class="bg-zinc-800 text-left">
+                                    <th class="border border-zinc-700 px-4 py-2">ID</th>
+                                    <th class="border border-zinc-700 px-4 py-2">Name</th>
+                                    <th class="border border-zinc-700 px-4 py-2">Username</th>
+                                    <th class="border border-zinc-700 px-4 py-2">Email</th>
+                                    <th class="border border-zinc-700 px-4 py-2">Created At</th>
+                                    <th class="border border-zinc-700 px-4 py-2"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($users as $user)
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="border border-gray-300 px-4 py-2">{{ $user->id }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $user->name }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $user->username ?? '—' }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $user->email }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $user->created_at->format('Y-m-d H:i') }}</td>
-                                        <td class="border border-gray-300 px-4 py-2 text-center">
+                                    <tr class="hover:bg-zinc-800">
+                                        <td class="border border-zinc-700 px-4 py-2">{{ $user->id }}</td>
+                                        <td class="border border-zinc-700 px-4 py-2">{{ $user->name }}</td>
+                                        <td class="border border-zinc-700 px-4 py-2">{{ $user->username ?? '—' }}</td>
+                                        <td class="border border-zinc-700 px-4 py-2">{{ $user->email }}</td>
+                                        <td class="border border-zinc-700 px-4 py-2">{{ $user->created_at->format('Y-m-d H:i') }}</td>
+                                        <td class="border border-zinc-700 px-4 py-2 text-center">
                                             <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
                                                 onsubmit="return confirm('Are you sure you want to delete this user?')">
                                                 @csrf
