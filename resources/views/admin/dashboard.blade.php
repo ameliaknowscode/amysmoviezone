@@ -108,7 +108,7 @@
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2">
                                     <span class="font-medium text-zinc-100 truncate">{{ $user->name }}</span>
-                                    <span class="text-zinc-500 text-sm truncate">@{{ $user->username }}</span>
+                                    <span class="text-zinc-500 text-sm truncate">{{ $user->username }}</span>
                                     @if ($user->is_admin)
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-900/30 text-amber-300">Admin</span>
                                     @endif
