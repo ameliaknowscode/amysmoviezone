@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
             @if($totalWatched === 0)
-                <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+                <div class="card">
                     <div class="p-12 text-center">
                         <p class="text-zinc-500 mb-3">No stats yet — start marking movies as watched to see your breakdown here.</p>
                         <a href="{{ route('movies.browse') }}" class="text-sm font-semibold text-amber-400 hover:text-amber-300 underline underline-offset-2">Browse movies</a>
@@ -18,7 +18,7 @@
             @else
 
             {{-- Overview --}}
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-zinc-200 mb-5">Overview</h3>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -64,7 +64,7 @@
             {{-- Films by Year Watched --}}
             @if($byYearWatched->isNotEmpty())
             @php $maxYearCount = $byYearWatched->max('count'); @endphp
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-zinc-200 mb-5">Films Watched by Year</h3>
                     <div class="space-y-2.5">
@@ -87,7 +87,7 @@
             {{-- Films by Release Decade --}}
             @if($byDecade->isNotEmpty())
             @php $maxDecadeCount = $byDecade->max('count'); @endphp
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-zinc-200 mb-5">Films by Release Decade</h3>
                     <div class="space-y-2.5">
@@ -109,7 +109,7 @@
             {{-- Top Genres --}}
             @if($byGenre->isNotEmpty())
             @php $maxGenreCount = $byGenre->max('count'); @endphp
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-zinc-200 mb-5">Top Genres</h3>
                     <div class="space-y-2.5">
@@ -131,7 +131,7 @@
             {{-- Rating Distribution --}}
             @if($ratingDist->isNotEmpty())
             @php $maxRatingCount = $ratingDist->max('count'); @endphp
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-zinc-200 mb-5">Rating Distribution</h3>
                     <div class="space-y-2.5">
@@ -160,7 +160,7 @@
 
             {{-- Top Directors --}}
             @if($byDirector->isNotEmpty())
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-zinc-200 mb-5">Top Directors</h3>
                     <ol class="divide-y divide-zinc-800">

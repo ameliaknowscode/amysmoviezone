@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6 text-zinc-100">
 
                     @if(session('success'))
@@ -33,7 +33,7 @@
                                 placeholder="Filter by name or nationality…"
                                 class="border-zinc-700 rounded-md shadow-sm text-sm w-full sm:w-72">
                             <button type="submit"
-                                class="px-3 py-1.5 bg-amber-500 text-white text-sm rounded-md hover:bg-amber-400">
+                                class="btn-amber px-3 py-1.5 text-sm">
                                 Filter
                             </button>
                             @if($search)

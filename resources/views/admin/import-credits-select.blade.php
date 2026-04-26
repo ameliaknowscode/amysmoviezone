@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6 text-zinc-100">
                     <p class="text-sm text-zinc-400 mb-4">Select a movie to import credits for.</p>
 
@@ -28,7 +28,7 @@
 
                             <button
                                 type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-md hover:bg-amber-400 transition"
+                                class="btn-amber inline-flex items-center px-4 py-2 text-sm"
                             >
                                 Go
                             </button>

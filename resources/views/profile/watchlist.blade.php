@@ -10,7 +10,7 @@
 
             {{-- Want to Watch --}}
             @if($wantToWatch !== null)
-            <div id="want-to-watch" class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div id="want-to-watch" class="card">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-zinc-200 mb-4">Want to Watch</h3>
 
@@ -47,7 +47,7 @@
 
             {{-- Watched --}}
             @if($watched !== null)
-            <div id="watched" class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div id="watched" class="card">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-zinc-200 mb-4">Watched</h3>
 
@@ -83,7 +83,7 @@
             @endif
 
             @if($wantToWatch === null && $watched === null)
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6 text-sm text-zinc-500">This user's watchlists are private.</div>
             </div>
             @endif

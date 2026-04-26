@@ -140,7 +140,7 @@
                     @csrf
                     <input type="text" name="body" placeholder="Add a comment…" maxlength="1000"
                            class="flex-1 rounded-md border-zinc-800 bg-zinc-800 text-zinc-100 placeholder-zinc-500 shadow-sm text-xs focus:border-amber-500 focus:ring-amber-500 py-1.5">
-                    <button type="submit" class="px-3 py-1.5 text-xs bg-amber-500 text-white rounded-md hover:bg-amber-400 transition">Post</button>
+                    <button type="submit" class="btn-amber px-3 py-1.5 text-xs">Post</button>
                 </form>
                 @endauth
             </div>

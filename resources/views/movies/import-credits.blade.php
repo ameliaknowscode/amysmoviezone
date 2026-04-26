@@ -9,7 +9,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             {{-- Upload Form --}}
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6 text-zinc-100">
 
                     @if($errors->any())
@@ -49,7 +49,7 @@ Keanu Reeves,Actor|Director,Neo</pre>
                                    class="block text-sm text-zinc-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-amber-900/20 file:text-amber-300 hover:file:bg-amber-900/30 cursor-pointer"
                                    required>
                             <button type="submit"
-                                    class="inline-flex items-center px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-md hover:bg-amber-400 transition">
+                                    class="btn-amber inline-flex items-center px-4 py-2 text-sm">
                                 Import
                             </button>
                         </div>
@@ -68,7 +68,7 @@ Keanu Reeves,Actor|Director,Neo</pre>
                 @endif
 
                 @if(!empty($rowErrors))
-                    <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+                    <div class="card">
                         <div class="p-6">
                             <h3 class="text-sm font-semibold text-zinc-200 mb-3">
                                 {{ count($rowErrors) }} {{ Str::plural('row', count($rowErrors)) }} skipped

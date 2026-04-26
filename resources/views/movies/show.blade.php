@@ -590,7 +590,7 @@
                                         This review contains spoilers
                                     </label>
                                     <div class="flex items-center gap-3 mt-2">
-                                        <button type="submit" class="px-4 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-400 transition">Update</button>
+                                        <button type="submit" class="btn-amber px-4 py-1.5 text-sm">Update</button>
                                         <button type="button" @click="editing = false" class="text-xs text-zinc-500 hover:text-zinc-400 transition underline">Cancel</button>
                                     </div>
                                 </form>
@@ -630,7 +630,7 @@
                                             This review contains spoilers
                                         </label>
                                         <div class="flex items-center gap-3 mt-2">
-                                            <button type="submit" class="px-4 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-400 transition">Save</button>
+                                            <button type="submit" class="btn-amber px-4 py-1.5 text-sm">Save</button>
                                             <button type="button" @click="open = false" class="text-xs text-zinc-500 hover:text-zinc-400 transition underline">Cancel</button>
                                         </div>
                                     </form>
