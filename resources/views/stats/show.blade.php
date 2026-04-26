@@ -73,7 +73,7 @@
                         <div class="flex items-center gap-3">
                             <div class="w-12 text-sm text-zinc-500 text-right shrink-0">{{ $row->year }}</div>
                             <div class="flex-1 h-6 bg-zinc-800 rounded overflow-hidden">
-                                <div class="h-full bg-amber-900/200 rounded" style="width: {{ $pct }}%"></div>
+                                <div class="h-full bg-amber-500 rounded" style="width: {{ $pct }}%"></div>
                             </div>
                             <div class="w-6 text-sm text-zinc-400 text-right shrink-0">{{ $row->count }}</div>
                         </div>

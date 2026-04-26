@@ -164,7 +164,7 @@
                             </div>
                             <div class="flex-1 h-6 bg-zinc-800 rounded overflow-hidden">
                                 @if($row->count > 0)
-                                    <div class="h-full bg-amber-900/200 rounded transition-all" style="width: {{ $pct }}%"></div>
+                                    <div class="h-full bg-amber-500 rounded transition-all" style="width: {{ $pct }}%"></div>
                                 @endif
                             </div>
                             <div class="w-6 text-sm text-right shrink-0 {{ $row->count > 0 ? 'text-zinc-400' : 'text-zinc-600' }}">
