@@ -5,7 +5,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6 text-zinc-100">
 
                     @if($errors->any())
@@ -28,7 +28,7 @@
 
                         <div class="flex items-center gap-4">
                             <button type="submit"
-                                    class="px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-400">
+                                    class="btn-amber px-4 py-2">
                                 Save Changes
                             </button>
                             <a href="{{ route('admin.genres.index') }}" class="text-zinc-400 hover:underline">Cancel</a>

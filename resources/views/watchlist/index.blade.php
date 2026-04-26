@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
             {{-- Want to Watch --}}
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-semibold text-zinc-200">Want to Watch</h3>
@@ -57,7 +57,7 @@
             </div>
 
             {{-- Watched --}}
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-semibold text-zinc-200">Watched</h3>

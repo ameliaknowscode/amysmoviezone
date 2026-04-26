@@ -69,7 +69,7 @@
 
                 <div class="flex items-end gap-2">
                     <button type="submit"
-                            class="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-md hover:bg-amber-400 transition-colors">
+                            class="btn-amber px-4 py-2 text-sm-colors">
                         Filter
                     </button>
                     @if($hasFilters)

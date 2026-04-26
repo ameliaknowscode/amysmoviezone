@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-zinc-100 leading-tight">Collections</h2>
             <a href="{{ route('admin.collections.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-md hover:bg-amber-400 transition">
+               class="btn-amber inline-flex items-center px-4 py-2 text-sm">
                 + Add Collection
             </a>
         </div>
@@ -16,7 +16,7 @@
                 <div class="mb-4 p-4 bg-green-100 text-green-800 rounded-md text-sm">{{ session('success') }}</div>
             @endif
 
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <table class="min-w-full divide-y divide-zinc-700 text-sm">
                     <thead class="bg-zinc-900">
                         <tr>

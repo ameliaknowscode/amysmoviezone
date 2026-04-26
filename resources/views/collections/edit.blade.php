@@ -5,7 +5,7 @@
 
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg p-6">
+            <div class="card p-6">
 
                 @if($errors->any())
                     <div class="mb-4 p-4 bg-red-50 text-red-700 rounded-md text-sm">
@@ -33,7 +33,7 @@
 
                     <div class="flex items-center gap-4 pt-2">
                         <button type="submit"
-                                class="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-md hover:bg-amber-400 transition">
+                                class="btn-amber px-4 py-2 text-sm">
                             Save Changes
                         </button>
                         <a href="{{ route('admin.collections.index') }}" class="text-sm text-zinc-500 hover:text-zinc-300">Cancel</a>

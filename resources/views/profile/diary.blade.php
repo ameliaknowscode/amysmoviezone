@@ -9,12 +9,12 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
             @if($entries === null)
-                <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+                <div class="card">
                     <div class="p-6 text-sm text-zinc-500">This user's diary is private.</div>
                 </div>
 
             @elseif($entries->isEmpty() && $paginator->total() === 0)
-                <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+                <div class="card">
                     <div class="p-6 text-sm text-zinc-500">No diary entries yet.</div>
                 </div>
 

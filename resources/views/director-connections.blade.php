@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
             {{-- Search Form --}}
-            <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+            <div class="card">
                 <div class="p-6 text-zinc-100">
                     <p class="text-sm text-zinc-400 mb-5">
                         Pick two or more directors to discover every actor who has appeared in at least one film by <em>each</em> of them.
@@ -69,7 +69,7 @@
                                 x-show="directors.length < {{ $directors->count() }}"
                                 class="text-sm text-amber-400 hover:text-amber-300 font-medium"
                             >+ Add director</button>
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-md hover:bg-amber-400 transition">
+                            <button type="submit" class="btn-amber inline-flex items-center px-4 py-2 text-sm">
                                 Find connections
                             </button>
                         </div>
@@ -79,7 +79,7 @@
 
             {{-- Results --}}
             @if($selectedDirectors->isNotEmpty())
-                <div class="bg-zinc-900 overflow-hidden sm:rounded-lg">
+                <div class="card">
                     <div class="px-6 py-5 border-b border-zinc-800">
                         <h3 class="text-base font-semibold text-zinc-100">
                             Actors in films by {{ $selectedDirectors->pluck('name')->join(', ', ' & ') }}

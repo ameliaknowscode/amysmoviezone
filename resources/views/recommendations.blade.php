@@ -16,7 +16,7 @@
                         Rate at least {{ $needed }} to unlock personalised recommendations.
                     </p>
                     <a href="{{ route('movies.browse') }}"
-                       class="mt-4 inline-block px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-md hover:bg-amber-400 transition-colors">
+                       class="mt-4 inline-block btn-amber px-4 py-2 text-sm-colors">
                         Browse Movies
                     </a>
                 </div>
