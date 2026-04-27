@@ -9,34 +9,7 @@
             </div>
 
             <div
-                x-data="{
-                    a: { query: '', results: [], selected: null, loading: false, open: false },
-                    b: { query: '', results: [], selected: null, loading: false, open: false },
-                    searchUrl: '{{ route('directors.search') }}',
-                    async search(side) {
-                        const q = this[side].query.trim();
-                        this[side].selected = null;
-                        if (q.length < 2) { this[side].results = []; this[side].open = false; return; }
-                        this[side].loading = true;
-                        const res = await fetch(this.searchUrl + '?q=' + encodeURIComponent(q));
-                        this[side].results = await res.json();
-                        this[side].loading = false;
-                        this[side].open = this[side].results.length > 0;
-                    },
-                    pick(side, person) {
-                        this[side].selected = person;
-                        this[side].query = person.name;
-                        this[side].open = false;
-                        this[side].results = [];
-                    },
-                    get canCompare() {
-                        return this.a.selected && this.b.selected && this.a.selected.slug !== this.b.selected.slug;
-                    },
-                    go() {
-                        if (!this.canCompare) return;
-                        window.location = '{{ url('/compare') }}/' + this.a.selected.slug + '/' + this.b.selected.slug;
-                    }
-                }"
+                x-data="directorCompare('{{ route('directors.search') }}', '{{ url('/compare') }}')"
                 @keydown.escape="a.open = false; b.open = false"
             >
                 <div class="bg-zinc-900 rounded-2xl border border-zinc-800 p-8 space-y-6">

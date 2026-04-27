@@ -94,10 +94,7 @@
                     {{-- User actions --}}
                     @auth
                     <div
-                        x-data="{
-                            stars: {{ $userRating?->stars ?? 0 }},
-                            hovered: 0,
-                        }"
+                        x-data="starRating({{ $userRating?->stars ?? 0 }})"
                         class="mt-6 space-y-3"
                     >
                         {{-- Stars + Remove + Heart --}}
@@ -227,7 +224,7 @@
                                 </div>
                             @endif
 
-                            <a href="#reviews" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-zinc-400 hover:text-white transition">
+                            <a href="#review-form" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-zinc-400 hover:text-white transition">
                                 + Review or Log
                             </a>
 
@@ -536,11 +533,11 @@
                     </ul>
                 </div>
                 @endif
-                    <div class="bg-zinc-900 rounded-lg">
+                    <div class="bg-zinc-900 rounded-lg" x-data="{ open: false }">
                         <div class="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
                             <h2 class="text-sm font-semibold text-zinc-100">Reviews</h2>
                             @auth
-                            <a href="#review-form" class="text-xs text-amber-400 hover:text-amber-300 transition font-medium">+ Review or Log</a>
+                            <button type="button" @click="open = true" class="text-xs text-amber-400 hover:text-amber-300 transition font-medium">+ Review or Log</button>
                             @endauth
                         </div>
 
@@ -602,7 +599,7 @@
                             @endforeach
 
                             {{-- Review or Log form --}}
-                            <div id="review-form" x-data="{ open: false }" class="px-5 py-4">
+                            <div id="review-form" class="px-5 py-4">
                                 <button @click="open = true" x-show="!open"
                                         class="text-sm text-amber-400 hover:text-amber-300 transition font-medium">
                                     + Review or Log

@@ -5,6 +5,8 @@ import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 
 import './credits-manager';
+import './director-compare';
+import './star-rating';
 
 Alpine.start();
 
