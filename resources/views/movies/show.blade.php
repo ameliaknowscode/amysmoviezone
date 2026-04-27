@@ -68,7 +68,7 @@
                         @if($ratingCount > 0)
                             <div class="flex items-center gap-1.5">
                                 <span class="text-yellow-400 text-xl font-bold">{{ number_format($avgRating, 1) }}</span>
-                                <x-star-display :value="$avgRating" class="text-sm" emptyClass="text-amber-300" />
+                                <x-star-display :value="$avgRating" class="text-sm" />
                                 <span class="text-zinc-400 text-xs">{{ $ratingCount }} {{ Str::plural('rating', $ratingCount) }}</span>
                             </div>
                             <span class="text-amber-300 hidden sm:inline">·</span>
@@ -94,195 +94,18 @@
                     {{-- User actions --}}
                     @auth
                     <div
-                        x-data="{
-                            stars: {{ $userRating?->stars ?? 0 }},
-                            hovered: 0,
-                        }"
+                        x-data="starRating({{ $userRating?->stars ?? 0 }})"
                         class="mt-6 space-y-3"
                     >
-                        {{-- Stars + Remove + Heart --}}
                         <div class="flex items-center gap-4">
-                            <form method="POST" action="{{ route('movies.rate', $movie) }}" x-ref="ratingForm" class="flex items-center">
-                                @csrf
-                                <input type="hidden" name="stars" x-bind:value="stars">
-                                @foreach([1,2,3,4,5] as $star)
-                                {{-- Single star span: mousemove detects left (half) vs right (full) half --}}
-                                <span
-                                    class="relative inline-block text-2xl sm:text-3xl leading-none cursor-pointer select-none"
-                                    @mousemove="hovered = $event.offsetX < $el.offsetWidth / 2 ? {{ $star - 0.5 }} : {{ $star }}"
-                                    @mouseleave="hovered = 0"
-                                    @click="stars = hovered; $nextTick(() => $refs.ratingForm.submit())"
-                                    :title="(hovered || stars) + ' ' + ((hovered || stars) === 1 ? 'star' : 'stars')"
-                                >
-                                    {{-- Base star (full or empty) --}}
-                                    <span class="transition-colors"
-                                          :class="(hovered || stars) >= {{ $star }} ? 'text-yellow-400' : 'text-amber-300'"
-                                    >&#9733;</span>
-                                    {{-- Half overlay --}}
-                                    <span
-                                        class="absolute top-0 left-0 text-yellow-400 pointer-events-none transition-opacity"
-                                        :class="(hovered || stars) >= {{ $star - 0.5 }} && (hovered || stars) < {{ $star }} ? 'opacity-100' : 'opacity-0'"
-                                        style="clip-path: inset(0 50% 0 0)"
-                                    >&#9733;</span>
-                                </span>
-                                @endforeach
-                            </form>
-
-                            @if($userRating?->stars)
-                            <form method="POST" action="{{ route('movies.rating.destroy', $movie) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-xs text-zinc-500 hover:text-zinc-300 transition underline">
-                                    Remove
-                                </button>
-                            </form>
-                            @endif
-
-                            {{-- Heart --}}
-                            <form method="POST" action="{{ route('movies.rate', $movie) }}">
-                                @csrf
-                                <input type="hidden" name="liked" value="{{ $userRating?->liked ? '0' : '1' }}">
-                                <button
-                                    type="submit"
-                                    class="focus:outline-none transition-colors {{ $userRating?->liked ? 'text-red-400' : 'text-amber-300 hover:text-red-400' }}"
-                                    title="{{ $userRating?->liked ? 'Unlike' : 'Like' }}"
-                                >
-                                    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                    </svg>
-                                </button>
-                            </form>
+                            <x-movie-star-rating :movie="$movie" :userRating="$userRating" />
                         </div>
-
-                        {{-- Watchlist buttons --}}
-                        @php $listType = $userWatchlistEntry?->list_type; @endphp
-                        <div class="flex flex-wrap items-center gap-2">
-                            @if($listType === 'want_to_watch')
-                                <form method="POST" action="{{ route('movies.watchlist.destroy', $movie) }}">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-amber-500 text-white hover:bg-amber-900/200 transition font-medium">
-                                        <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                        Want to Watch
-                                    </button>
-                                </form>
-                            @else
-                                <form method="POST" action="{{ route('movies.watchlist.store', $movie) }}">
-                                    @csrf
-                                    <input type="hidden" name="list_type" value="want_to_watch">
-                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-zinc-600 text-zinc-300 hover:border-zinc-400 hover:text-white transition font-medium">
-                                        + Want to Watch
-                                    </button>
-                                </form>
-                            @endif
-
-                            @if($listType === 'watched')
-                                <div x-data="{ editing: false }">
-                                    <div class="flex items-center gap-2">
-                                        <form method="POST" action="{{ route('movies.watchlist.destroy', $movie) }}">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-emerald-600 text-white hover:bg-emerald-500 transition font-medium">
-                                                <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                                Watched
-                                            </button>
-                                        </form>
-                                        <button @click="editing = !editing"
-                                                class="text-xs text-zinc-400 hover:text-white transition">
-                                            @if($userWatchlistEntry->watched_at)
-                                                {{ $userWatchlistEntry->watched_at->format('j M Y') }}
-                                            @else
-                                                + add date
-                                            @endif
-                                        </button>
-                                    </div>
-                                    <form x-show="editing" x-cloak method="POST"
-                                          action="{{ route('movies.watchlist.watched-at', $movie) }}"
-                                          class="flex items-center gap-2 mt-2">
-                                        @csrf @method('PATCH')
-                                        <input type="date" name="watched_at"
-                                               value="{{ $userWatchlistEntry->watched_at?->format('Y-m-d') }}"
-                                               max="{{ now()->format('Y-m-d') }}"
-                                               class="text-xs rounded border border-zinc-700 bg-zinc-800 text-zinc-100 px-2 py-1 focus:outline-none focus:border-amber-500">
-                                        <button type="submit" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium transition">Save</button>
-                                        <button type="button" @click="editing = false" class="text-xs text-zinc-500 hover:text-zinc-300 transition">Cancel</button>
-                                    </form>
-                                </div>
-                            @else
-                                <div x-data="{ open: false }">
-                                    <button @click="open = true"
-                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-zinc-600 text-zinc-300 hover:border-zinc-400 hover:text-white transition font-medium">
-                                        + Watched
-                                    </button>
-                                    <form x-show="open" x-cloak method="POST"
-                                          action="{{ route('movies.watchlist.store', $movie) }}"
-                                          class="flex items-center gap-2 mt-2">
-                                        @csrf
-                                        <input type="hidden" name="list_type" value="watched">
-                                        <input type="date" name="watched_at"
-                                               value="{{ now()->format('Y-m-d') }}"
-                                               max="{{ now()->format('Y-m-d') }}"
-                                               class="text-xs rounded border border-zinc-700 bg-zinc-800 text-zinc-100 px-2 py-1 focus:outline-none focus:border-amber-500">
-                                        <button type="submit" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium transition">Mark Watched</button>
-                                        <button type="button" @click="open = false" class="text-xs text-zinc-500 hover:text-zinc-300 transition">Cancel</button>
-                                    </form>
-                                </div>
-                            @endif
-
-                            <a href="#reviews" class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-zinc-400 hover:text-white transition">
-                                + Review or Log
-                            </a>
-
-                            {{-- Add to List --}}
-                            <div class="relative" x-data="{ open: false }" @click.outside="open = false">
-                                <button @click="open = !open"
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition font-medium">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h8"/>
-                                    </svg>
-                                    Lists
-                                </button>
-                                <div x-show="open" x-cloak
-                                     class="absolute left-0 mt-1.5 w-56 bg-zinc-900 rounded-lg shadow-lg border border-zinc-800 py-1 z-20">
-                                    @forelse($userLists as $list)
-                                        @php $inList = $movieListIds->contains($list->id); @endphp
-                                        <form method="POST"
-                                              action="{{ $inList
-                                                  ? route('lists.movies.destroy', [$list, $movie])
-                                                  : route('lists.movies.store', $list) }}">
-                                            @csrf
-                                            @if($inList) @method('DELETE') @else
-                                                <input type="hidden" name="movie_id" value="{{ $movie->id }}">
-                                            @endif
-                                            <button type="submit"
-                                                    class="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors text-left">
-                                                <span class="w-4 h-4 shrink-0 flex items-center justify-center">
-                                                    @if($inList)
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                                        </svg>
-                                                    @else
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                                                        </svg>
-                                                    @endif
-                                                </span>
-                                                <span class="truncate">{{ $list->name }}</span>
-                                            </button>
-                                        </form>
-                                    @empty
-                                        <p class="px-4 py-2 text-xs text-zinc-500">No lists yet.</p>
-                                    @endforelse
-                                    <div class="border-t border-zinc-800 mt-1 pt-1">
-                                        <a href="{{ route('lists.create') }}"
-                                           class="flex items-center gap-2.5 px-4 py-2 text-sm text-amber-400 hover:bg-zinc-800 transition-colors">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                                            </svg>
-                                            New list
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <x-movie-watchlist-actions
+                            :movie="$movie"
+                            :userWatchlistEntry="$userWatchlistEntry"
+                            :userLists="$userLists"
+                            :movieListIds="$movieListIds"
+                        />
                     </div>
                     @else
                     <p class="mt-4 text-sm text-zinc-400">
@@ -536,11 +359,11 @@
                     </ul>
                 </div>
                 @endif
-                    <div class="bg-zinc-900 rounded-lg">
+                    <div class="bg-zinc-900 rounded-lg" x-data="{ open: false }">
                         <div class="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
                             <h2 class="text-sm font-semibold text-zinc-100">Reviews</h2>
                             @auth
-                            <a href="#review-form" class="text-xs text-amber-400 hover:text-amber-300 transition font-medium">+ Review or Log</a>
+                            <button type="button" @click="open = true" class="text-xs text-amber-400 hover:text-amber-300 transition font-medium">+ Review or Log</button>
                             @endauth
                         </div>
 
@@ -602,7 +425,7 @@
                             @endforeach
 
                             {{-- Review or Log form --}}
-                            <div id="review-form" x-data="{ open: false }" class="px-5 py-4">
+                            <div id="review-form" class="px-5 py-4">
                                 <button @click="open = true" x-show="!open"
                                         class="text-sm text-amber-400 hover:text-amber-300 transition font-medium">
                                     + Review or Log
