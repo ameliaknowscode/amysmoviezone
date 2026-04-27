@@ -170,7 +170,15 @@
 
                 {{-- ── Sidebar: Cast / Crew ── --}}
                 @if($cast->isNotEmpty() || $crew->isNotEmpty())
-                <div class="mb-8 lg:mb-0" x-data="{ tab: 'cast' }">
+                @php
+                    $castLimit      = 5;
+                    $crewGroupLimit = 3;
+                    $hiddenCastCount = max(0, $cast->count() - $castLimit);
+                    $hiddenCrewCount = $crew->count() > $crewGroupLimit
+                        ? $crew->skip($crewGroupLimit)->flatten()->count()
+                        : 0;
+                @endphp
+                <div class="mb-8 lg:mb-0" x-data="{ tab: 'cast', castExpanded: false, crewExpanded: false }">
                     <div class="bg-zinc-900 rounded-lg overflow-hidden">
                         {{-- Tab bar --}}
                         <div class="border-b border-zinc-800 px-4">
@@ -192,7 +200,7 @@
                         <div x-show="tab === 'cast'" class="p-4">
                             @if($cast->isNotEmpty())
                                 <ul class="space-y-3">
-                                    @foreach($cast as $credit)
+                                    @foreach($cast->take($castLimit) as $credit)
                                     <li class="flex items-center gap-3">
                                         <div class="w-8 h-8 rounded-full bg-amber-900/30 flex items-center justify-center text-amber-400 text-xs font-bold shrink-0 select-none">
                                             {{ strtoupper(substr($credit->person->name, 0, 1)) }}
@@ -209,6 +217,31 @@
                                     </li>
                                     @endforeach
                                 </ul>
+                                @if($hiddenCastCount > 0)
+                                <ul class="space-y-3 mt-3" x-show="castExpanded" x-cloak>
+                                    @foreach($cast->skip($castLimit) as $credit)
+                                    <li class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-amber-900/30 flex items-center justify-center text-amber-400 text-xs font-bold shrink-0 select-none">
+                                            {{ strtoupper(substr($credit->person->name, 0, 1)) }}
+                                        </div>
+                                        <div class="min-w-0">
+                                            <a href="{{ $credit->byTypeUrl() }}"
+                                               class="text-sm font-medium text-zinc-100 hover:text-amber-400 transition-colors block truncate">
+                                                {{ $credit->person->name }}
+                                            </a>
+                                            @if($credit->character)
+                                                <span class="text-xs text-zinc-500 block truncate">{{ $credit->character }}</span>
+                                            @endif
+                                        </div>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                                <button @click="castExpanded = !castExpanded"
+                                        class="mt-3 text-xs text-amber-400 hover:text-amber-300 transition">
+                                    <span x-show="!castExpanded">Show {{ $hiddenCastCount }} more</span>
+                                    <span x-show="castExpanded" x-cloak>Show less</span>
+                                </button>
+                                @endif
                             @else
                                 <p class="text-sm text-zinc-500">No cast listed.</p>
                             @endif
@@ -218,7 +251,7 @@
                         <div x-show="tab === 'crew'" class="p-4">
                             @if($crew->isNotEmpty())
                                 <dl class="space-y-4">
-                                    @foreach($crew as $typeName => $credits)
+                                    @foreach($crew->take($crewGroupLimit) as $typeName => $credits)
                                     <div>
                                         <dt class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">{{ $typeName }}</dt>
                                         <dd class="space-y-1">
@@ -237,6 +270,33 @@
                                     </div>
                                     @endforeach
                                 </dl>
+                                @if($hiddenCrewCount > 0)
+                                <dl class="space-y-4 mt-4" x-show="crewExpanded" x-cloak>
+                                    @foreach($crew->skip($crewGroupLimit) as $typeName => $credits)
+                                    <div>
+                                        <dt class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">{{ $typeName }}</dt>
+                                        <dd class="space-y-1">
+                                            @foreach($credits as $credit)
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-500 text-xs font-bold shrink-0 select-none">
+                                                    {{ strtoupper(substr($credit->person->name, 0, 1)) }}
+                                                </div>
+                                                <a href="{{ $credit->byTypeUrl() }}"
+                                                   class="text-sm text-zinc-100 hover:text-amber-400 transition-colors truncate">
+                                                    {{ $credit->person->name }}
+                                                </a>
+                                            </div>
+                                            @endforeach
+                                        </dd>
+                                    </div>
+                                    @endforeach
+                                </dl>
+                                <button @click="crewExpanded = !crewExpanded"
+                                        class="mt-3 text-xs text-amber-400 hover:text-amber-300 transition">
+                                    <span x-show="!crewExpanded">Show {{ $hiddenCrewCount }} more</span>
+                                    <span x-show="crewExpanded" x-cloak>Show less</span>
+                                </button>
+                                @endif
                             @else
                                 <p class="text-sm text-zinc-500">No crew listed.</p>
                             @endif
