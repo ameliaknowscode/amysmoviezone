@@ -17,6 +17,8 @@ class DcExport extends Command
 
     public function handle(): int
     {
+        ini_set('memory_limit', '1G');
+
         $filename = $this->option('output') ?: 'dc-export.json';
 
         $this->info('Exporting Director Connections data...');
