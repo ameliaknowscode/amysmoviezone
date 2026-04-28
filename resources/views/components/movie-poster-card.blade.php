@@ -7,7 +7,7 @@
                  class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
         @else
             <div class="w-full h-full flex items-center justify-center p-2 text-center">
-                <span class="text-xs text-zinc-500 leading-snug">{{ $movie->title }}</span>
+                <span class="text-xs text-zinc-400 leading-snug">{{ $movie->title }}</span>
             </div>
         @endif
     </div>
@@ -18,14 +18,14 @@
         @php $displayRating = $avgRating ?? ($showRating ? ($movie->avg_stars ?? null) : null); @endphp
         <div class="flex items-center gap-1.5">
             @if($movie->release_year)
-                <span class="text-xs text-zinc-500">{{ $movie->release_year }}</span>
+                <span class="text-xs text-zinc-400">{{ $movie->release_year }}</span>
             @endif
             @if($displayRating)
                 <span class="text-xs text-yellow-500 font-medium">★ {{ number_format($displayRating, 1) }}</span>
             @endif
         </div>
         @if($subline)
-            <p class="text-xs text-zinc-500">{{ $subline }}</p>
+            <p class="text-xs text-zinc-400">{{ $subline }}</p>
         @endif
     </div>
 </a>

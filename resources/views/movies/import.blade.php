@@ -29,7 +29,7 @@
                     </p>
 
                     <div class="mb-5 p-3 bg-zinc-900 border border-zinc-800 rounded-md">
-                        <p class="text-xs font-medium text-zinc-500 mb-1">Expected format:</p>
+                        <p class="text-xs font-medium text-zinc-400 mb-1">Expected format:</p>
                         <pre class="text-xs font-mono text-zinc-300">title,release_year
 The Matrix,1999
 Inception,2010</pre>
@@ -93,7 +93,7 @@ Inception,2010</pre>
                                 <tbody>
                                     @foreach($rowErrors as $rowError)
                                         <tr class="hover:bg-zinc-800">
-                                            <td class="border border-zinc-800 px-3 py-2 text-zinc-500">{{ $rowError['row'] }}</td>
+                                            <td class="border border-zinc-800 px-3 py-2 text-zinc-400">{{ $rowError['row'] }}</td>
                                             <td class="border border-zinc-800 px-3 py-2">{{ $rowError['title'] }}</td>
                                             <td class="border border-zinc-800 px-3 py-2 text-red-600">{{ $rowError['reason'] }}</td>
                                         </tr>
@@ -105,7 +105,7 @@ Inception,2010</pre>
                 @endif
 
                 @if($imported === 0 && $updated === 0 && empty($rowErrors))
-                    <p class="text-sm text-zinc-500">The file was empty or contained no data rows.</p>
+                    <p class="text-sm text-zinc-400">The file was empty or contained no data rows.</p>
                 @endif
             @endisset
 

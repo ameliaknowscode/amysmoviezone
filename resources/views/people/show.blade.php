@@ -36,7 +36,7 @@
     <div class="py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if($person->credits->isEmpty())
-                <p class="text-sm text-zinc-500">No credits listed.</p>
+                <p class="text-sm text-zinc-400">No credits listed.</p>
             @else
                 @php
                     $creditsByType = $person->credits->groupBy(fn($c) => $c->type->name);
@@ -50,11 +50,11 @@
                             <button @click="activeTab = '{{ $typeName }}'"
                                     :class="activeTab === '{{ $typeName }}'
                                         ? 'border-b-2 border-amber-500 text-amber-400'
-                                        : 'text-zinc-500 hover:text-zinc-300 border-b-2 border-transparent'"
+                                        : 'text-zinc-400 hover:text-zinc-300 border-b-2 border-transparent'"
                                     class="px-4 py-2.5 text-sm font-medium transition-colors -mb-px">
                                 {{ $typeName }}
                                 <span class="ml-1 text-xs px-1.5 py-0.5 rounded-full"
-                                      :class="activeTab === '{{ $typeName }}' ? 'bg-amber-900/20 text-amber-400' : 'bg-zinc-800 text-zinc-500'">
+                                      :class="activeTab === '{{ $typeName }}' ? 'bg-amber-900/20 text-amber-400' : 'bg-zinc-800 text-zinc-400'">
                                     {{ $creditsByType[$typeName]->count() }}
                                 </span>
                             </button>
@@ -74,7 +74,7 @@
                                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center bg-zinc-800">
-                                                    <span class="text-zinc-500 text-3xl">🎬</span>
+                                                    <span class="text-zinc-400 text-3xl">🎬</span>
                                                 </div>
                                             @endif
                                         </div>
@@ -82,9 +82,9 @@
                                             <p class="text-xs font-medium text-zinc-200 group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
                                                 {{ $credit->movie->title }}
                                             </p>
-                                            <span class="text-xs text-zinc-500">{{ $credit->movie->release_year }}</span>
+                                            <span class="text-xs text-zinc-400">{{ $credit->movie->release_year }}</span>
                                             @if($credit->character)
-                                                <p class="text-xs text-zinc-500 italic line-clamp-1">{{ $credit->character }}</p>
+                                                <p class="text-xs text-zinc-400 italic line-clamp-1">{{ $credit->character }}</p>
                                             @endif
                                         </div>
                                     </a>

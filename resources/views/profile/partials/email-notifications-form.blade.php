@@ -16,7 +16,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-zinc-300">Email notifications</p>
-                <p class="text-xs text-zinc-500">New followers, liked reviews, and friend activity</p>
+                <p class="text-xs text-zinc-400">New followers, liked reviews, and friend activity</p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
                 <input
@@ -27,7 +27,7 @@
                 >
                 <input type="hidden" name="email_notifications" value="{{ $user->email_notifications ? '1' : '0' }}">
                 <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-zinc-900 after:border-zinc-700 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
-                <span class="ms-3 text-sm text-zinc-500">{{ $user->email_notifications ? 'On' : 'Off' }}</span>
+                <span class="ms-3 text-sm text-zinc-400">{{ $user->email_notifications ? 'On' : 'Off' }}</span>
             </label>
         </div>
 

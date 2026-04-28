@@ -29,12 +29,12 @@
                     </p>
 
                     <div class="mb-5 p-3 bg-zinc-900 border border-zinc-800 rounded-md">
-                        <p class="text-xs font-medium text-zinc-500 mb-1">Expected format:</p>
+                        <p class="text-xs font-medium text-zinc-400 mb-1">Expected format:</p>
                         <pre class="text-xs font-mono text-zinc-300">title,release_year,genres
 The Matrix,1999,Action|Science Fiction
 Parasite,2019,Drama|Thriller
 Toy Story,1995,Animation|Comedy|Family</pre>
-                        <p class="text-xs text-zinc-500 mt-2">
+                        <p class="text-xs text-zinc-400 mt-2">
                             Use <code class="bg-zinc-800 px-1 rounded font-mono">|</code> to separate multiple genres.
                             Genre names are matched case-insensitively; unrecognised genres are created automatically.
                         </p>
@@ -84,7 +84,7 @@ Toy Story,1995,Animation|Comedy|Family</pre>
                                 <tbody>
                                     @foreach($rowErrors as $rowError)
                                         <tr class="hover:bg-zinc-800">
-                                            <td class="border border-zinc-800 px-3 py-2 text-zinc-500">{{ $rowError['row'] }}</td>
+                                            <td class="border border-zinc-800 px-3 py-2 text-zinc-400">{{ $rowError['row'] }}</td>
                                             <td class="border border-zinc-800 px-3 py-2">{{ $rowError['title'] }}</td>
                                             <td class="border border-zinc-800 px-3 py-2 text-red-600">{{ $rowError['reason'] }}</td>
                                         </tr>
@@ -96,7 +96,7 @@ Toy Story,1995,Animation|Comedy|Family</pre>
                 @endif
 
                 @if($updated === 0 && empty($rowErrors))
-                    <p class="text-sm text-zinc-500">The file was empty or contained no data rows.</p>
+                    <p class="text-sm text-zinc-400">The file was empty or contained no data rows.</p>
                 @endif
             @endisset
 

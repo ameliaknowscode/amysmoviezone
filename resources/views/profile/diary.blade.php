@@ -10,19 +10,19 @@
 
             @if($entries === null)
                 <div class="card">
-                    <div class="p-6 text-sm text-zinc-500">This user's diary is private.</div>
+                    <div class="p-6 text-sm text-zinc-400">This user's diary is private.</div>
                 </div>
 
             @elseif($entries->isEmpty() && $paginator->total() === 0)
                 <div class="card">
-                    <div class="p-6 text-sm text-zinc-500">No diary entries yet.</div>
+                    <div class="p-6 text-sm text-zinc-400">No diary entries yet.</div>
                 </div>
 
             @else
                 <div class="space-y-8">
                     @foreach($entries as $monthKey => $monthEntries)
                     <div>
-                        <h2 class="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-3">
+                        <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">
                             {{ \Carbon\Carbon::createFromFormat('Y-m', $monthKey)->format('F Y') }}
                         </h2>
 
@@ -33,7 +33,7 @@
                                 {{-- Day number --}}
                                 <div class="w-8 shrink-0 text-center">
                                     <span class="text-lg font-bold text-zinc-200 leading-none">{{ $entry->watched_at->format('j') }}</span>
-                                    <span class="block text-xs text-zinc-500">{{ $entry->watched_at->format('D') }}</span>
+                                    <span class="block text-xs text-zinc-400">{{ $entry->watched_at->format('D') }}</span>
                                 </div>
 
                                 {{-- Poster --}}
@@ -54,7 +54,7 @@
                                             {{ $entry->movie->title }}
                                         </a>
                                         @if($entry->movie->release_year)
-                                            <span class="text-xs text-zinc-500">{{ $entry->movie->release_year }}</span>
+                                            <span class="text-xs text-zinc-400">{{ $entry->movie->release_year }}</span>
                                         @endif
                                         @if($entry->is_rewatch)
                                             <span class="text-xs text-zinc-400 border border-zinc-600 rounded px-1.5 py-0.5 leading-none">Rewatch</span>
