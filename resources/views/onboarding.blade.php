@@ -15,7 +15,7 @@
                         <div class="flex-shrink-0 w-9 h-9 rounded-full bg-amber-900/30 flex items-center justify-center text-amber-400 font-semibold text-sm">1</div>
                         <div>
                             <h3 class="font-semibold text-zinc-100">Rate movies you've seen</h3>
-                            <p class="text-sm text-zinc-500 mt-0.5">Give films a star rating and unlock personalised recommendations the more you rate.</p>
+                            <p class="text-sm text-zinc-400 mt-0.5">Give films a star rating and unlock personalised recommendations the more you rate.</p>
                         </div>
                     </div>
 
@@ -23,7 +23,7 @@
                         <div class="flex-shrink-0 w-9 h-9 rounded-full bg-amber-900/30 flex items-center justify-center text-amber-400 font-semibold text-sm">2</div>
                         <div>
                             <h3 class="font-semibold text-zinc-100">Build your watchlist</h3>
-                            <p class="text-sm text-zinc-500 mt-0.5">Save films you want to see, log ones you've watched, and write reviews in your diary.</p>
+                            <p class="text-sm text-zinc-400 mt-0.5">Save films you want to see, log ones you've watched, and write reviews in your diary.</p>
                         </div>
                     </div>
 
@@ -31,7 +31,7 @@
                         <div class="flex-shrink-0 w-9 h-9 rounded-full bg-amber-900/30 flex items-center justify-center text-amber-400 font-semibold text-sm">3</div>
                         <div>
                             <h3 class="font-semibold text-zinc-100">Follow people</h3>
-                            <p class="text-sm text-zinc-500 mt-0.5">See what others are watching and rating in your personal activity feed.</p>
+                            <p class="text-sm text-zinc-400 mt-0.5">See what others are watching and rating in your personal activity feed.</p>
                         </div>
                     </div>
                 </div>

@@ -88,7 +88,7 @@
                         :disabled="!canCompare"
                         :class="canCompare
                             ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950 cursor-pointer'
-                            : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'"
+                            : 'bg-zinc-800 text-zinc-400 cursor-not-allowed'"
                         class="w-full py-3 rounded-xl font-semibold text-sm transition-colors"
                     >
                         Compare &rarr;

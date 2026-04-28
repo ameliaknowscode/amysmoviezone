@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Sign Up">
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
@@ -13,7 +13,7 @@
         <div class="mt-4">
             <x-input-label for="username" :value="__('Username')" />
             <div class="flex mt-1">
-                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-zinc-700 bg-zinc-900 text-zinc-500 text-sm">@</span>
+                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-zinc-700 bg-zinc-900 text-zinc-400 text-sm">@</span>
                 <x-text-input id="username" class="block w-full rounded-l-none" type="text" name="username" :value="old('username')" required autocomplete="username" />
             </div>
             <x-input-error :messages="$errors->get('username')" class="mt-2" />

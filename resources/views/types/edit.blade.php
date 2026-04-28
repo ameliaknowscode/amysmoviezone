@@ -36,7 +36,7 @@
                                     class="rounded border-zinc-700 text-amber-400 shadow-sm">
                                 <span class="text-sm font-medium text-zinc-300">Crew role</span>
                             </label>
-                            <p class="mt-1 text-xs text-zinc-500">Check this if the type represents a crew position (e.g. Director, Producer).</p>
+                            <p class="mt-1 text-xs text-zinc-400">Check this if the type represents a crew position (e.g. Director, Producer).</p>
                         </div>
 
                         <div class="flex items-center gap-4">

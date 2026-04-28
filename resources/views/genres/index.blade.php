@@ -34,7 +34,7 @@
                                         <tr class="hover:bg-zinc-800">
                                             <td class="border border-zinc-700 px-4 py-2">{{ $genre->id }}</td>
                                             <td class="border border-zinc-700 px-4 py-2">{{ $genre->name }}</td>
-                                            <td class="border border-zinc-700 px-4 py-2 text-zinc-500 text-sm">{{ $genre->slug }}</td>
+                                            <td class="border border-zinc-700 px-4 py-2 text-zinc-400 text-sm">{{ $genre->slug }}</td>
                                             <td class="border border-zinc-700 px-4 py-2 text-center">
                                                 <div class="flex items-center justify-center gap-3">
                                                     <a href="{{ route('admin.genres.edit', $genre) }}" class="text-indigo-500 hover:text-amber-300" title="Edit genre">

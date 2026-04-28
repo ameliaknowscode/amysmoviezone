@@ -41,7 +41,7 @@
                                 class="px-5 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-400 transition-colors">
                             Create List
                         </button>
-                        <a href="{{ route('lists.index') }}" class="text-sm text-zinc-500 hover:text-zinc-300">Cancel</a>
+                        <a href="{{ route('lists.index') }}" class="text-sm text-zinc-400 hover:text-zinc-300">Cancel</a>
                     </div>
                 </form>
             </div>

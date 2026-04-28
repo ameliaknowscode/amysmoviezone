@@ -33,7 +33,7 @@
                         <div class="space-y-2 mb-5">
                             <template x-for="(val, idx) in directors" :key="idx">
                                 <div class="flex items-center gap-2">
-                                    <label class="text-sm font-medium text-zinc-500 w-20 shrink-0" x-text="'Director ' + (idx + 1)"></label>
+                                    <label class="text-sm font-medium text-zinc-400 w-20 shrink-0" x-text="'Director ' + (idx + 1)"></label>
                                     <select
                                         :name="'directors[' + idx + ']'"
                                         x-model="directors[idx]"
@@ -51,7 +51,7 @@
                                         type="button"
                                         @click="remove(idx)"
                                         x-show="directors.length > 1"
-                                        class="text-zinc-500 hover:text-red-500 transition shrink-0"
+                                        class="text-zinc-400 hover:text-red-500 transition shrink-0"
                                         title="Remove"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -85,7 +85,7 @@
                             Actors in films by {{ $selectedDirectors->pluck('name')->join(', ', ' & ') }}
                         </h3>
                         @if($actors->isNotEmpty())
-                            <p class="mt-1 text-sm text-zinc-500">
+                            <p class="mt-1 text-sm text-zinc-400">
                                 {{ $actors->count() }} {{ Str::plural('actor', $actors->count()) }} appeared in at least one film by each director.
                             </p>
                         @endif
@@ -94,14 +94,14 @@
                     <div class="p-6">
                         @if($actors->isEmpty())
                             <div class="text-center py-8">
-                                <p class="text-zinc-500 font-medium">No actors in common.</p>
-                                <p class="text-sm text-zinc-500 mt-1">These directors haven't shared any cast members. Try a different combination.</p>
+                                <p class="text-zinc-400 font-medium">No actors in common.</p>
+                                <p class="text-sm text-zinc-400 mt-1">These directors haven't shared any cast members. Try a different combination.</p>
                             </div>
                         @else
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-zinc-700">
                                     <thead>
-                                        <tr class="text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                                        <tr class="text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
                                             <th class="pb-3 pr-6">Actor</th>
                                             @foreach($selectedDirectors as $dir)
                                                 <th class="pb-3 pr-6">{{ $dir->name }}</th>
@@ -117,7 +117,7 @@
                                                         {{ $actor->name }}
                                                     </a>
                                                     @if($actor->nationality)
-                                                        <span class="text-xs text-zinc-500 ml-1">{{ $actor->nationality }}</span>
+                                                        <span class="text-xs text-zinc-400 ml-1">{{ $actor->nationality }}</span>
                                                     @endif
                                                 </td>
                                                 @foreach($selectedDirectors as $dir)
@@ -126,7 +126,7 @@
                                                         @if($films)
                                                             {{ implode(', ', array_unique($films)) }}
                                                         @else
-                                                            <span class="text-zinc-600">—</span>
+                                                            <span class="text-zinc-400">—</span>
                                                         @endif
                                                     </td>
                                                 @endforeach

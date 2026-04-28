@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="'Search results' . (request('q') ? ' for ' . e(request('q')) : '')">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-zinc-100 leading-tight">
             Results for &ldquo;{{ $query }}&rdquo;
@@ -20,7 +20,7 @@
                 </div>
 
                 @if($movies->isEmpty())
-                    <p class="px-6 py-5 text-sm text-zinc-500">No movies found for &ldquo;{{ $query }}&rdquo;.</p>
+                    <p class="px-6 py-5 text-sm text-zinc-400">No movies found for &ldquo;{{ $query }}&rdquo;.</p>
                 @else
                     <ul class="divide-y divide-zinc-800">
                         @foreach($movies as $movie)
@@ -48,7 +48,7 @@
                                             </span>
                                         @endif
                                     </div>
-                                    <div class="flex items-center gap-2 mt-0.5 text-xs text-zinc-500">
+                                    <div class="flex items-center gap-2 mt-0.5 text-xs text-zinc-400">
                                         @if($movie->release_year)
                                             <span>{{ $movie->release_year }}</span>
                                         @endif
@@ -84,7 +84,7 @@
                 </div>
 
                 @if($people->isEmpty())
-                    <p class="px-6 py-5 text-sm text-zinc-500">No people found for &ldquo;{{ $query }}&rdquo;.</p>
+                    <p class="px-6 py-5 text-sm text-zinc-400">No people found for &ldquo;{{ $query }}&rdquo;.</p>
                 @else
                     <ul class="divide-y divide-zinc-800">
                         @foreach($people as $person)
@@ -112,7 +112,7 @@
                                             </span>
                                         @endif
                                     </div>
-                                    <div class="flex items-center gap-2 mt-0.5 text-xs text-zinc-500">
+                                    <div class="flex items-center gap-2 mt-0.5 text-xs text-zinc-400">
                                         @if($person->nationality)
                                             <span>{{ $person->nationality }}</span>
                                         @endif

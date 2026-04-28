@@ -51,7 +51,7 @@
                 @endif
                 <a href="{{ $movie->publicUrl() }}" class="font-medium hover:text-amber-400 transition-colors">{{ $movie->title }}</a>
                 @if($item->watched_at)
-                    <span class="text-zinc-500">on {{ $item->watched_at->format('j M Y') }}</span>
+                    <span class="text-zinc-400">on {{ $item->watched_at->format('j M Y') }}</span>
                 @endif
 
             @elseif($activity->type === 'watchlist')
@@ -62,16 +62,16 @@
                 @endif
                 <a href="{{ $movie->publicUrl() }}" class="font-medium hover:text-amber-400 transition-colors">{{ $movie->title }}</a>
                 @if($item->list_type === 'watched')
-                    <span class="text-zinc-500">as watched</span>
+                    <span class="text-zinc-400">as watched</span>
                 @endif
             @endif
         </p>
 
         @if($activity->type === 'review' && $item->body)
-            <p class="text-sm text-zinc-500 mt-1 leading-relaxed line-clamp-2">{{ $item->body }}</p>
+            <p class="text-sm text-zinc-400 mt-1 leading-relaxed line-clamp-2">{{ $item->body }}</p>
         @endif
 
-        <p class="text-xs text-zinc-500 mt-1">{{ $activity->created_at->diffForHumans() }}</p>
+        <p class="text-xs text-zinc-400 mt-1">{{ $activity->created_at->diffForHumans() }}</p>
     </div>
 
 </div>
