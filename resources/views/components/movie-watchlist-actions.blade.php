@@ -7,7 +7,7 @@
     @if($listType === 'want_to_watch')
         <form method="POST" action="{{ route('movies.watchlist.destroy', $movie) }}">
             @csrf @method('DELETE')
-            <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-amber-500 text-white hover:bg-amber-900/200 transition font-medium">
+            <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-amber-500 text-zinc-950 hover:bg-amber-400 transition font-medium">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                 Want to Watch
             </button>
@@ -51,7 +51,7 @@
                        max="{{ now()->format('Y-m-d') }}"
                        class="text-xs rounded border border-zinc-700 bg-zinc-800 text-zinc-100 px-2 py-1 focus:outline-none focus:border-amber-500">
                 <button type="submit" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium transition">Save</button>
-                <button type="button" @click="editing = false" class="text-xs text-zinc-500 hover:text-zinc-300 transition">Cancel</button>
+                <button type="button" @click="editing = false" class="text-xs text-zinc-400 hover:text-zinc-300 transition">Cancel</button>
             </form>
         </div>
     @else
@@ -70,7 +70,7 @@
                        max="{{ now()->format('Y-m-d') }}"
                        class="text-xs rounded border border-zinc-700 bg-zinc-800 text-zinc-100 px-2 py-1 focus:outline-none focus:border-amber-500">
                 <button type="submit" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium transition">Mark Watched</button>
-                <button type="button" @click="open = false" class="text-xs text-zinc-500 hover:text-zinc-300 transition">Cancel</button>
+                <button type="button" @click="open = false" class="text-xs text-zinc-400 hover:text-zinc-300 transition">Cancel</button>
             </form>
         </div>
     @endif
@@ -81,9 +81,12 @@
 
     {{-- Lists --}}
     <div class="relative" x-data="{ open: false }" @click.outside="open = false">
-        <button @click="open = !open"
+        <button type="button"
+                @click="open = !open"
+                :aria-expanded="open ? 'true' : 'false'"
+                aria-haspopup="menu"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-zinc-600 text-zinc-300 hover:bg-zinc-800 transition font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h8"/>
             </svg>
             Lists
@@ -108,7 +111,7 @@
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                 </svg>
                             @else
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                                 </svg>
                             @endif
@@ -117,7 +120,7 @@
                     </button>
                 </form>
             @empty
-                <p class="px-4 py-2 text-xs text-zinc-500">No lists yet.</p>
+                <p class="px-4 py-2 text-xs text-zinc-400">No lists yet.</p>
             @endforelse
             <div class="border-t border-zinc-800 mt-1 pt-1">
                 <a href="{{ route('lists.create') }}"

@@ -28,6 +28,25 @@
         filter: invert(1) opacity(0.6);
         cursor: pointer;
     }
+
+    /* Visible keyboard-only focus indicator. Many components use `focus:outline-none`
+     * (utilities layer) to suppress the browser's default outline on mouse click;
+     * !important here keeps the outline for keyboard users without disturbing those rules. */
+    a:focus-visible,
+    button:focus-visible,
+    [role="button"]:focus-visible,
+    summary:focus-visible,
+    [tabindex]:focus-visible {
+        outline: 2px solid theme('colors.amber.400') !important;
+        outline-offset: 2px !important;
+        border-radius: 2px;
+    }
+
+    /* Skip-to-content link — visually hidden until focused. */
+    .skip-link {
+        @apply absolute left-2 top-2 z-[100] -translate-y-20 focus:translate-y-0 transition-transform
+               bg-amber-500 text-zinc-950 font-semibold px-4 py-2 rounded-md shadow-lg;
+    }
 }
 
 @layer components {
@@ -38,7 +57,7 @@
 
     /* Amber CTA button — add size (px-*, py-*, text-*) and layout (inline-flex etc.) inline */
     .btn-amber {
-        @apply bg-amber-500 text-white font-medium rounded-md hover:bg-amber-400 transition;
+        @apply bg-amber-500 text-zinc-950 font-medium rounded-md hover:bg-amber-400 transition;
     }
 
     /* Dark form input — add width and layout classes inline */
