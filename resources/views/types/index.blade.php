@@ -40,7 +40,7 @@
                                             @if($type->is_crew)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-900/30 text-amber-300">Yes</span>
                                             @else
-                                                <span class="text-zinc-500">—</span>
+                                                <span class="text-zinc-400">—</span>
                                             @endif
                                         </td>
                                         <td class="border border-zinc-700 px-4 py-2 text-center">

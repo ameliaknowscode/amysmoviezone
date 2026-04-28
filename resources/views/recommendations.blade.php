@@ -11,7 +11,7 @@
                 <div class="bg-zinc-900 sm:rounded-lg px-6 py-12 text-center">
                     <p class="text-3xl mb-3">🎬</p>
                     <h3 class="text-base font-semibold text-zinc-200 mb-1">Rate a few more films to get started</h3>
-                    <p class="text-sm text-zinc-500">
+                    <p class="text-sm text-zinc-400">
                         You've rated {{ $rated }} {{ $rated === 1 ? 'film' : 'films' }}.
                         Rate at least {{ $needed }} to unlock personalised recommendations.
                     </p>
@@ -28,12 +28,12 @@
                 ----------------------------------------------------------------- --}}
                 @if(!empty($tasteProfile['genres']) || !empty($tasteProfile['directors']))
                     <div class="bg-zinc-900 sm:rounded-lg px-6 py-5">
-                        <h3 class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4">Your taste profile</h3>
+                        <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">Your taste profile</h3>
                         <div class="flex flex-wrap gap-8">
 
                             @if(!empty($tasteProfile['genres']))
                                 <div>
-                                    <p class="text-xs text-zinc-500 mb-2">Top genres</p>
+                                    <p class="text-xs text-zinc-400 mb-2">Top genres</p>
                                     <div class="flex flex-wrap gap-2">
                                         @foreach($tasteProfile['genres'] as $genre)
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-900/20 text-amber-300 ring-1 ring-amber-500/30">
@@ -47,7 +47,7 @@
 
                             @if(!empty($tasteProfile['directors']))
                                 <div>
-                                    <p class="text-xs text-zinc-500 mb-2">Favourite directors</p>
+                                    <p class="text-xs text-zinc-400 mb-2">Favourite directors</p>
                                     <div class="flex flex-wrap gap-x-5 gap-y-1">
                                         @foreach($tasteProfile['directors'] as $director)
                                             <span class="text-sm text-zinc-300">
@@ -70,7 +70,7 @@
                     <div class="bg-zinc-900 sm:rounded-lg px-6 py-12 text-center">
                         <p class="text-3xl mb-3">👀</p>
                         <h3 class="text-base font-semibold text-zinc-200 mb-1">No recommendations yet</h3>
-                        <p class="text-sm text-zinc-500">
+                        <p class="text-sm text-zinc-400">
                             Keep rating films — we'll have suggestions for you soon!
                         </p>
                     </div>
@@ -115,7 +115,7 @@
                     @if($collaborativeMovies->isNotEmpty())
                         <section>
                             <h3 class="text-sm font-semibold text-zinc-300 mb-1 px-1">Picked for you</h3>
-                            <p class="text-xs text-zinc-500 mb-3 px-1">Based on members who rated the same films as you.</p>
+                            <p class="text-xs text-zinc-400 mb-3 px-1">Based on members who rated the same films as you.</p>
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
                                 @foreach($collaborativeMovies as $movie)
                                     <x-movie-poster-card

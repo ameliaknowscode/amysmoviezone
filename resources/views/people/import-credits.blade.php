@@ -31,12 +31,12 @@
                     </p>
 
                     <div class="mb-5 p-3 bg-zinc-900 border border-zinc-800 rounded-md">
-                        <p class="text-xs font-medium text-zinc-500 mb-1">Expected format:</p>
+                        <p class="text-xs font-medium text-zinc-400 mb-1">Expected format:</p>
                         <pre class="text-xs font-mono text-zinc-300">movie_title,release_year,type,character
 The Matrix,1999,Actor,Neo
 Inception,2010,Actor,
 Adaptation,2002,Actor|Director|Actor,Charlie|Donald</pre>
-                        <p class="text-xs text-zinc-500 mt-2">Use <code class="bg-zinc-800 px-1 rounded font-mono">|</code> in the <code class="bg-zinc-800 px-1 rounded font-mono">type</code> column to assign multiple credit types for the same movie. Character values are consumed in order by <strong>Actor</strong> credits only — other types always have no character.</p>
+                        <p class="text-xs text-zinc-400 mt-2">Use <code class="bg-zinc-800 px-1 rounded font-mono">|</code> in the <code class="bg-zinc-800 px-1 rounded font-mono">type</code> column to assign multiple credit types for the same movie. Character values are consumed in order by <strong>Actor</strong> credits only — other types always have no character.</p>
                     </div>
 
                     <form method="POST" action="{{ route('admin.people.credits.import.store', $person) }}" enctype="multipart/form-data">
@@ -83,7 +83,7 @@ Adaptation,2002,Actor|Director|Actor,Charlie|Donald</pre>
                                 <tbody>
                                     @foreach($rowErrors as $rowError)
                                         <tr class="hover:bg-zinc-800">
-                                            <td class="border border-zinc-800 px-3 py-2 text-zinc-500">{{ $rowError['row'] }}</td>
+                                            <td class="border border-zinc-800 px-3 py-2 text-zinc-400">{{ $rowError['row'] }}</td>
                                             <td class="border border-zinc-800 px-3 py-2">{{ $rowError['movie'] }}</td>
                                             <td class="border border-zinc-800 px-3 py-2 text-red-600">{{ $rowError['reason'] }}</td>
                                         </tr>
@@ -95,7 +95,7 @@ Adaptation,2002,Actor|Director|Actor,Charlie|Donald</pre>
                 @endif
 
                 @if($imported === 0 && empty($rowErrors))
-                    <p class="text-sm text-zinc-500">The file was empty or contained no data rows.</p>
+                    <p class="text-sm text-zinc-400">The file was empty or contained no data rows.</p>
                 @endif
             @endisset
 

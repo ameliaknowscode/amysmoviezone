@@ -78,7 +78,7 @@
                 <input id="avatar" name="avatar" type="file" accept="image/*"
                        class="text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-amber-900/20 file:text-amber-300 hover:file:bg-amber-900/30 cursor-pointer" />
             </div>
-            <p class="mt-1 text-xs text-zinc-500">JPG, PNG, GIF up to 2MB.</p>
+            <p class="mt-1 text-xs text-zinc-400">JPG, PNG, GIF up to 2MB.</p>
             <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
         </div>
 

@@ -24,7 +24,7 @@
     {{-- Film grid --}}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         @if($collection->movies->isEmpty())
-            <p class="text-center text-zinc-500 py-16">No films in this collection yet.</p>
+            <p class="text-center text-zinc-400 py-16">No films in this collection yet.</p>
         @else
             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
                 @foreach($collection->movies as $movie)

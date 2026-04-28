@@ -12,15 +12,15 @@
             <div class="bg-zinc-900 sm:rounded-lg">
                 <nav class="flex overflow-x-auto border-b border-zinc-800 px-2">
                     <a href="{{ route('profile.show', $profileUser->username) }}"
-                       class="shrink-0 px-4 py-3 text-sm font-medium text-zinc-500 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-indigo-300">
+                       class="shrink-0 px-4 py-3 text-sm font-medium text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-indigo-300">
                         Overview
                     </a>
                     <a href="{{ route('profile.diary', $profileUser->username) }}"
-                       class="shrink-0 px-4 py-3 text-sm font-medium text-zinc-500 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-indigo-300">
+                       class="shrink-0 px-4 py-3 text-sm font-medium text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-indigo-300">
                         Diary
                     </a>
                     <a href="{{ route('profile.watchlist', $profileUser->username) }}"
-                       class="shrink-0 px-4 py-3 text-sm font-medium text-zinc-500 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-indigo-300">
+                       class="shrink-0 px-4 py-3 text-sm font-medium text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-indigo-300">
                         Watchlist
                     </a>
                     <a href="{{ route('profile.lists', $profileUser->username) }}"
@@ -31,11 +31,11 @@
             </div>
 
             @if($profileUser->profile_private && !$isOwner)
-                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-500 text-sm">
+                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-400 text-sm">
                     This profile is private.
                 </div>
             @elseif($lists->isEmpty())
-                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-500 text-sm">
+                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-400 text-sm">
                     @if($isOwner)
                         You haven't created any lists yet.
                         <a href="{{ route('lists.create') }}" class="text-amber-400 hover:underline ml-1">Create one</a>
@@ -57,14 +57,14 @@
                                         <span class="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full font-medium">Ranked</span>
                                     @endif
                                     @if(!$list->is_public)
-                                        <span class="text-xs bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full font-medium">Private</span>
+                                        <span class="text-xs bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded-full font-medium">Private</span>
                                     @endif
                                 </div>
                                 @if($list->description)
-                                    <p class="text-sm text-zinc-500 mt-0.5 truncate">{{ $list->description }}</p>
+                                    <p class="text-sm text-zinc-400 mt-0.5 truncate">{{ $list->description }}</p>
                                 @endif
                             </div>
-                            <span class="shrink-0 text-sm text-zinc-500">
+                            <span class="shrink-0 text-sm text-zinc-400">
                                 {{ $list->items_count }} {{ Str::plural('film', $list->items_count) }}
                             </span>
                         </a>
