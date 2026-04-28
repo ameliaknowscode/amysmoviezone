@@ -45,7 +45,7 @@
                                 class="px-5 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-400 transition-colors">
                             Save Changes
                         </button>
-                        <a href="{{ route('lists.show', $movieList) }}" class="text-sm text-zinc-500 hover:text-zinc-300">Cancel</a>
+                        <a href="{{ route('lists.show', $movieList) }}" class="text-sm text-zinc-400 hover:text-zinc-300">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -57,9 +57,9 @@
                     <h3 class="text-sm font-semibold text-zinc-300 mb-4">
                         Films
                         @if($movieList->is_ranked)
-                            <span class="text-zinc-500 font-normal ml-1">— drag to reorder</span>
+                            <span class="text-zinc-400 font-normal ml-1">— drag to reorder</span>
                         @else
-                            <span class="text-zinc-500 font-normal ml-1">— drag to reorder</span>
+                            <span class="text-zinc-400 font-normal ml-1">— drag to reorder</span>
                         @endif
                     </h3>
 
@@ -68,12 +68,12 @@
                             <li class="flex items-center gap-3 bg-zinc-900 rounded-lg px-3 py-2 cursor-grab active:cursor-grabbing"
                                 data-id="{{ $item->id }}">
                                 {{-- Drag handle --}}
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
                                 </svg>
 
                                 @if($movieList->is_ranked)
-                                    <span class="rank-number text-xs font-bold text-zinc-500 w-5 text-center shrink-0">{{ $loop->iteration }}</span>
+                                    <span class="rank-number text-xs font-bold text-zinc-400 w-5 text-center shrink-0">{{ $loop->iteration }}</span>
                                 @endif
 
                                 <div class="w-8 h-12 bg-zinc-700 rounded overflow-hidden shrink-0">
@@ -85,7 +85,7 @@
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-zinc-200 truncate">{{ $item->movie->title }}</p>
                                     @if($item->movie->release_year)
-                                        <p class="text-xs text-zinc-500">{{ $item->movie->release_year }}</p>
+                                        <p class="text-xs text-zinc-400">{{ $item->movie->release_year }}</p>
                                     @endif
                                 </div>
 
@@ -94,7 +94,7 @@
                                       onsubmit="return confirm('Remove this film?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-zinc-600 hover:text-red-400 transition-colors p-1" aria-label="Remove {{ $item->movie->title }} from list">
+                                    <button type="submit" class="text-zinc-400 hover:text-red-400 transition-colors p-1" aria-label="Remove {{ $item->movie->title }} from list">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                                         </svg>
@@ -109,7 +109,7 @@
             {{-- Danger zone --}}
             <div class="bg-zinc-900 sm:rounded-lg p-6 border border-red-100">
                 <h3 class="text-sm font-semibold text-red-600 mb-3">Delete List</h3>
-                <p class="text-sm text-zinc-500 mb-4">This will permanently delete the list and all its items.</p>
+                <p class="text-sm text-zinc-400 mb-4">This will permanently delete the list and all its items.</p>
                 <form method="POST" action="{{ route('lists.destroy', $movieList) }}"
                       onsubmit="return confirm('Delete this list? This cannot be undone.')">
                     @csrf

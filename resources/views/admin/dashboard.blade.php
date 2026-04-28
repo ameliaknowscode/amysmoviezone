@@ -20,7 +20,7 @@
                     </div>
                     <div>
                         <p class="text-3xl font-bold text-zinc-100">{{ number_format($stats['total_users']) }}</p>
-                        <p class="text-sm font-medium text-zinc-500 mt-0.5">Users</p>
+                        <p class="text-sm font-medium text-zinc-400 mt-0.5">Users</p>
                         @if ($stats['new_users_7_days'] > 0)
                             <p class="text-xs text-amber-400 mt-1">+{{ $stats['new_users_7_days'] }} this week</p>
                         @endif
@@ -36,7 +36,7 @@
                     </div>
                     <div>
                         <p class="text-3xl font-bold text-zinc-100">{{ number_format($stats['total_movies']) }}</p>
-                        <p class="text-sm font-medium text-zinc-500 mt-0.5">Movies</p>
+                        <p class="text-sm font-medium text-zinc-400 mt-0.5">Movies</p>
                     </div>
                 </div>
 
@@ -49,7 +49,7 @@
                     </div>
                     <div>
                         <p class="text-3xl font-bold text-zinc-100">{{ number_format($stats['total_ratings']) }}</p>
-                        <p class="text-sm font-medium text-zinc-500 mt-0.5">Ratings</p>
+                        <p class="text-sm font-medium text-zinc-400 mt-0.5">Ratings</p>
                         @if ($stats['average_stars'])
                             <p class="text-xs text-yellow-600 mt-1">avg {{ number_format($stats['average_stars'], 1) }} ★</p>
                         @endif
@@ -65,7 +65,7 @@
                     </div>
                     <div>
                         <p class="text-3xl font-bold text-zinc-100">{{ number_format($stats['total_likes']) }}</p>
-                        <p class="text-sm font-medium text-zinc-500 mt-0.5">Likes</p>
+                        <p class="text-sm font-medium text-zinc-400 mt-0.5">Likes</p>
                     </div>
                 </div>
 
@@ -78,7 +78,7 @@
                     </div>
                     <div>
                         <p class="text-3xl font-bold text-zinc-100">{{ number_format($stats['total_watchlist']) }}</p>
-                        <p class="text-sm font-medium text-zinc-500 mt-0.5">Watchlist Entries</p>
+                        <p class="text-sm font-medium text-zinc-400 mt-0.5">Watchlist Entries</p>
                     </div>
                 </div>
 
@@ -91,7 +91,7 @@
                     </div>
                     <div>
                         <p class="text-3xl font-bold text-zinc-100">{{ number_format($stats['total_follows']) }}</p>
-                        <p class="text-sm font-medium text-zinc-500 mt-0.5">Follows</p>
+                        <p class="text-sm font-medium text-zinc-400 mt-0.5">Follows</p>
                     </div>
                 </div>
 
@@ -108,12 +108,12 @@
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2">
                                     <span class="font-medium text-zinc-100 truncate">{{ $user->name }}</span>
-                                    <span class="text-zinc-500 text-sm truncate">{{ $user->username }}</span>
+                                    <span class="text-zinc-400 text-sm truncate">{{ $user->username }}</span>
                                     @if ($user->is_admin)
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-900/30 text-amber-300">Admin</span>
                                     @endif
                                 </div>
-                                <p class="text-sm text-zinc-500 truncate mt-0.5">{{ $user->email }}</p>
+                                <p class="text-sm text-zinc-400 truncate mt-0.5">{{ $user->email }}</p>
                             </div>
                             <div class="flex-shrink-0 text-right">
                                 @if ($user->email_verified_at)
@@ -131,7 +131,7 @@
                                         Unverified
                                     </span>
                                 @endif
-                                <p class="text-xs text-zinc-500 mt-0.5">{{ $user->created_at->diffForHumans() }}</p>
+                                <p class="text-xs text-zinc-400 mt-0.5">{{ $user->created_at->diffForHumans() }}</p>
                             </div>
                         </div>
                     @endforeach

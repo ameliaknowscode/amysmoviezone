@@ -5,7 +5,7 @@
                 class="w-full h-full object-cover group-hover:opacity-80 transition-opacity">
         @else
             <div class="w-full h-full flex items-center justify-center p-2 text-center">
-                <span class="text-xs text-zinc-500 leading-snug">{{ $rating->movie->title }}</span>
+                <span class="text-xs text-zinc-400 leading-snug">{{ $rating->movie->title }}</span>
             </div>
         @endif
     </div>
@@ -16,7 +16,7 @@
             <x-star-display :value="$rating->stars" class="text-xs" />
         </div>
         @endif
-        <div class="text-xs text-zinc-500 truncate">
+        <div class="text-xs text-zinc-400 truncate">
             <a href="{{ route('profile.show', $rating->user->username) }}"
                class="hover:text-amber-400 hover:underline"
                onclick="event.stopPropagation()">{{ $rating->user->name }}</a>

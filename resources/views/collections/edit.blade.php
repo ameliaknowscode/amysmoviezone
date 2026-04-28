@@ -26,7 +26,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-zinc-300 mb-1">Description <span class="text-zinc-500 font-normal">(optional)</span></label>
+                        <label class="block text-sm font-medium text-zinc-300 mb-1">Description <span class="text-zinc-400 font-normal">(optional)</span></label>
                         <textarea name="description" rows="3"
                                   class="w-full rounded-md border-zinc-700 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm">{{ old('description', $collection->description) }}</textarea>
                     </div>
@@ -36,7 +36,7 @@
                                 class="btn-amber px-4 py-2 text-sm">
                             Save Changes
                         </button>
-                        <a href="{{ route('admin.collections.index') }}" class="text-sm text-zinc-500 hover:text-zinc-300">Cancel</a>
+                        <a href="{{ route('admin.collections.index') }}" class="text-sm text-zinc-400 hover:text-zinc-300">Cancel</a>
                     </div>
                 </form>
 

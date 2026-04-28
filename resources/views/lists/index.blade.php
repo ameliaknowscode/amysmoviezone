@@ -15,7 +15,7 @@
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             @if($lists->isEmpty())
-                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-500">
+                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-400">
                     <p class="text-sm">You haven't created any lists yet.</p>
                     <a href="{{ route('lists.create') }}" class="mt-3 inline-block text-sm text-amber-400 hover:underline">Create your first list</a>
                 </div>
@@ -33,14 +33,14 @@
                                         <span class="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full font-medium">Ranked</span>
                                     @endif
                                     @if(!$list->is_public)
-                                        <span class="text-xs bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full font-medium">Private</span>
+                                        <span class="text-xs bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded-full font-medium">Private</span>
                                     @endif
                                 </div>
                                 @if($list->description)
-                                    <p class="text-sm text-zinc-500 mt-0.5 truncate">{{ $list->description }}</p>
+                                    <p class="text-sm text-zinc-400 mt-0.5 truncate">{{ $list->description }}</p>
                                 @endif
                             </div>
-                            <span class="shrink-0 text-sm text-zinc-500">
+                            <span class="shrink-0 text-sm text-zinc-400">
                                 {{ $list->items_count }} {{ Str::plural('film', $list->items_count) }}
                             </span>
                         </a>

@@ -38,7 +38,7 @@
                             </button>
                             @if($search)
                                 <a href="{{ route('admin.people.index', ['sort_by' => $sortBy, 'direction' => $direction]) }}"
-                                   class="text-sm text-zinc-500 hover:underline">Clear</a>
+                                   class="text-sm text-zinc-400 hover:underline">Clear</a>
                             @endif
                         </form>
                         <a href="{{ route('admin.people.create') }}" class="text-amber-400 hover:underline text-sm shrink-0">+ Add Person</a>
