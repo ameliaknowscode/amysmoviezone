@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Browse Movies">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-zinc-100 leading-tight">Movies</h2>
     </x-slot>
@@ -11,19 +11,19 @@
                   class="bg-zinc-900 sm:rounded-lg px-4 py-4 flex flex-wrap gap-3 items-end">
 
                 <div class="flex-1 min-w-[150px]">
-                    <label class="block text-xs font-medium text-zinc-500 mb-1">Title</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">Title</label>
                     <input type="text" name="search" value="{{ $search }}" placeholder="Search titles…"
                            class="w-full rounded-md border-zinc-700 bg-zinc-800 text-zinc-100 placeholder-zinc-500 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500">
                 </div>
 
                 <div class="flex-1 min-w-[150px]">
-                    <label class="block text-xs font-medium text-zinc-500 mb-1">Director</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">Director</label>
                     <input type="text" name="director" value="{{ $director }}" placeholder="e.g. Wes Anderson"
                            class="w-full rounded-md border-zinc-700 bg-zinc-800 text-zinc-100 placeholder-zinc-500 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500">
                 </div>
 
                 <div class="flex-1 min-w-[150px]">
-                    <label class="block text-xs font-medium text-zinc-500 mb-1">Genre</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">Genre</label>
                     <select name="genre"
                             class="w-full rounded-md border-zinc-700 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500">
                         <option value="">Any</option>
@@ -34,7 +34,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-zinc-500 mb-1">From year</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">From year</label>
                     <select name="year_from"
                             class="rounded-md border-zinc-700 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500">
                         <option value="">Any</option>
@@ -45,7 +45,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-zinc-500 mb-1">To year</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">To year</label>
                     <select name="year_to"
                             class="rounded-md border-zinc-700 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500">
                         <option value="">Any</option>
@@ -56,7 +56,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-zinc-500 mb-1">Sort by</label>
+                    <label class="block text-xs font-medium text-zinc-400 mb-1">Sort by</label>
                     <select name="sort"
                             class="rounded-md border-zinc-700 text-sm shadow-sm focus:border-amber-500 focus:ring-amber-500">
                         <option value="rating"       {{ $sort === 'rating'       ? 'selected' : '' }}>Highest Rated</option>
@@ -84,10 +84,10 @@
 
             {{-- Results --}}
             @if($movies->isEmpty())
-                <p class="text-sm text-zinc-500 px-1">No movies matched your filters.</p>
+                <p class="text-sm text-zinc-400 px-1">No movies matched your filters.</p>
             @else
                 @if($hasFilters)
-                    <p class="text-sm text-zinc-500 px-1">
+                    <p class="text-sm text-zinc-400 px-1">
                         {{ number_format($movies->total()) }} {{ Str::plural('film', $movies->total()) }} found
                     </p>
                 @endif
@@ -106,7 +106,7 @@
                                          class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center p-2 text-center">
-                                        <span class="text-xs text-zinc-500 leading-snug">{{ $movie->title }}</span>
+                                        <span class="text-xs text-zinc-400 leading-snug">{{ $movie->title }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -115,7 +115,7 @@
                                     {{ $movie->title }}
                                 </div>
                                 @if($movie->release_year)
-                                    <div class="text-xs text-zinc-500">{{ $movie->release_year }}</div>
+                                    <div class="text-xs text-zinc-400">{{ $movie->release_year }}</div>
                                 @endif
                             </div>
                         </a>

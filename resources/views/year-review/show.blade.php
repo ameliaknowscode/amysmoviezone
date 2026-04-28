@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="$year . ' in Review'">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-zinc-100 leading-tight">
             Year in Review
@@ -68,7 +68,7 @@
             @if($totalWatched === 0)
                 <div class="card">
                     <div class="p-12 text-center">
-                        <p class="text-zinc-500 mb-3">No films logged for {{ $year }} — add watch dates to your diary to see your year in review.</p>
+                        <p class="text-zinc-400 mb-3">No films logged for {{ $year }} — add watch dates to your diary to see your year in review.</p>
                         <a href="{{ route('profile.diary', auth()->user()->username) }}" class="text-sm font-semibold text-amber-400 hover:text-amber-300 underline underline-offset-2">Go to diary</a>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
                         <div class="text-center">
                             <div class="text-3xl font-bold text-zinc-100">{{ number_format($totalWatched) }}</div>
-                            <div class="text-xs text-zinc-500 uppercase tracking-wide mt-1">Films Watched</div>
+                            <div class="text-xs text-zinc-400 uppercase tracking-wide mt-1">Films Watched</div>
                         </div>
                         <div class="text-center">
                             @if($totalMinutes > 0)
@@ -91,28 +91,28 @@
                                 @endphp
                                 @if($days >= 2)
                                     <div class="text-3xl font-bold text-zinc-100">{{ number_format($days) }}</div>
-                                    <div class="text-xs text-zinc-500 uppercase tracking-wide mt-1">Days Watched</div>
+                                    <div class="text-xs text-zinc-400 uppercase tracking-wide mt-1">Days Watched</div>
                                 @else
                                     <div class="text-3xl font-bold text-zinc-100">{{ number_format($hours) }}</div>
-                                    <div class="text-xs text-zinc-500 uppercase tracking-wide mt-1">Hours Watched</div>
+                                    <div class="text-xs text-zinc-400 uppercase tracking-wide mt-1">Hours Watched</div>
                                 @endif
                             @else
-                                <div class="text-3xl font-bold text-zinc-600">&mdash;</div>
-                                <div class="text-xs text-zinc-500 uppercase tracking-wide mt-1">Time Watched</div>
+                                <div class="text-3xl font-bold text-zinc-400">&mdash;</div>
+                                <div class="text-xs text-zinc-400 uppercase tracking-wide mt-1">Time Watched</div>
                             @endif
                         </div>
                         <div class="text-center">
                             @if($avgRating)
                                 <div class="text-3xl font-bold text-zinc-100">{{ number_format($avgRating, 1) }}</div>
-                                <div class="text-xs text-zinc-500 uppercase tracking-wide mt-1">Avg Rating</div>
+                                <div class="text-xs text-zinc-400 uppercase tracking-wide mt-1">Avg Rating</div>
                             @else
-                                <div class="text-3xl font-bold text-zinc-600">&mdash;</div>
-                                <div class="text-xs text-zinc-500 uppercase tracking-wide mt-1">Avg Rating</div>
+                                <div class="text-3xl font-bold text-zinc-400">&mdash;</div>
+                                <div class="text-xs text-zinc-400 uppercase tracking-wide mt-1">Avg Rating</div>
                             @endif
                         </div>
                         <div class="text-center">
                             <div class="text-3xl font-bold text-zinc-100">{{ number_format($totalRewatches) }}</div>
-                            <div class="text-xs text-zinc-500 uppercase tracking-wide mt-1">Rewatches</div>
+                            <div class="text-xs text-zinc-400 uppercase tracking-wide mt-1">Rewatches</div>
                         </div>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                                  class="w-16 h-24 object-cover rounded shadow-sm shrink-0 group-hover:shadow-md transition">
                         @else
                             <div class="w-16 h-24 bg-zinc-800 rounded flex items-center justify-center shrink-0">
-                                <svg class="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 16h4m10 0h4"/>
                                 </svg>
                             </div>
@@ -140,7 +140,7 @@
                             <div class="text-base font-semibold text-zinc-100 group-hover:text-amber-400 transition">
                                 {{ $highestRated->title }}
                             </div>
-                            <div class="text-sm text-zinc-500 mt-0.5">{{ $highestRated->release_year }}</div>
+                            <div class="text-sm text-zinc-400 mt-0.5">{{ $highestRated->release_year }}</div>
                             <div class="mt-2">
                                 <x-star-display :value="$highestRated->stars" />
                             </div>
@@ -159,7 +159,7 @@
                         @foreach($byMonth as $row)
                         @php $pct = $maxMonthCount > 0 ? round(($row->count / $maxMonthCount) * 100) : 0; @endphp
                         <div class="flex items-center gap-3">
-                            <div class="w-8 text-xs text-zinc-500 text-right shrink-0">
+                            <div class="w-8 text-xs text-zinc-400 text-right shrink-0">
                                 {{ \Carbon\Carbon::create()->month($row->month)->format('M') }}
                             </div>
                             <div class="flex-1 h-6 bg-zinc-800 rounded overflow-hidden">
@@ -167,7 +167,7 @@
                                     <div class="h-full bg-amber-500 rounded transition-all" style="width: {{ $pct }}%"></div>
                                 @endif
                             </div>
-                            <div class="w-6 text-sm text-right shrink-0 {{ $row->count > 0 ? 'text-zinc-400' : 'text-zinc-600' }}">
+                            <div class="w-6 text-sm text-right shrink-0 {{ $row->count > 0 ? 'text-zinc-400' : 'text-zinc-400' }}">
                                 {{ $row->count > 0 ? $row->count : '' }}
                             </div>
                         </div>
@@ -186,7 +186,7 @@
                         @foreach($byGenre as $row)
                         @php $pct = $maxGenreCount > 0 ? round(($row->count / $maxGenreCount) * 100) : 0; @endphp
                         <div class="flex items-center gap-3">
-                            <div class="w-28 text-sm text-zinc-500 text-right shrink-0 truncate" title="{{ $row->name }}">{{ $row->name }}</div>
+                            <div class="w-28 text-sm text-zinc-400 text-right shrink-0 truncate" title="{{ $row->name }}">{{ $row->name }}</div>
                             <div class="flex-1 h-6 bg-zinc-800 rounded overflow-hidden">
                                 <div class="h-full bg-emerald-500 rounded" style="width: {{ $pct }}%"></div>
                             </div>
@@ -206,12 +206,12 @@
                     <ol class="divide-y divide-zinc-800">
                         @foreach($byDirector as $i => $row)
                         <li class="py-2.5 flex items-center gap-4">
-                            <span class="text-sm text-zinc-500 w-5 text-right shrink-0">{{ $i + 1 }}</span>
+                            <span class="text-sm text-zinc-400 w-5 text-right shrink-0">{{ $i + 1 }}</span>
                             <a href="{{ route('people.show', $row->slug) }}"
                                class="flex-1 text-sm font-medium text-amber-400 hover:underline truncate">
                                 {{ $row->name }}
                             </a>
-                            <span class="text-sm text-zinc-500 shrink-0">{{ $row->count }} {{ Str::plural('film', $row->count) }}</span>
+                            <span class="text-sm text-zinc-400 shrink-0">{{ $row->count }} {{ Str::plural('film', $row->count) }}</span>
                         </li>
                         @endforeach
                     </ol>
@@ -242,7 +242,7 @@
                                     <div class="h-full bg-yellow-400 rounded" style="width: {{ $pct }}%"></div>
                                 @endif
                             </div>
-                            <div class="w-6 text-sm text-right shrink-0 {{ $count > 0 ? 'text-zinc-400' : 'text-zinc-600' }}">{{ $count ?: '' }}</div>
+                            <div class="w-6 text-sm text-right shrink-0 {{ $count > 0 ? 'text-zinc-400' : 'text-zinc-400' }}">{{ $count ?: '' }}</div>
                         </div>
                         @endif
                         @endfor
@@ -261,7 +261,7 @@
                         @foreach($byDecade as $row)
                         @php $pct = $maxDecadeCount > 0 ? round(($row->count / $maxDecadeCount) * 100) : 0; @endphp
                         <div class="flex items-center gap-3">
-                            <div class="w-14 text-sm text-zinc-500 text-right shrink-0">{{ $row->decade }}s</div>
+                            <div class="w-14 text-sm text-zinc-400 text-right shrink-0">{{ $row->decade }}s</div>
                             <div class="flex-1 h-6 bg-zinc-800 rounded overflow-hidden">
                                 <div class="h-full bg-violet-500 rounded" style="width: {{ $pct }}%"></div>
                             </div>

@@ -55,7 +55,7 @@
                             <label class="block font-medium text-sm text-zinc-300 mb-1">Photo</label>
                             <input type="file" name="photo" accept="image/*"
                                    class="text-sm text-zinc-400 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-amber-900/20 file:text-amber-300 hover:file:bg-amber-900/30">
-                            <p class="text-xs text-zinc-500 mt-1">JPG, PNG, WebP — max 2MB</p>
+                            <p class="text-xs text-zinc-400 mt-1">JPG, PNG, WebP — max 2MB</p>
                         </div>
 
                         <div class="flex items-center gap-4">

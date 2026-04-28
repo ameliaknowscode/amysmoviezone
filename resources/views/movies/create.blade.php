@@ -44,12 +44,12 @@
                                         <img :src="preview" alt="Poster preview" class="w-full rounded-md shadow-sm">
                                     </template>
                                     <template x-if="!preview">
-                                        <div class="flex flex-col items-center gap-2 text-zinc-500">
+                                        <div class="flex flex-col items-center gap-2 text-zinc-400">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16.5V19a1 1 0 001 1h16a1 1 0 001-1v-2.5M16 9l-4-4-4 4M12 5v10"/>
                                             </svg>
                                             <span class="text-sm">Click to upload poster</span>
-                                            <span class="text-xs text-zinc-500">PNG, JPG, GIF up to 2MB</span>
+                                            <span class="text-xs text-zinc-400">PNG, JPG, GIF up to 2MB</span>
                                         </div>
                                     </template>
                                     <input type="file" id="poster" name="poster" accept="image/*" class="hidden"
@@ -57,7 +57,7 @@
                                 </label>
                                 <template x-if="preview">
                                     <button type="button" @click="preview = null; $refs.posterInput.value = ''"
-                                        class="mt-1 text-xs text-zinc-500 hover:text-zinc-400 underline">Remove</button>
+                                        class="mt-1 text-xs text-zinc-400 hover:text-zinc-200 underline">Remove</button>
                                 </template>
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                                 <input type="number" id="runtime" name="runtime" value="{{ old('runtime') }}"
                                     min="1" max="1440"
                                     class="w-full max-w-md border-zinc-700 rounded-md shadow-sm">
-                                <p class="text-xs text-zinc-500 mt-1">Enter in minutes (e.g. 102 for 1h 42m)</p>
+                                <p class="text-xs text-zinc-400 mt-1">Enter in minutes (e.g. 102 for 1h 42m)</p>
                             </div>
 
                             <div class="mb-4">

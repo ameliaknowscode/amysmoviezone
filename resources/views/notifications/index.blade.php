@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Notifications">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-zinc-100 leading-tight">Notifications</h2>
     </x-slot>
@@ -6,7 +6,7 @@
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             @if($notifications->isEmpty())
-                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-500 text-sm">
+                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-400 text-sm">
                     You're all caught up — no notifications yet.
                 </div>
             @else
@@ -104,13 +104,13 @@
                                            class="font-medium hover:text-amber-400 transition-colors">{{ $data['list_name'] }}</a>.
                                     @endif
                                 </p>
-                                <p class="text-xs text-zinc-500 mt-0.5">{{ $notification->created_at->diffForHumans() }}</p>
+                                <p class="text-xs text-zinc-400 mt-0.5">{{ $notification->created_at->diffForHumans() }}</p>
                             </div>
 
                             {{-- Dismiss --}}
                             <form method="POST" action="{{ route('notifications.destroy', $notification->id) }}" class="shrink-0">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="text-zinc-600 hover:text-zinc-500 transition-colors p-1" title="Dismiss" aria-label="Dismiss notification">
+                                <button type="submit" class="text-zinc-400 hover:text-zinc-200 transition-colors p-1" title="Dismiss" aria-label="Dismiss notification">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>

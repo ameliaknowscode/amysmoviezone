@@ -10,7 +10,7 @@
             <div class="card">
                 <div class="p-6">
                     @if($followers->isEmpty())
-                        <p class="text-sm text-zinc-500">No followers yet.</p>
+                        <p class="text-sm text-zinc-400">No followers yet.</p>
                     @else
                         <ul class="divide-y divide-zinc-800">
                             @foreach($followers as $user)
@@ -31,7 +31,7 @@
                                        class="text-sm font-medium text-zinc-100 hover:text-amber-400 transition-colors">
                                         {{ $user->name }}
                                     </a>
-                                    <p class="text-xs text-zinc-500">&#64;{{ $user->username }}</p>
+                                    <p class="text-xs text-zinc-400">&#64;{{ $user->username }}</p>
                                 </div>
                             </li>
                             @endforeach

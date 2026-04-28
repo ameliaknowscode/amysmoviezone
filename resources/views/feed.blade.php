@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Activity">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-zinc-100 leading-tight">Activity Feed</h2>
     </x-slot>
@@ -33,7 +33,7 @@
                         <div class="p-10 text-center">
                             <div class="text-3xl mb-3">&#128101;</div>
                             <h3 class="font-semibold text-zinc-300 mb-1">Nothing here yet</h3>
-                            <p class="text-sm text-zinc-500 mb-5">Follow other members to see their ratings, reviews, and watchlist activity here.</p>
+                            <p class="text-sm text-zinc-400 mb-5">Follow other members to see their ratings, reviews, and watchlist activity here.</p>
                             <a href="{{ route('users.index') }}"
                                class="inline-block bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
                                 Find people to follow
@@ -47,8 +47,8 @@
                 {{-- Sentinel: triggers load more when scrolled into view --}}
                 <div x-ref="sentinel" class="h-1"></div>
 
-                <div x-show="loading" class="text-center py-6 text-sm text-zinc-500">Loading…</div>
-                <div x-show="done && {{ $activities->isNotEmpty() ? 'true' : 'false' }}" class="text-center py-6 text-sm text-zinc-500">
+                <div x-show="loading" class="text-center py-6 text-sm text-zinc-400">Loading…</div>
+                <div x-show="done && {{ $activities->isNotEmpty() ? 'true' : 'false' }}" class="text-center py-6 text-sm text-zinc-400">
                     You're all caught up.
                 </div>
             </div>

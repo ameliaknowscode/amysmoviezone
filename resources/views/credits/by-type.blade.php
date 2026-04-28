@@ -100,7 +100,7 @@
                                 {{ $credit->movie->title }}
                             </p>
                             <div class="flex items-center gap-1.5">
-                                <span class="text-xs text-zinc-500">{{ $credit->movie->release_year }}</span>
+                                <span class="text-xs text-zinc-400">{{ $credit->movie->release_year }}</span>
                                 @if(isset($avgRatings[$credit->movie_id]))
                                     <span class="text-xs text-yellow-500 font-medium">
                                         ★ {{ number_format($avgRatings[$credit->movie_id]->avg_stars, 1) }}
@@ -108,7 +108,7 @@
                                 @endif
                             </div>
                             @if($credit->character)
-                                <p class="text-xs text-zinc-500 italic line-clamp-1">{{ $credit->character }}</p>
+                                <p class="text-xs text-zinc-400 italic line-clamp-1">{{ $credit->character }}</p>
                             @endif
                         </div>
                     </a>

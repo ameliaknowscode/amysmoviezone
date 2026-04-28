@@ -26,7 +26,7 @@
                             </button>
                             @if($search)
                                 <a href="{{ route('admin.movies.index', ['sort' => $direction]) }}"
-                                   class="text-sm text-zinc-500 hover:underline">Clear</a>
+                                   class="text-sm text-zinc-400 hover:underline">Clear</a>
                             @endif
                         </form>
                         <a href="{{ route('admin.movies.import') }}" class="text-amber-400 hover:underline text-sm shrink-0">↑ Import CSV</a>
