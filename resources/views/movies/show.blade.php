@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="$movie->title . ($movie->release_year ? ' (' . $movie->release_year . ')' : '')">
 
     {{-- ═══════════════════════════════════════════════════════════
          HERO
@@ -182,22 +182,34 @@
                     <div class="bg-zinc-900 rounded-lg overflow-hidden">
                         {{-- Tab bar --}}
                         <div class="border-b border-zinc-800 px-4">
-                            <nav class="-mb-px flex gap-5">
-                                <button type="button" @click="tab = 'cast'"
-                                    :class="tab === 'cast' ? 'border-amber-500 text-amber-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'"
+                            <div role="tablist" aria-label="Cast and crew" class="-mb-px flex gap-5"
+                                 @keydown.right.prevent="$event.target.nextElementSibling?.focus()"
+                                 @keydown.left.prevent="$event.target.previousElementSibling?.focus()">
+                                <button type="button" @click="tab = 'cast'" @focus="tab = 'cast'"
+                                    role="tab"
+                                    id="credits-tab-cast"
+                                    aria-controls="credits-panel-cast"
+                                    :aria-selected="tab === 'cast' ? 'true' : 'false'"
+                                    :tabindex="tab === 'cast' ? '0' : '-1'"
+                                    :class="tab === 'cast' ? 'border-amber-500 text-amber-400' : 'border-transparent text-zinc-400 hover:text-zinc-300'"
                                     class="whitespace-nowrap border-b-2 py-3 text-sm font-medium transition-colors">
                                     Cast
                                 </button>
-                                <button type="button" @click="tab = 'crew'"
-                                    :class="tab === 'crew' ? 'border-amber-500 text-amber-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'"
+                                <button type="button" @click="tab = 'crew'" @focus="tab = 'crew'"
+                                    role="tab"
+                                    id="credits-tab-crew"
+                                    aria-controls="credits-panel-crew"
+                                    :aria-selected="tab === 'crew' ? 'true' : 'false'"
+                                    :tabindex="tab === 'crew' ? '0' : '-1'"
+                                    :class="tab === 'crew' ? 'border-amber-500 text-amber-400' : 'border-transparent text-zinc-400 hover:text-zinc-300'"
                                     class="whitespace-nowrap border-b-2 py-3 text-sm font-medium transition-colors">
                                     Crew
                                 </button>
-                            </nav>
+                            </div>
                         </div>
 
                         {{-- Cast --}}
-                        <div x-show="tab === 'cast'" class="p-4">
+                        <div x-show="tab === 'cast'" role="tabpanel" id="credits-panel-cast" aria-labelledby="credits-tab-cast" tabindex="0" class="p-4">
                             @if($cast->isNotEmpty())
                                 <ul class="space-y-3">
                                     @foreach($cast->take($castLimit) as $credit)
@@ -211,7 +223,7 @@
                                                 {{ $credit->person->name }}
                                             </a>
                                             @if($credit->character)
-                                                <span class="text-xs text-zinc-500 block truncate">{{ $credit->character }}</span>
+                                                <span class="text-xs text-zinc-400 block truncate">{{ $credit->character }}</span>
                                             @endif
                                         </div>
                                     </li>
@@ -230,7 +242,7 @@
                                                 {{ $credit->person->name }}
                                             </a>
                                             @if($credit->character)
-                                                <span class="text-xs text-zinc-500 block truncate">{{ $credit->character }}</span>
+                                                <span class="text-xs text-zinc-400 block truncate">{{ $credit->character }}</span>
                                             @endif
                                         </div>
                                     </li>
@@ -243,21 +255,21 @@
                                 </button>
                                 @endif
                             @else
-                                <p class="text-sm text-zinc-500">No cast listed.</p>
+                                <p class="text-sm text-zinc-400">No cast listed.</p>
                             @endif
                         </div>
 
                         {{-- Crew --}}
-                        <div x-show="tab === 'crew'" class="p-4">
+                        <div x-show="tab === 'crew'" role="tabpanel" id="credits-panel-crew" aria-labelledby="credits-tab-crew" tabindex="0" class="p-4">
                             @if($crew->isNotEmpty())
                                 <dl class="space-y-4">
                                     @foreach($crew->take($crewGroupLimit) as $typeName => $credits)
                                     <div>
-                                        <dt class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">{{ $typeName }}</dt>
+                                        <dt class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">{{ $typeName }}</dt>
                                         <dd class="space-y-1">
                                             @foreach($credits as $credit)
                                             <div class="flex items-center gap-2">
-                                                <div class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-500 text-xs font-bold shrink-0 select-none">
+                                                <div class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 text-xs font-bold shrink-0 select-none">
                                                     {{ strtoupper(substr($credit->person->name, 0, 1)) }}
                                                 </div>
                                                 <a href="{{ $credit->byTypeUrl() }}"
@@ -274,11 +286,11 @@
                                 <dl class="space-y-4 mt-4" x-show="crewExpanded" x-cloak>
                                     @foreach($crew->skip($crewGroupLimit) as $typeName => $credits)
                                     <div>
-                                        <dt class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">{{ $typeName }}</dt>
+                                        <dt class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">{{ $typeName }}</dt>
                                         <dd class="space-y-1">
                                             @foreach($credits as $credit)
                                             <div class="flex items-center gap-2">
-                                                <div class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-500 text-xs font-bold shrink-0 select-none">
+                                                <div class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 text-xs font-bold shrink-0 select-none">
                                                     {{ strtoupper(substr($credit->person->name, 0, 1)) }}
                                                 </div>
                                                 <a href="{{ $credit->byTypeUrl() }}"
@@ -298,7 +310,7 @@
                                 </button>
                                 @endif
                             @else
-                                <p class="text-sm text-zinc-500">No crew listed.</p>
+                                <p class="text-sm text-zinc-400">No crew listed.</p>
                             @endif
                         </div>
                     </div>
@@ -350,9 +362,9 @@
                         ARRAY_FILTER_USE_BOTH
                     ));
                 @endphp
-                <div class="bg-zinc-900 rounded-lg mb-5">
+                <section aria-labelledby="friends-activity-heading" class="bg-zinc-900 rounded-lg mb-5">
                     <div class="px-5 py-3 border-b border-zinc-800">
-                        <h2 class="text-sm font-semibold text-zinc-100">Friends</h2>
+                        <h2 id="friends-activity-heading" class="text-sm font-semibold text-zinc-100">Friends</h2>
                     </div>
                     @if(count($watchPartyDates) > 0)
                         @foreach($watchPartyDates as $partyDate)
@@ -371,8 +383,8 @@
                     <ul class="divide-y divide-zinc-800">
                         @foreach($friendActivity as $friend)
                         <li class="flex items-center gap-3 px-5 py-3">
-                            {{-- Avatar --}}
-                            <a href="{{ route('profile.show', $friend->user->username) }}" class="shrink-0">
+                            {{-- Avatar (decorative — name link follows) --}}
+                            <a href="{{ route('profile.show', $friend->user->username) }}" class="shrink-0" tabindex="-1" aria-hidden="true">
                                 @if($friend->user->avatar)
                                     <img src="{{ asset('storage/' . $friend->user->avatar) }}"
                                          class="h-8 w-8 rounded-full object-cover ring-1 ring-gray-200" alt="">
@@ -390,7 +402,7 @@
                             </a>
 
                             {{-- Activity --}}
-                            <div class="shrink-0 flex items-center gap-2 text-sm text-zinc-500">
+                            <div class="shrink-0 flex items-center gap-2 text-sm text-zinc-400">
                                 @if($friend->rating?->stars)
                                     <x-star-display :value="$friend->rating->stars" class="text-xs" emptyClass="text-zinc-700" />
                                 @elseif($friend->rating?->liked)
@@ -400,14 +412,14 @@
                                 @endif
 
                                 @if($friend->review_count > 0)
-                                    <span class="text-xs text-zinc-500">
+                                    <span class="text-xs text-zinc-400">
                                         logged {{ $friend->review_count > 1 ? $friend->review_count . '×' : '' }}
                                         @if($friend->watched_dates->isNotEmpty())
                                             · {{ $friend->watched_dates->first()->format('j M Y') }}
                                         @endif
                                     </span>
                                 @elseif($friend->watchlist?->list_type === 'watched' && !$friend->rating)
-                                    <span class="text-xs text-zinc-500">watched</span>
+                                    <span class="text-xs text-zinc-400">watched</span>
                                 @endif
 
                                 @if($friend->watchlist?->list_type === 'want_to_watch')
@@ -417,11 +429,11 @@
                         </li>
                         @endforeach
                     </ul>
-                </div>
+                </section>
                 @endif
-                    <div class="bg-zinc-900 rounded-lg" x-data="{ open: false }">
+                    <section aria-labelledby="reviews-heading" class="bg-zinc-900 rounded-lg" x-data="{ open: false }">
                         <div class="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
-                            <h2 class="text-sm font-semibold text-zinc-100">Reviews</h2>
+                            <h2 id="reviews-heading" class="text-sm font-semibold text-zinc-100">Reviews</h2>
                             @auth
                             <button type="button" @click="open = true" class="text-xs text-amber-400 hover:text-amber-300 transition font-medium">+ Review or Log</button>
                             @endauth
@@ -431,13 +443,13 @@
                             <p class="text-xs text-emerald-600 px-5 pt-3">Review saved.</p>
                         @endif
                         @if(session('status') === 'review-deleted')
-                            <p class="text-xs text-zinc-500 px-5 pt-3">Review deleted.</p>
+                            <p class="text-xs text-zinc-400 px-5 pt-3">Review deleted.</p>
                         @endif
                         @if(session('status') === 'comment-posted')
                             <p class="text-xs text-emerald-600 px-5 pt-3">Comment posted.</p>
                         @endif
                         @if(session('status') === 'comment-deleted')
-                            <p class="text-xs text-zinc-500 px-5 pt-3">Comment deleted.</p>
+                            <p class="text-xs text-zinc-400 px-5 pt-3">Comment deleted.</p>
                         @endif
 
                         <div class="divide-y divide-gray-50">
@@ -445,7 +457,7 @@
                             {{-- Current user's reviews --}}
                             @auth
                             @if($userReviews->isNotEmpty())
-                                <div class="px-5 py-2 bg-zinc-900 text-xs text-zinc-500">
+                                <div class="px-5 py-2 bg-zinc-900 text-xs text-zinc-400">
                                     You've watched this {{ $userReviews->count() }} {{ Str::plural('time', $userReviews->count()) }}
                                 </div>
                             @endif
@@ -454,7 +466,7 @@
                                 <form method="POST" action="{{ route('reviews.update', $userReview) }}">
                                     @csrf @method('PATCH')
                                     <div class="mb-2">
-                                        <label class="block text-xs text-zinc-500 mb-1">Watch date</label>
+                                        <label class="block text-xs text-zinc-400 mb-1">Watch date</label>
                                         <input type="date" name="watched_at"
                                                value="{{ old('watched_at', $userReview->watched_at?->format('Y-m-d')) }}"
                                                class="input-dark text-sm">
@@ -466,7 +478,7 @@
                                     @error('body')
                                         <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                                     @enderror
-                                    <label class="flex items-center gap-2 mt-2 text-xs text-zinc-500 cursor-pointer select-none">
+                                    <label class="flex items-center gap-2 mt-2 text-xs text-zinc-400 cursor-pointer select-none">
                                         <input type="checkbox" name="has_spoilers" value="1"
                                                {{ old('has_spoilers', $userReview->has_spoilers) ? 'checked' : '' }}
                                                class="rounded border-zinc-700 bg-zinc-800 text-amber-400">
@@ -474,7 +486,7 @@
                                     </label>
                                     <div class="flex items-center gap-3 mt-2">
                                         <button type="submit" class="btn-amber px-4 py-1.5 text-sm">Update</button>
-                                        <button type="button" @click="editing = false" class="text-xs text-zinc-500 hover:text-zinc-400 transition underline">Cancel</button>
+                                        <button type="button" @click="editing = false" class="text-xs text-zinc-400 hover:text-zinc-200 transition underline">Cancel</button>
                                     </div>
                                 </form>
                                 <form method="POST" action="{{ route('reviews.destroy', $userReview) }}" class="mt-2">
@@ -494,7 +506,7 @@
                                     <form method="POST" action="{{ route('movies.review.store', $movie) }}">
                                         @csrf
                                         <div class="mb-2">
-                                            <label class="block text-xs text-zinc-500 mb-1">Watch date</label>
+                                            <label class="block text-xs text-zinc-400 mb-1">Watch date</label>
                                             <input type="date" name="watched_at"
                                                    value="{{ old('watched_at', now()->format('Y-m-d')) }}"
                                                    class="input-dark text-sm">
@@ -506,7 +518,7 @@
                                         @error('body')
                                             <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                                         @enderror
-                                        <label class="flex items-center gap-2 mt-2 text-xs text-zinc-500 cursor-pointer select-none">
+                                        <label class="flex items-center gap-2 mt-2 text-xs text-zinc-400 cursor-pointer select-none">
                                             <input type="checkbox" name="has_spoilers" value="1"
                                                    {{ old('has_spoilers') ? 'checked' : '' }}
                                                    class="rounded border-zinc-700 bg-zinc-800 text-amber-400">
@@ -514,7 +526,7 @@
                                         </label>
                                         <div class="flex items-center gap-3 mt-2">
                                             <button type="submit" class="btn-amber px-4 py-1.5 text-sm">Save</button>
-                                            <button type="button" @click="open = false" class="text-xs text-zinc-500 hover:text-zinc-400 transition underline">Cancel</button>
+                                            <button type="button" @click="open = false" class="text-xs text-zinc-400 hover:text-zinc-200 transition underline">Cancel</button>
                                         </div>
                                     </form>
                                 </div>
@@ -531,7 +543,7 @@
 
                             {{-- Empty state --}}
                             @if($reviews->isEmpty() && $userReviews->isEmpty())
-                            <div class="px-5 py-6 text-sm text-zinc-500">
+                            <div class="px-5 py-6 text-sm text-zinc-400">
                                 No reviews yet.
                                 @guest
                                     <a href="{{ route('login') }}" class="text-amber-400 hover:underline">Sign in</a> to write one.
@@ -540,7 +552,7 @@
                             @endif
 
                         </div>
-                    </div>
+                    </section>
                 </div>
 
             </div>
@@ -551,7 +563,7 @@
          MORE FROM THIS DIRECTOR
     ═══════════════════════════════════════════════════════════ --}}
     @if($moreByDirector->isNotEmpty())
-    <div class="border-t border-zinc-800 py-8">
+    <section aria-labelledby="more-by-director-heading" class="border-t border-zinc-800 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             @php
@@ -560,7 +572,7 @@
                     : 'This Director';
             @endphp
 
-            <h2 class="text-sm font-semibold text-zinc-100 mb-4">More from {{ $directorNames }}</h2>
+            <h2 id="more-by-director-heading" class="text-sm font-semibold text-zinc-100 mb-4">More from {{ $directorNames }}</h2>
 
             <div class="grid grid-cols-3 sm:grid-cols-6 gap-4">
                 @foreach($moreByDirector as $film)
@@ -569,7 +581,7 @@
             </div>
 
         </div>
-    </div>
+    </section>
     @endif
 
 </x-app-layout>

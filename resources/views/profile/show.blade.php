@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="$profileUser->name">
 
     <div class="py-10">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
@@ -53,22 +53,22 @@
 
                     {{-- Name + username --}}
                     <h1 class="text-2xl font-bold text-zinc-100 leading-tight">{{ $profileUser->name }}</h1>
-                    <p class="text-sm text-zinc-500 mt-0.5">&#64;{{ $profileUser->username }}</p>
+                    <p class="text-sm text-zinc-400 mt-0.5">&#64;{{ $profileUser->username }}</p>
 
                     {{-- Social counts + member since --}}
                     <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm">
                         <a href="{{ route('profile.followers', $profileUser->username) }}"
                            class="text-zinc-300 hover:text-amber-400 transition-colors">
                             <span class="font-semibold">{{ number_format($followerCount) }}</span>
-                            <span class="text-zinc-500">{{ Str::plural('follower', $followerCount) }}</span>
+                            <span class="text-zinc-400">{{ Str::plural('follower', $followerCount) }}</span>
                         </a>
                         <a href="{{ route('profile.following', $profileUser->username) }}"
                            class="text-zinc-300 hover:text-amber-400 transition-colors">
                             <span class="font-semibold">{{ number_format($followingCount) }}</span>
-                            <span class="text-zinc-500">following</span>
+                            <span class="text-zinc-400">following</span>
                         </a>
-                        <span class="text-zinc-600 hidden sm:inline">·</span>
-                        <span class="text-zinc-500 text-xs">Member since {{ $profileUser->created_at->format('M Y') }}</span>
+                        <span class="text-zinc-400 hidden sm:inline">·</span>
+                        <span class="text-zinc-400 text-xs">Member since {{ $profileUser->created_at->format('M Y') }}</span>
                     </div>
 
                     {{-- Activity stats --}}
@@ -76,15 +76,15 @@
                     <div class="flex flex-wrap gap-x-5 gap-y-2 mt-4">
                         <div class="text-center">
                             <div class="text-lg font-bold text-zinc-100">{{ number_format($totalRated) }}</div>
-                            <div class="text-xs text-zinc-500 uppercase tracking-wide">Rated</div>
+                            <div class="text-xs text-zinc-400 uppercase tracking-wide">Rated</div>
                         </div>
                         <div class="text-center">
                             <div class="text-lg font-bold text-zinc-100">{{ number_format($totalWatched) }}</div>
-                            <div class="text-xs text-zinc-500 uppercase tracking-wide">Watched</div>
+                            <div class="text-xs text-zinc-400 uppercase tracking-wide">Watched</div>
                         </div>
                         <div class="text-center">
                             <div class="text-lg font-bold text-zinc-100">{{ number_format($totalLogged) }}</div>
-                            <div class="text-xs text-zinc-500 uppercase tracking-wide">Logged</div>
+                            <div class="text-xs text-zinc-400 uppercase tracking-wide">Logged</div>
                         </div>
                     </div>
                     @endif
@@ -94,25 +94,25 @@
                     <div class="mt-6 -mx-6 border-t border-zinc-800">
                         <nav class="flex overflow-x-auto">
                             <a href="{{ route('profile.diary', $profileUser->username) }}"
-                               class="shrink-0 px-5 py-3 text-sm font-medium text-zinc-500 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-amber-400">
+                               class="shrink-0 px-5 py-3 text-sm font-medium text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-amber-400">
                                 Diary
                             </a>
                             <a href="{{ route('profile.watchlist', $profileUser->username) }}#want-to-watch"
-                               class="shrink-0 px-5 py-3 text-sm font-medium text-zinc-500 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-amber-400 flex items-center gap-1.5">
+                               class="shrink-0 px-5 py-3 text-sm font-medium text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-amber-400 flex items-center gap-1.5">
                                 Want to Watch
                                 @if($wantToWatchCount > 0)
-                                <span class="bg-zinc-800 text-zinc-500 text-xs px-1.5 py-0.5 rounded-full font-normal">{{ $wantToWatchCount }}</span>
+                                <span class="bg-zinc-800 text-zinc-400 text-xs px-1.5 py-0.5 rounded-full font-normal">{{ $wantToWatchCount }}</span>
                                 @endif
                             </a>
                             <a href="{{ route('profile.watchlist', $profileUser->username) }}#watched"
-                               class="shrink-0 px-5 py-3 text-sm font-medium text-zinc-500 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-amber-400 flex items-center gap-1.5">
+                               class="shrink-0 px-5 py-3 text-sm font-medium text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-amber-400 flex items-center gap-1.5">
                                 Watched
                                 @if($totalWatched > 0)
-                                <span class="bg-zinc-800 text-zinc-500 text-xs px-1.5 py-0.5 rounded-full font-normal">{{ $totalWatched }}</span>
+                                <span class="bg-zinc-800 text-zinc-400 text-xs px-1.5 py-0.5 rounded-full font-normal">{{ $totalWatched }}</span>
                                 @endif
                             </a>
                             <a href="{{ route('profile.lists', $profileUser->username) }}"
-                               class="shrink-0 px-5 py-3 text-sm font-medium text-zinc-500 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-amber-400">
+                               class="shrink-0 px-5 py-3 text-sm font-medium text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors border-b-2 border-transparent hover:border-amber-400">
                                 Lists
                             </a>
                         </nav>
@@ -121,15 +121,15 @@
 
                     {{-- Private profile message --}}
                     @if($profileUser->profile_private)
-                    <div class="mt-6 pt-6 border-t border-zinc-800 text-sm text-zinc-500 italic">
+                    <div class="mt-6 pt-6 border-t border-zinc-800 text-sm text-zinc-400 italic">
                         This profile is private.
                     </div>
                     @endif
 
                     {{-- Recently rated --}}
                     @if($recentRatings->isNotEmpty())
-                    <div class="mt-6 pt-6 border-t border-zinc-800">
-                        <h2 class="text-sm font-semibold text-zinc-300 mb-3">Recently Rated</h2>
+                    <section aria-labelledby="profile-recently-rated-heading" class="mt-6 pt-6 border-t border-zinc-800">
+                        <h2 id="profile-recently-rated-heading" class="text-sm font-semibold text-zinc-300 mb-3">Recently Rated</h2>
                         <div class="grid grid-cols-6 gap-2">
                             @foreach($recentRatings as $rating)
                             <a href="{{ $rating->movie->publicUrl() }}" class="group">
@@ -139,7 +139,7 @@
                                              class="w-full h-full object-cover group-hover:opacity-90 transition-opacity">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center p-1">
-                                            <span class="text-xs text-zinc-500 text-center leading-snug">{{ $rating->movie->title }}</span>
+                                            <span class="text-xs text-zinc-400 text-center leading-snug">{{ $rating->movie->title }}</span>
                                         </div>
                                     @endif
                                 </div>
@@ -151,13 +151,13 @@
                             </a>
                             @endforeach
                         </div>
-                    </div>
+                    </section>
                     @endif
 
                     {{-- Recent reviews --}}
                     @if($recentReviews->isNotEmpty())
-                    <div class="mt-6 pt-6 border-t border-zinc-800">
-                        <h2 class="text-sm font-semibold text-zinc-300 mb-3">Recent Reviews</h2>
+                    <section aria-labelledby="profile-recent-reviews-heading" class="mt-6 pt-6 border-t border-zinc-800">
+                        <h2 id="profile-recent-reviews-heading" class="text-sm font-semibold text-zinc-300 mb-3">Recent Reviews</h2>
                         <div class="space-y-5">
                             @foreach($recentReviews as $review)
                             <div class="flex gap-3">
@@ -180,7 +180,7 @@
                                             <x-star-display :value="$rating->stars" class="text-xs" />
                                         @endif
                                         @if($review->watched_at)
-                                            <span class="text-xs text-zinc-500">{{ $review->watched_at->format('j M Y') }}</span>
+                                            <span class="text-xs text-zinc-400">{{ $review->watched_at->format('j M Y') }}</span>
                                         @endif
                                     </div>
                                     <p class="text-sm text-zinc-300 mt-1 leading-relaxed line-clamp-3">{{ $review->body }}</p>
@@ -188,7 +188,7 @@
                             </div>
                             @endforeach
                         </div>
-                    </div>
+                    </section>
                     @endif
 
                 </div>

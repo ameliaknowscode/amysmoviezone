@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="My Watchlist">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-zinc-100 leading-tight">
             My Watchlist
@@ -17,7 +17,7 @@
 
                     @if($wantToWatch->isEmpty())
                         <div class="py-6 text-center">
-                            <p class="text-sm text-zinc-500 mb-3">Nothing here yet. Browse movies and add them to your watchlist.</p>
+                            <p class="text-sm text-zinc-400 mb-3">Nothing here yet. Browse movies and add them to your watchlist.</p>
                             <a href="{{ route('movies.browse') }}"
                                class="inline-block text-sm font-semibold text-amber-400 hover:text-amber-300 underline underline-offset-2">
                                 Browse movies
@@ -32,7 +32,7 @@
                                     <img src="{{ $entry->movie->posterUrl() }}" alt="{{ $entry->movie->title }}"
                                         class="h-[110px] w-[75px] object-cover rounded shrink-0 shadow-sm">
                                 @else
-                                    <div class="h-[110px] w-[75px] rounded bg-zinc-700 shrink-0 flex items-center justify-center text-zinc-500 text-xs">
+                                    <div class="h-[110px] w-[75px] rounded bg-zinc-700 shrink-0 flex items-center justify-center text-zinc-400 text-xs">
                                         &#127902;
                                     </div>
                                 @endif
@@ -40,13 +40,13 @@
                                     <a href="{{ route('movies.show', $entry->movie) }}" class="text-sm font-medium text-amber-400 hover:underline">
                                         {{ $entry->movie->title }}
                                     </a>
-                                    <p class="text-xs text-zinc-500">{{ $entry->movie->release_year }}</p>
+                                    <p class="text-xs text-zinc-400">{{ $entry->movie->release_year }}</p>
                                 </div>
                                 <form method="POST" action="{{ route('movies.watchlist.destroy', $entry->movie) }}"
                                       onsubmit="return confirm('Remove this film from your watchlist?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-xs text-zinc-500 hover:text-red-500 transition"
+                                    <button type="submit" class="text-xs text-zinc-400 hover:text-red-500 transition"
                                             title="Remove" aria-label="Remove {{ $entry->movie->title }} from watchlist">&#10005;</button>
                                 </form>
                             </li>
@@ -65,7 +65,7 @@
 
                     @if($watched->isEmpty())
                         <div class="py-6 text-center">
-                            <p class="text-sm text-zinc-500 mb-3">Nothing here yet. Mark movies as watched from their pages.</p>
+                            <p class="text-sm text-zinc-400 mb-3">Nothing here yet. Mark movies as watched from their pages.</p>
                             <a href="{{ route('movies.browse') }}"
                                class="inline-block text-sm font-semibold text-amber-400 hover:text-amber-300 underline underline-offset-2">
                                 Browse movies
@@ -81,7 +81,7 @@
                                     <img src="{{ $entry->movie->posterUrl() }}" alt="{{ $entry->movie->title }}"
                                         class="h-[110px] w-[75px] object-cover rounded shrink-0 shadow-sm">
                                 @else
-                                    <div class="h-[110px] w-[75px] rounded bg-zinc-700 shrink-0 flex items-center justify-center text-zinc-500 text-xs">
+                                    <div class="h-[110px] w-[75px] rounded bg-zinc-700 shrink-0 flex items-center justify-center text-zinc-400 text-xs">
                                         &#127902;
                                     </div>
                                 @endif
@@ -89,9 +89,9 @@
                                     <a href="{{ route('movies.show', $entry->movie) }}" class="text-sm font-medium text-amber-400 hover:underline">
                                         {{ $entry->movie->title }}
                                     </a>
-                                    <p class="text-xs text-zinc-500">{{ $entry->movie->release_year }}</p>
+                                    <p class="text-xs text-zinc-400">{{ $entry->movie->release_year }}</p>
                                     @if($entry->watched_at)
-                                        <p class="text-xs text-zinc-500 mt-0.5">Watched {{ $entry->watched_at->format('j M Y') }}</p>
+                                        <p class="text-xs text-zinc-400 mt-0.5">Watched {{ $entry->watched_at->format('j M Y') }}</p>
                                     @endif
                                     @if($rating)
                                     <div class="flex items-center gap-2 mt-1">
@@ -108,7 +108,7 @@
                                       onsubmit="return confirm('Remove this film from your watchlist?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-xs text-zinc-500 hover:text-red-500 transition"
+                                    <button type="submit" class="text-xs text-zinc-400 hover:text-red-500 transition"
                                             title="Remove" aria-label="Remove {{ $entry->movie->title }} from watchlist">&#10005;</button>
                                 </form>
                             </li>

@@ -1,8 +1,8 @@
-<x-app-layout>
+<x-app-layout title="Home">
 
     {{-- Cinematic hero --}}
     @if($featuredMovie)
-    <div class="relative overflow-hidden min-h-[420px] flex items-center">
+    <section aria-label="Featured film" class="relative overflow-hidden min-h-[420px] flex items-center">
         {{-- Blurred poster backdrop --}}
         @if($featuredMovie->posterUrl())
         <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
@@ -23,7 +23,7 @@
                         {{ $featuredMovie->title }}
                     </h1>
                     @if($featuredMovie->release_year)
-                    <p class="text-zinc-500 text-sm mt-2">{{ $featuredMovie->release_year }}</p>
+                    <p class="text-zinc-400 text-sm mt-2">{{ $featuredMovie->release_year }}</p>
                     @endif
                     @if($featuredMovie->genres->isNotEmpty())
                     <div class="flex flex-wrap gap-2 mt-3">
@@ -55,7 +55,7 @@
 
             </div>
         </div>
-    </div>
+    </section>
     @endif
 
     <div class="py-12">
@@ -65,41 +65,50 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div class="bg-zinc-900 rounded-lg p-6 text-center">
                     <div class="text-3xl font-bold text-zinc-100">{{ number_format($movieCount) }}</div>
-                    <div class="text-sm text-zinc-500 mt-1">Movies</div>
+                    <div class="text-sm text-zinc-400 mt-1">Movies</div>
                 </div>
                 <div class="bg-zinc-900 rounded-lg p-6 text-center">
                     <div class="text-3xl font-bold text-zinc-100">{{ number_format($peopleCount) }}</div>
-                    <div class="text-sm text-zinc-500 mt-1">People</div>
+                    <div class="text-sm text-zinc-400 mt-1">People</div>
                 </div>
                 <div class="bg-zinc-900 rounded-lg p-6 text-center">
                     <div class="text-3xl font-bold text-zinc-100">{{ number_format($creditCount) }}</div>
-                    <div class="text-sm text-zinc-500 mt-1">Credits</div>
+                    <div class="text-sm text-zinc-400 mt-1">Credits</div>
                 </div>
                 <a href="{{ route('users.index') }}" class="bg-zinc-900 rounded-lg p-6 text-center hover:bg-zinc-800 transition-colors block">
                     <div class="text-3xl font-bold text-zinc-100">{{ number_format($memberCount) }}</div>
-                    <div class="text-sm text-zinc-500 mt-1">Members</div>
+                    <div class="text-sm text-zinc-400 mt-1">Members</div>
                 </a>
             </div>
 
             {{-- Recently Added --}}
             @if($recentMovies->isNotEmpty())
-            <div>
-                <h2 class="text-lg font-semibold text-zinc-100 mb-4">Recently Added</h2>
+            <section aria-labelledby="recently-added-heading">
+                <h2 id="recently-added-heading" class="text-lg font-semibold text-zinc-100 mb-4">Recently Added</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     @foreach($recentMovies as $movie)
                     <x-movie-poster-card :movie="$movie" />
                     @endforeach
                 </div>
-            </div>
+            </section>
             @endif
 
             {{-- Activity --}}
-            <div x-data="{ tab: '{{ auth()->check() && $followingRatings->isNotEmpty() ? 'following' : 'all' }}' }">
+            <section aria-labelledby="activity-heading" x-data="{ tab: '{{ auth()->check() && $followingRatings->isNotEmpty() ? 'following' : 'all' }}' }">
+                <h2 id="activity-heading" class="sr-only">Recent activity</h2>
 
-                <div class="flex items-center gap-2 mb-4">
+                <div role="tablist" aria-label="Recent activity" class="flex items-center gap-2 mb-4"
+                     @keydown.right.prevent="$event.target.nextElementSibling?.focus()"
+                     @keydown.left.prevent="$event.target.previousElementSibling?.focus()">
                     @auth
                         @if($followingRatings->isNotEmpty())
                         <button @click="tab = 'following'"
+                                @focus="tab = 'following'"
+                                role="tab"
+                                id="activity-tab-following"
+                                aria-controls="activity-panel-following"
+                                :aria-selected="tab === 'following' ? 'true' : 'false'"
+                                :tabindex="tab === 'following' ? '0' : '-1'"
                                 :class="tab === 'following' ? 'bg-amber-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200'"
                                 class="px-3 py-1.5 rounded-md text-sm font-semibold transition-colors">
                             Following
@@ -107,6 +116,12 @@
                         @endif
                     @endauth
                     <button @click="tab = 'all'"
+                            @focus="tab = 'all'"
+                            role="tab"
+                            id="activity-tab-all"
+                            aria-controls="activity-panel-all"
+                            :aria-selected="tab === 'all' ? 'true' : 'false'"
+                            :tabindex="tab === 'all' ? '0' : '-1'"
                             :class="tab === 'all' ? 'bg-amber-500 text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200'"
                             class="px-3 py-1.5 rounded-md text-sm font-semibold transition-colors">
                         All Activity
@@ -115,7 +130,11 @@
 
                 @auth
                     @if($followingRatings->isNotEmpty())
-                    <div x-show="tab === 'following'">
+                    <div x-show="tab === 'following'"
+                         role="tabpanel"
+                         id="activity-panel-following"
+                         aria-labelledby="activity-tab-following"
+                         tabindex="0">
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             @foreach($followingRatings as $rating)
                             @include('partials.rating-card', ['rating' => $rating])
@@ -125,7 +144,11 @@
                     @endif
                 @endauth
 
-                <div x-show="tab === 'all'">
+                <div x-show="tab === 'all'"
+                     role="tabpanel"
+                     id="activity-panel-all"
+                     aria-labelledby="activity-tab-all"
+                     tabindex="0">
                     @if($recentRatings->isNotEmpty())
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         @foreach($recentRatings as $rating)
@@ -133,16 +156,16 @@
                         @endforeach
                     </div>
                     @else
-                        <p class="text-sm text-zinc-500">No ratings yet.</p>
+                        <p class="text-sm text-zinc-400">No ratings yet.</p>
                     @endif
                 </div>
 
-            </div>
+            </section>
 
             {{-- Recent Reviews --}}
             @if($recentReviews->isNotEmpty())
-            <div>
-                <h2 class="text-lg font-semibold text-zinc-100 mb-4">Recent Reviews</h2>
+            <section aria-labelledby="recent-reviews-heading">
+                <h2 id="recent-reviews-heading" class="text-lg font-semibold text-zinc-100 mb-4">Recent Reviews</h2>
                 <div class="space-y-3">
                     @foreach($recentReviews as $review)
                     <div class="bg-zinc-900 rounded-lg p-5 flex gap-4">
@@ -160,19 +183,19 @@
                                    class="text-sm font-medium text-zinc-200 hover:text-amber-400 transition-colors">
                                     {{ $review->user->name }}
                                 </a>
-                                <span class="text-xs text-zinc-600">reviewed</span>
+                                <span class="text-xs text-zinc-400">reviewed</span>
                                 <a href="{{ $review->movie->publicUrl() }}"
                                    class="text-sm font-medium text-amber-400 hover:underline truncate">
                                     {{ $review->movie->title }}
                                 </a>
-                                <span class="text-xs text-zinc-600 ml-auto">{{ $review->created_at->diffForHumans() }}</span>
+                                <span class="text-xs text-zinc-400 ml-auto">{{ $review->created_at->diffForHumans() }}</span>
                             </div>
                             <p class="text-sm text-zinc-400 mt-1 leading-relaxed line-clamp-2">{{ $review->body }}</p>
                         </div>
                     </div>
                     @endforeach
                 </div>
-            </div>
+            </section>
             @endif
 
         </div>

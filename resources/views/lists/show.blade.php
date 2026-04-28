@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="$movieList->name">
     <x-slot name="header">
         <div class="flex items-center justify-between gap-4">
             <div class="min-w-0">
@@ -8,10 +8,10 @@
                         <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">Ranked</span>
                     @endif
                     @if(!$movieList->is_public)
-                        <span class="text-xs bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full font-medium">Private</span>
+                        <span class="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full font-medium">Private</span>
                     @endif
                 </div>
-                <p class="text-sm text-zinc-500 mt-0.5">
+                <p class="text-sm text-zinc-400 mt-0.5">
                     by <a href="{{ route('profile.show', $movieList->user->username) }}" class="hover:text-amber-400 transition-colors">{{ $movieList->user->name }}</a>
                     · {{ $movieList->items->count() }} {{ Str::plural('film', $movieList->items->count()) }}
                     @if($followerCount > 0)
@@ -60,7 +60,7 @@
             @endif
 
             @if($movieList->items->isEmpty())
-                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-500 text-sm">
+                <div class="bg-zinc-900 sm:rounded-lg p-10 text-center text-zinc-400 text-sm">
                     No films in this list yet.
                 </div>
             @else
@@ -71,7 +71,7 @@
 
                             {{-- Rank / position --}}
                             @if($movieList->is_ranked)
-                                <span class="w-7 text-center text-sm font-bold text-zinc-500 shrink-0">{{ $loop->iteration }}</span>
+                                <span class="w-7 text-center text-sm font-bold text-zinc-400 shrink-0">{{ $loop->iteration }}</span>
                             @endif
 
                             {{-- Poster --}}
@@ -88,7 +88,7 @@
                                     {{ $item->movie->title }}
                                 </p>
                                 @if($item->movie->release_year)
-                                    <p class="text-sm text-zinc-500">{{ $item->movie->release_year }}</p>
+                                    <p class="text-sm text-zinc-400">{{ $item->movie->release_year }}</p>
                                 @endif
                             </div>
                         </a>
