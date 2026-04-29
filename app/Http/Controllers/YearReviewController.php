@@ -106,6 +106,68 @@ class YearReviewController extends Controller
             ->limit(5)
             ->get();
 
+        // Directors Discovered: first-ever watch of a director's work in this year.
+        // A director qualifies if they appear in this year's reviews but in no
+        // earlier year's reviews. We attach the introducing film (the earliest
+        // film of theirs the user watched in this year) via a second query.
+        $directorsDiscovered = DB::table('reviews')
+            ->join('credits', 'credits.movie_id', '=', 'reviews.movie_id')
+            ->join('types', function ($j) {
+                $j->on('types.id', '=', 'credits.type_id')->where('types.name', 'Director');
+            })
+            ->join('people', 'people.id', '=', 'credits.person_id')
+            ->where('reviews.user_id', $userId)
+            ->whereYear('reviews.watched_at', $year)
+            ->whereNotIn('people.id', function ($sub) use ($userId, $year) {
+                $sub->from('reviews as r2')
+                    ->join('credits as c2', 'c2.movie_id', '=', 'r2.movie_id')
+                    ->join('types as t2', function ($j) {
+                        $j->on('t2.id', '=', 'c2.type_id')->where('t2.name', 'Director');
+                    })
+                    ->where('r2.user_id', $userId)
+                    ->whereYear('r2.watched_at', '<', $year)
+                    ->select('c2.person_id');
+            })
+            ->select('people.id', 'people.name', 'people.slug')
+            ->selectRaw('COUNT(DISTINCT reviews.movie_id) AS count')
+            ->selectRaw('MIN(reviews.watched_at) AS first_watched')
+            ->groupBy('people.id', 'people.name', 'people.slug')
+            ->orderBy('first_watched')
+            ->orderBy('people.name')
+            ->limit(10)
+            ->get();
+
+        if ($directorsDiscovered->isNotEmpty()) {
+            $discoveredIds = $directorsDiscovered->pluck('id');
+
+            $firstFilms = DB::table('reviews')
+                ->join('credits', 'credits.movie_id', '=', 'reviews.movie_id')
+                ->join('types', function ($j) {
+                    $j->on('types.id', '=', 'credits.type_id')->where('types.name', 'Director');
+                })
+                ->join('movies', 'movies.id', '=', 'reviews.movie_id')
+                ->where('reviews.user_id', $userId)
+                ->whereYear('reviews.watched_at', $year)
+                ->whereIn('credits.person_id', $discoveredIds)
+                ->select(
+                    'credits.person_id',
+                    'movies.title',
+                    'movies.slug',
+                    'movies.poster',
+                    'movies.release_year',
+                    'reviews.watched_at',
+                )
+                ->orderBy('reviews.watched_at')
+                ->orderBy('movies.title')
+                ->get()
+                ->unique('person_id')
+                ->keyBy('person_id');
+
+            foreach ($directorsDiscovered as $director) {
+                $director->first_film = $firstFilms->get($director->id);
+            }
+        }
+
         $byDecade = Review::where('reviews.user_id', $userId)
             ->whereYear('reviews.watched_at', $year)
             ->join('movies', 'movies.id', '=', 'reviews.movie_id')
@@ -141,6 +203,7 @@ class YearReviewController extends Controller
             'byMonth',
             'byGenre',
             'byDirector',
+            'directorsDiscovered',
             'byDecade',
             'ratingDist',
         ));
