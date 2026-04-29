@@ -83,6 +83,20 @@ php artisan queue:work
 
 For local development it's simpler to set `QUEUE_CONNECTION=sync` in `.env` so notifications fire immediately without a worker.
 
+## Testing
+
+The full test suite runs against an in-memory SQLite database, so no separate test database setup is required.
+
+```bash
+php artisan test
+```
+
+To run a single test file:
+
+```bash
+php artisan test --filter=YearReviewControllerTest
+```
+
 ## License
 
 MIT
