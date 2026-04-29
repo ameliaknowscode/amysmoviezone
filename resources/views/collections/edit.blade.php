@@ -45,7 +45,7 @@
             </div>
 
             {{-- Add a film (search) --}}
-            <div class="card p-6"
+            <div class="card overflow-visible p-6"
                  x-data="collectionMovieSearch('{{ route('admin.collections.movies.search', $collection) }}')">
                 <h3 class="text-sm font-semibold text-zinc-300 mb-4">Add a Film</h3>
 
@@ -131,6 +131,4 @@
         </div>
     </div>
 
-    {{-- SortableJS (loaded via CDN, same approach as lists/edit) --}}
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
 </x-app-layout>
