@@ -219,6 +219,58 @@
             </div>
             @endif
 
+            {{-- Directors Discovered --}}
+            @if($directorsDiscovered->isNotEmpty())
+            <div class="card">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-zinc-200">Directors Discovered</h3>
+                    <p class="text-xs text-zinc-400 mt-1 mb-5">First-ever watch of their work in {{ $year }}</p>
+                    <ul class="divide-y divide-zinc-800">
+                        @foreach($directorsDiscovered as $director)
+                        <li class="py-3 flex items-center gap-4">
+                            @if($director->first_film)
+                                <a href="{{ route('movies.public', $director->first_film->slug) }}"
+                                   class="shrink-0"
+                                   aria-label="{{ $director->first_film->title }}">
+                                    @if($director->first_film->poster)
+                                        <img src="{{ asset('storage/' . $director->first_film->poster) }}"
+                                             alt=""
+                                             class="w-10 h-14 object-cover rounded shadow-sm">
+                                    @else
+                                        <div class="w-10 h-14 bg-zinc-800 rounded flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 16h4m10 0h4"/>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </a>
+                            @endif
+                            <div class="flex-1 min-w-0">
+                                <a href="{{ route('people.show', $director->slug) }}"
+                                   class="text-sm font-semibold text-amber-400 hover:underline truncate block">
+                                    {{ $director->name }}
+                                </a>
+                                @if($director->first_film)
+                                    <div class="text-xs text-zinc-400 truncate">
+                                        via
+                                        <a href="{{ route('movies.public', $director->first_film->slug) }}"
+                                           class="hover:text-zinc-300">{{ $director->first_film->title }}</a>
+                                        @if($director->first_film->release_year)
+                                            <span>({{ $director->first_film->release_year }})</span>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                            @if($director->count > 1)
+                                <span class="text-xs text-zinc-400 shrink-0">{{ $director->count }} films</span>
+                            @endif
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+            @endif
+
             {{-- Rating Distribution --}}
             @if($ratingDist->isNotEmpty())
             @php $maxRatingCount = $ratingDist->max('count'); @endphp
