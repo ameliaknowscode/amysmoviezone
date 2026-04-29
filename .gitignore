@@ -23,3 +23,9 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 *.csv
+
+# Local-only utility scripts for building Director Connections filmography data
+/clean-credits.php
+/clean-filmography.php
+/format-credits.php
+/make-credits-csvs.php
