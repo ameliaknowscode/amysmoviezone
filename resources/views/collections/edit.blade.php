@@ -45,7 +45,7 @@
             </div>
 
             {{-- Add a film (search) --}}
-            <div class="card p-6"
+            <div class="card overflow-visible p-6"
                  x-data="collectionMovieSearch('{{ route('admin.collections.movies.search', $collection) }}')">
                 <h3 class="text-sm font-semibold text-zinc-300 mb-4">Add a Film</h3>
 
