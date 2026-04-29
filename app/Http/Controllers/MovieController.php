@@ -74,7 +74,7 @@ class MovieController extends Controller
 
         SyncCredits::for($movie, $request->input('credits', []));
         $movie->genres()->sync($validated['genres'] ?? []);
-        $movie->collections()->sync($request->input('collections', []));
+        $movie->syncCollections($request->input('collections', []));
         Cache::forget('movies.release_years');
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie added successfully.');
@@ -132,7 +132,7 @@ class MovieController extends Controller
 
         SyncCredits::for($movie, $request->input('credits', []));
         $movie->genres()->sync($validated['genres'] ?? []);
-        $movie->collections()->sync($request->input('collections', []));
+        $movie->syncCollections($request->input('collections', []));
         Cache::forget('movies.release_years');
 
         return redirect()->route('admin.movies.index')->with('success', 'Movie updated successfully.');
