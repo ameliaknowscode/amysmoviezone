@@ -214,6 +214,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/collections/{collection}/edit', [CollectionController::class, 'edit'])->name('collections.edit');
         Route::patch('/collections/{collection}', [CollectionController::class, 'update'])->name('collections.update');
         Route::delete('/collections/{collection}', [CollectionController::class, 'destroy'])->name('collections.destroy');
+        Route::get('/collections/{collection}/movies/search', [CollectionController::class, 'searchMovies'])->name('collections.movies.search');
+        Route::post('/collections/{collection}/movies', [CollectionController::class, 'attachMovie'])->name('collections.movies.attach');
+        Route::delete('/collections/{collection}/movies/{movie}', [CollectionController::class, 'detachMovie'])->name('collections.movies.detach');
+        Route::post('/collections/{collection}/reorder', [CollectionController::class, 'reorder'])->name('collections.reorder');
 
         Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
         Route::get('/genres/import', [GenreImportController::class, 'create'])->name('genres.import');
