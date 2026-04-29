@@ -19,6 +19,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "sortablejs": "^1.15.7",
         "tom-select": "^2.5.2"
     }
 }

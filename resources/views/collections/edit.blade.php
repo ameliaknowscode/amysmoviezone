@@ -131,6 +131,4 @@
         </div>
     </div>
 
-    {{-- SortableJS (loaded via CDN, same approach as lists/edit) --}}
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
 </x-app-layout>

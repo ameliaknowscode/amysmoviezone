@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import Sortable from 'sortablejs';
 
 Alpine.data('collectionReorder', (reorderUrl) => ({
     init() {

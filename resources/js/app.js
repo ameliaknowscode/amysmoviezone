@@ -8,6 +8,7 @@ import './credits-manager';
 import './director-compare';
 import './star-rating';
 import './collection-edit';
+import './list-edit';
 
 Alpine.start();
 
