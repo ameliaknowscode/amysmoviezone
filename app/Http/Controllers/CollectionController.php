@@ -129,7 +129,7 @@ class CollectionController extends Controller
     public function publicIndex()
     {
         $collections = Collection::withCount('movies')
-            ->having('movies_count', '>', 0)
+            ->whereHas('movies')
             ->orderBy('name')
             ->get();
 
