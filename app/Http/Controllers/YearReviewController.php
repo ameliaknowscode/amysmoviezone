@@ -13,13 +13,12 @@ class YearReviewController extends Controller
     {
         $userId = $request->user()->id;
 
-        $latestYear = Review::where('user_id', $userId)
+        $latestWatched = Review::where('user_id', $userId)
             ->whereNotNull('watched_at')
-            ->selectRaw('YEAR(watched_at) as year')
-            ->orderByDesc('year')
-            ->value('year');
+            ->orderByDesc('watched_at')
+            ->value('watched_at');
 
-        return redirect()->route('year-review.show', $latestYear ?? now()->year);
+        return redirect()->route('year-review.show', $latestWatched?->year ?? now()->year);
     }
 
     public function show(Request $request, int $year): View
@@ -29,10 +28,11 @@ class YearReviewController extends Controller
 
         $availableYears = Review::where('user_id', $userId)
             ->whereNotNull('watched_at')
-            ->selectRaw('YEAR(watched_at) as year')
-            ->distinct()
-            ->orderBy('year')
-            ->pluck('year');
+            ->orderBy('watched_at')
+            ->pluck('watched_at')
+            ->map(fn ($d) => $d->year)
+            ->unique()
+            ->values();
 
         $totalWatched = $user->reviews()
             ->whereYear('watched_at', $year)
