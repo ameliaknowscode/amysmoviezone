@@ -124,38 +124,4 @@
         </div>
     </div>
 
-    {{-- SortableJS --}}
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('listReorder', (reorderUrl) => ({
-                init() {
-                    const el = document.getElementById('sortable-list');
-                    if (!el) return;
-
-                    Sortable.create(el, {
-                        animation: 150,
-                        handle: 'li',
-                        onEnd: () => {
-                            const order = [...el.querySelectorAll('li[data-id]')].map(li => li.dataset.id);
-
-                            // Update rank numbers if ranked
-                            el.querySelectorAll('.rank-number').forEach((span, i) => {
-                                span.textContent = i + 1;
-                            });
-
-                            fetch(reorderUrl, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                },
-                                body: JSON.stringify({ order }),
-                            });
-                        },
-                    });
-                },
-            }));
-        });
-    </script>
 </x-app-layout>
