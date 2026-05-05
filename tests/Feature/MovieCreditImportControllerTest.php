@@ -121,7 +121,7 @@ class MovieCreditImportControllerTest extends TestCase
         $this->assertDatabaseHas('credits', ['movie_id' => $movie->id, 'character' => null]);
     }
 
-    public function test_unknown_type_is_created_automatically(): void
+    public function test_unknown_type_is_rejected_as_row_error(): void
     {
         $user  = User::factory()->admin()->create();
         $movie = Movie::factory()->create();
@@ -132,9 +132,30 @@ class MovieCreditImportControllerTest extends TestCase
         $this->actingAs($user)
             ->post(route('admin.movies.credits.import.store', $movie), ['file' => $file])
             ->assertOk()
-            ->assertSee('1 credit imported successfully');
+            ->assertSee('Unknown type "Choreographer"');
 
-        $this->assertDatabaseHas('types', ['name' => 'Choreographer']);
+        $this->assertDatabaseMissing('types', ['name' => 'Choreographer']);
+        $this->assertSame(0, Credit::where('movie_id', $movie->id)->count());
+    }
+
+    public function test_unknown_type_in_pipe_list_skips_only_that_segment(): void
+    {
+        $user  = User::factory()->admin()->create();
+        $movie = Movie::factory()->create();
+        Person::factory()->create(['name' => 'Keanu Reeves']);
+        Type::firstOrCreate(['name' => 'Actor'], ['is_crew' => false]);
+
+        $csv  = "person_name,type,character\nKeanu Reeves,Actor|Choreographer,Neo\n";
+        $file = UploadedFile::fake()->createWithContent('credits.csv', $csv);
+
+        $this->actingAs($user)
+            ->post(route('admin.movies.credits.import.store', $movie), ['file' => $file])
+            ->assertOk()
+            ->assertSee('1 credit imported successfully')
+            ->assertSee('Unknown type "Choreographer"');
+
+        $this->assertDatabaseHas('credits', ['movie_id' => $movie->id, 'character' => 'Neo']);
+        $this->assertDatabaseMissing('types', ['name' => 'Choreographer']);
     }
 
     // -----------------------------------------------------------------------
