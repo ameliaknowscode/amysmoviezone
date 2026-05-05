@@ -125,7 +125,7 @@ class PersonCreditImportControllerTest extends TestCase
     // Row-level errors
     // -----------------------------------------------------------------------
 
-    public function test_row_with_unknown_type_is_created_automatically(): void
+    public function test_row_with_unknown_type_is_rejected(): void
     {
         $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
@@ -135,10 +135,11 @@ class PersonCreditImportControllerTest extends TestCase
 
         $this->actingAs($user)
             ->post(route('admin.people.credits.import.store', $person), ['file' => $file])
-            ->assertOk()->assertSee('1 credit imported successfully');
+            ->assertOk()
+            ->assertSee('Unknown type "NewType"');
 
-        $this->assertDatabaseHas('types', ['name' => 'NewType']);
-        $this->assertSame(1, Credit::where('person_id', $person->id)->count());
+        $this->assertDatabaseMissing('types', ['name' => 'NewType']);
+        $this->assertSame(0, Credit::where('person_id', $person->id)->count());
     }
 
     public function test_row_with_empty_movie_title_is_skipped(): void
@@ -261,7 +262,7 @@ class PersonCreditImportControllerTest extends TestCase
         $this->assertDatabaseHas('credits', ['person_id' => $person->id, 'character' => null]);
     }
 
-    public function test_pipe_separated_row_creates_unknown_type_automatically(): void
+    public function test_pipe_separated_row_skips_unknown_type_segment(): void
     {
         $user   = User::factory()->admin()->create();
         $person = Person::factory()->create();
@@ -273,10 +274,12 @@ class PersonCreditImportControllerTest extends TestCase
 
         $this->actingAs($user)
             ->post(route('admin.people.credits.import.store', $person), ['file' => $file])
-            ->assertOk()->assertSee('2 credits imported successfully');
+            ->assertOk()
+            ->assertSee('1 credit imported successfully')
+            ->assertSee('Unknown type "NewType"');
 
-        $this->assertDatabaseHas('types', ['name' => 'NewType']);
-        $this->assertSame(2, Credit::where('person_id', $person->id)->count());
+        $this->assertDatabaseMissing('types', ['name' => 'NewType']);
+        $this->assertSame(1, Credit::where('person_id', $person->id)->count());
     }
 
     // -----------------------------------------------------------------------
