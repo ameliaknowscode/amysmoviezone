@@ -83,10 +83,16 @@ class PersonCreditImportController extends Controller
                     continue;
                 }
 
-                $key  = strtolower($typeName);
-                $type = $typeCache[$key]
-                    ?? ($typeCache[$key] = Type::whereRaw('LOWER(name) = ?', [$key])->first()
-                        ?? Type::create(['name' => $typeName, 'slug' => Str::slug($typeName), 'is_crew' => false]));
+                $key = strtolower($typeName);
+                if (! array_key_exists($key, $typeCache)) {
+                    $typeCache[$key] = Type::whereRaw('LOWER(name) = ?', [$key])->first();
+                }
+                $type = $typeCache[$key];
+
+                if ($type === null) {
+                    $errors[] = ['row' => $row, 'movie' => $movieTitle, 'reason' => "Unknown type \"{$typeName}\". Add it under Admin → Types first."];
+                    continue;
+                }
 
                 // Only Actor-type credits receive a character value
                 $isActor   = strtolower($typeName) === 'actor';
