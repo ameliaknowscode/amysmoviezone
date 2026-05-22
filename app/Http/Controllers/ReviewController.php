@@ -21,13 +21,11 @@ class ReviewController extends Controller
 
         $userId = $request->user()->id;
 
-        $isRewatch = $movie->reviews()->where('user_id', $userId)->exists();
-
+        // is_rewatch is derived by ReviewObserver from chronology — don't pass it here.
         $movie->reviews()->create([
             'user_id'      => $userId,
             'body'         => $validated['body'] ?? null,
             'watched_at'   => $validated['watched_at'] ?? now()->toDateString(),
-            'is_rewatch'   => $isRewatch,
             'has_spoilers' => $request->boolean('has_spoilers'),
         ]);
 

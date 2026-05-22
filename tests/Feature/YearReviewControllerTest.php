@@ -155,10 +155,27 @@ class YearReviewControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->watch($user, $this->makeMovie(), '2025-01-10', ['is_rewatch' => true]);
-        $this->watch($user, $this->makeMovie(), '2025-02-10', ['is_rewatch' => true]);
-        $this->watch($user, $this->makeMovie(), '2025-03-10', ['is_rewatch' => false]);
-        $this->watch($user, $this->makeMovie(), '2024-04-10', ['is_rewatch' => true]); // out of year
+        // Each rewatch needs a prior watch of the same film so the observer
+        // can derive is_rewatch=true from chronology.
+        $movieA = $this->makeMovie();
+        $movieB = $this->makeMovie();
+        $movieC = $this->makeMovie();
+        $movieD = $this->makeMovie();
+
+        // movieA: rewatch in 2025 (counted)
+        $this->watch($user, $movieA, '2024-01-10');
+        $this->watch($user, $movieA, '2025-01-10');
+
+        // movieB: rewatch in 2025 (counted)
+        $this->watch($user, $movieB, '2024-02-10');
+        $this->watch($user, $movieB, '2025-02-10');
+
+        // movieC: first watch in 2025 (not counted)
+        $this->watch($user, $movieC, '2025-03-10');
+
+        // movieD: rewatch but out of year (not counted in 2025)
+        $this->watch($user, $movieD, '2023-04-10');
+        $this->watch($user, $movieD, '2024-04-10');
 
         $response = $this->actingAs($user)->get(route('year-review.show', 2025))->assertOk();
 
@@ -413,8 +430,8 @@ class YearReviewControllerTest extends TestCase
         $movie = $this->makeMovie(['title' => 'Same Film']);
         $this->attachDirector($movie, $dir);
 
-        $this->watch($user, $movie, '2025-02-10', ['is_rewatch' => false]);
-        $this->watch($user, $movie, '2025-08-10', ['is_rewatch' => true]); // rewatch same year
+        $this->watch($user, $movie, '2025-02-10');
+        $this->watch($user, $movie, '2025-08-10'); // observer marks this as the rewatch
 
         $response = $this->actingAs($user)->get(route('year-review.show', 2025))->assertOk();
 

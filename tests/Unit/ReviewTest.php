@@ -29,10 +29,23 @@ class ReviewTest extends TestCase
 
     public function test_is_rewatch_is_cast_to_boolean(): void
     {
-        $review = Review::factory()->create(['is_rewatch' => true]);
+        $user  = User::factory()->create();
+        $movie = Movie::factory()->create();
 
-        $this->assertIsBool($review->is_rewatch);
-        $this->assertTrue($review->is_rewatch);
+        Review::factory()->create([
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'watched_at' => '2025-01-01',
+        ]);
+
+        $rewatch = Review::factory()->create([
+            'user_id'    => $user->id,
+            'movie_id'   => $movie->id,
+            'watched_at' => '2025-06-01',
+        ]);
+
+        $this->assertIsBool($rewatch->is_rewatch);
+        $this->assertTrue($rewatch->is_rewatch);
     }
 
     public function test_is_rewatch_defaults_to_false(): void
