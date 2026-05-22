@@ -150,14 +150,14 @@ class UserSeeder extends Seeder
                     ]);
                 }
 
-                // Write a review for ~45% of films.
+                // Write a review for ~45% of films. is_rewatch is derived by
+                // ReviewObserver from chronology, so we don't set it here.
                 if (fake()->boolean(45)) {
                     Review::create([
                         'user_id'    => $user->id,
                         'movie_id'   => $movieId,
                         'body'       => fake()->optional(0.7)->paragraphs(fake()->numberBetween(1, 2), true),
                         'watched_at' => $date,
-                        'is_rewatch' => false,
                     ]);
                 }
 
@@ -179,7 +179,6 @@ class UserSeeder extends Seeder
                 'movie_id'   => $movieId,
                 'body'       => fake()->optional(0.5)->sentence(),
                 'watched_at' => $rewatchDate,
-                'is_rewatch' => true,
             ]);
         }
 
@@ -266,17 +265,16 @@ class UserSeeder extends Seeder
                 'movie_id'   => $movieId,
                 'body'       => fake()->optional(0.75)->paragraphs(fake()->numberBetween(1, 3), true),
                 'watched_at' => $watchedAt,
-                'is_rewatch' => false,
             ]);
 
-            // 20% chance of a rewatch entry for the same movie.
+            // 20% chance of a second entry for the same movie — the observer
+            // will derive is_rewatch from chronology.
             if (fake()->boolean(20)) {
                 Review::create([
                     'user_id'    => $user->id,
                     'movie_id'   => $movieId,
                     'body'       => fake()->optional(0.5)->paragraphs(1, true),
                     'watched_at' => fake()->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
-                    'is_rewatch' => true,
                 ]);
             }
         }
