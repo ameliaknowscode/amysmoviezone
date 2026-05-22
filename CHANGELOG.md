@@ -2,6 +2,22 @@
 
 All notable changes to Amy's Movie Zone are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] — 2026-05-22
+
+### Fixed
+
+- **Rewatch detection is now chronology-based.** Backdating a watch correctly flags it as the original (not the rewatch); deleting the first watch promotes the surviving entry to be the original; editing `watched_at` re-derives the flags across the (user, movie) group. Owned by a `ReviewObserver`; legacy data brought in line by a backfill migration.
+- **Credit CSV import no longer creates junk Type rows** from column-shifted TMDb-shaped exports. Unknown types produce a row-level error instead of silently joining the canonical list. Existing junk rows reassigned to "Actor" and removed.
+
+### Changed
+
+- **Public registration disabled.** New accounts now happen via admin invitation only.
+
+### Developer Experience
+
+- `DemoUserSeeder` — fixed-data seed for a screenshot-ready watch diary (`php artisan db:seed --class=DemoUserSeeder --force`). Idempotent; not auto-wired into `DatabaseSeeder`.
+- One-shot data-cleanup migrations: junk credit types removed; `reviews.is_rewatch` backfilled from chronology.
+
 ## [1.0.0] — 2026-04-29
 
 The initial public release.
