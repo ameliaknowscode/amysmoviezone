@@ -14,12 +14,13 @@ class ReviewFactory extends Factory
 {
     public function definition(): array
     {
+        // is_rewatch is derived by ReviewObserver from chronology — set up
+        // earlier sibling reviews in tests rather than overriding the flag.
         return [
             'user_id'    => User::factory(),
             'movie_id'   => Movie::factory(),
             'body'       => fake()->paragraph(),
             'watched_at' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
-            'is_rewatch' => false,
         ];
     }
 }
